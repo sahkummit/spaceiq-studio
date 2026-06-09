@@ -22,3 +22,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Temp development profiles & scripts
+chrome_profile/
+chrome_profile_console/
+scratch_copy_artifacts.php
