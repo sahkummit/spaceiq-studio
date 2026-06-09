@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $service->title . ' - Space IQ Design Studio')
+@section('title', $service->title . ' - Space IQ')
 @section('meta_description', $service->short_description)
 @section('og_image', $service->og_image ?? asset('img/social-share.png'))
 

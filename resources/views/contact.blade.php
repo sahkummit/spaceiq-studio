@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Contact Us - Space IQ Design Studio')
-@section('meta_description', 'Get in touch with Space IQ Design Studio to start your digital project.')
+@section('title', 'Contact Us - Space IQ')
+@section('meta_description', 'Get in touch with Space IQ to start your digital project.')
 
 @section('content')
 <!-- Header Section -->

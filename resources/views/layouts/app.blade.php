@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Space IQ Design Studio - Architectural Renderings')</title>
+    <title>@yield('title', 'Space IQ - Architectural Renderings')</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <meta name="description" content="@yield('meta_description', \App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'Hyper-realistic 4K renders that captivate clients.')">
     
     <!-- Open Graph SEO -->
-    <meta property="og:title" content="@yield('title', 'Space IQ Design Studio - Architectural Renderings')">
+    <meta property="og:title" content="@yield('title', 'Space IQ - Architectural Renderings')">
     <meta property="og:description" content="@yield('meta_description', 'High-Fidelity Renders. Professional Delivery. Zero Compromise.')">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request()->url() }}">

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $page->title . ' - Space IQ Design Studio')
+@section('title', $page->title . ' - Space IQ')
 @section('meta_description', $page->meta_description ?? 'View our ' . strtolower($page->title) . '.')
 
 @section('content')
