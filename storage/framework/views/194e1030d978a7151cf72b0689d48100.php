@@ -1,13 +1,11 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', $service->title . ' - Space IQ'); ?>
+<?php $__env->startSection('meta_description', $service->short_description); ?>
+<?php $__env->startSection('og_image', $service->og_image ?? asset('img/social-share.png')); ?>
 
-@section('title', $service->title . ' - Space IQ')
-@section('meta_description', $service->short_description)
-@section('og_image', $service->og_image ?? asset('img/social-share.png'))
-
-@if($service->slug === '360-views')
-@section('head')
-    <link rel="stylesheet" href="{{ asset('css/pannellum.css') }}"/>
-    <script src="{{ asset('js/pannellum.js') }}"></script>
+<?php if($service->slug === '360-views'): ?>
+<?php $__env->startSection('head'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/pannellum.css')); ?>"/>
+    <script src="<?php echo e(asset('js/pannellum.js')); ?>"></script>
     <style>
         .pnlm-container {
             background: #080e0e !important;
@@ -62,12 +60,12 @@
             opacity: 1;
         }
     </style>
-@endsection
-@endif
+<?php $__env->stopSection(); ?>
+<?php endif; ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-@php
+<?php
     $isExterior = $service->slug === 'exterior-renders';
     $isInterior = $service->slug === 'interior-renders';
     $isFloorPlans = $service->slug === 'floor-plans';
@@ -114,15 +112,15 @@
         $groupedMedia = collect();
         $lightboxImagesCollect = collect();
     }
-@endphp
+?>
 
 <div x-data="{ 
     lightboxOpen: false, 
     lightboxUrl: '', 
     lightboxTitle: '',
     lightboxIndex: 0,
-    lightboxImages: {{ json_encode($lightboxImagesCollect->values()->toArray()) }},
-    is360: {{ $service->slug === '360-views' ? 'true' : 'false' }},
+    lightboxImages: <?php echo e(json_encode($lightboxImagesCollect->values()->toArray())); ?>,
+    is360: <?php echo e($service->slug === '360-views' ? 'true' : 'false'); ?>,
     pannellumViewer: null,
     prevImage() {
         if (this.lightboxImages.length === 0) return;
@@ -168,23 +166,23 @@
 <!-- ── HERO ── -->
 <section class="relative flex flex-col justify-start overflow-hidden bg-brand-950 pb-0">
 
-    {{-- First portfolio image as blurred hero background --}}
-    @php $heroMedia = $service->media->sortBy('sort_order')->first(); @endphp
-    @if($heroMedia && $heroMedia->file_type !== 'video')
-    <div class="absolute inset-0 z-0" style="background-image:url('{{ parse_url(Storage::url($heroMedia->file_path), PHP_URL_PATH) }}');background-size:cover;background-position:center;filter:blur(8px) brightness(0.18);transform:scale(1.05);"></div>
-    @else
-    {{-- Background gradient fallback --}}
+    
+    <?php $heroMedia = $service->media->sortBy('sort_order')->first(); ?>
+    <?php if($heroMedia && $heroMedia->file_type !== 'video'): ?>
+    <div class="absolute inset-0 z-0" style="background-image:url('<?php echo e(parse_url(Storage::url($heroMedia->file_path), PHP_URL_PATH)); ?>');background-size:cover;background-position:center;filter:blur(8px) brightness(0.18);transform:scale(1.05);"></div>
+    <?php else: ?>
+    
     <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-900 to-[#0b2020]"></div>
-    @endif
+    <?php endif; ?>
 
-    {{-- Always-on dark overlay to ensure text readability --}}
+    
     <div class="absolute inset-0 bg-brand-950/70 z-0"></div>
 
-    {{-- Subtle grid --}}
+    
     <div class="absolute inset-0 opacity-[0.035]"
          style="background-image:linear-gradient(rgba(58,173,170,1) 1px,transparent 1px),linear-gradient(90deg,rgba(58,173,170,1) 1px,transparent 1px);background-size:64px 64px;"></div>
 
-    {{-- Glow orbs --}}
+    
     <div class="absolute -top-40 -left-40 w-[700px] h-[700px] rounded-full pointer-events-none"
          style="background:radial-gradient(circle,rgba(58,173,170,0.12) 0%,transparent 70%);"></div>
     <div class="absolute -bottom-32 right-[-5%] w-[600px] h-[600px] rounded-full pointer-events-none"
@@ -192,7 +190,7 @@
     <div class="absolute top-[30%] right-[20%] w-[300px] h-[300px] rounded-full pointer-events-none"
          style="background:radial-gradient(circle,rgba(58,173,170,0.06) 0%,transparent 70%);"></div>
 
-    {{-- Diagonal accent lines --}}
+    
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-0 left-[12%] w-px h-full"
              style="background:linear-gradient(to bottom,transparent 0%,rgba(58,173,170,0.18) 40%,transparent 100%);transform:skewX(-18deg);"></div>
@@ -204,17 +202,17 @@
              style="background:linear-gradient(to bottom,transparent 0%,rgba(58,173,170,0.06) 35%,transparent 100%);transform:skewX(-18deg);"></div>
     </div>
 
-    {{-- Floating particles --}}
+    
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        @foreach([['3%','8%',3,0],['17%','62%',2,1.2],['33%','25%',4,0.6],['50%','80%',2,2],['65%','15%',3,0.3],['78%','50%',2,1.8],['88%','35%',4,0.9],['92%','75%',3,1.5],['45%','55%',2,2.4],['25%','90%',3,0.7],['70%','88%',2,1.1],['55%','40%',4,1.9]] as [$t,$l,$s,$delay])
+        <?php $__currentLoopData = [['3%','8%',3,0],['17%','62%',2,1.2],['33%','25%',4,0.6],['50%','80%',2,2],['65%','15%',3,0.3],['78%','50%',2,1.8],['88%','35%',4,0.9],['92%','75%',3,1.5],['45%','55%',2,2.4],['25%','90%',3,0.7],['70%','88%',2,1.1],['55%','40%',4,1.9]]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$t,$l,$s,$delay]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <div class="absolute rounded-full bg-accent-400 animate-pulse"
-             style="top:{{$t}};left:{{$l}};width:{{$s}}px;height:{{$s}}px;opacity:0.18;animation-delay:{{$delay}}s;animation-duration:4s;"></div>
-        @endforeach
+             style="top:<?php echo e($t); ?>;left:<?php echo e($l); ?>;width:<?php echo e($s); ?>px;height:<?php echo e($s); ?>px;opacity:0.18;animation-delay:<?php echo e($delay); ?>s;animation-duration:4s;"></div>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
-    {{-- Back link --}}
+    
     <div class="relative z-10 container mx-auto px-6 pt-20 lg:pt-24">
-        <a href="{{ route('home') }}#services"
+        <a href="<?php echo e(route('home')); ?>#services"
            class="inline-flex items-center gap-2 text-white/40 hover:text-accent-300 transition-all duration-300 text-xs font-bold tracking-[0.2em] uppercase group">
             <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -223,102 +221,106 @@
         </a>
     </div>
 
-    {{-- Hero copy --}}
+    
     <div class="relative z-10 container mx-auto px-6 mt-8 pb-0">
 
-        {{-- Eyebrow --}}
+        
         <div class="flex items-center gap-4 mb-4">
             <div class="h-px w-12 bg-gradient-to-r from-accent-400 to-transparent"></div>
             <span class="text-accent-400 text-[10px] font-black tracking-[0.35em] uppercase">Space IQ Design Studio</span>
             <div class="h-px flex-1 bg-gradient-to-r from-accent-400/20 to-transparent max-w-[120px]"></div>
         </div>
 
-        {{-- Title --}}
+        
         <h1 class="font-black text-white leading-[0.88] tracking-tight mb-5"
             style="font-size:clamp(3.2rem,8.5vw,8rem);text-transform:uppercase;">
-            @if($hasSubcategories)
+            <?php if($hasSubcategories): ?>
                 <span class="block text-white/25 font-bold mb-2"
-                      style="font-size:clamp(0.75rem,1.8vw,1.2rem);letter-spacing:0.35em;">{{ $serviceLabel }}</span>
+                      style="font-size:clamp(0.75rem,1.8vw,1.2rem);letter-spacing:0.35em;"><?php echo e($serviceLabel); ?></span>
                 <span class="block"
                       style="background:linear-gradient(130deg,#ffffff 0%,#7EC8C0 45%,#1A9E96 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
-                    {{ $currentLabel }}
+                    <?php echo e($currentLabel); ?>
+
                 </span>
-            @else
+            <?php else: ?>
                 <span class="block"
                       style="background:linear-gradient(130deg,#ffffff 0%,#7EC8C0 45%,#1A9E96 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
-                    {{ $service->title }}
+                    <?php echo e($service->title); ?>
+
                 </span>
-            @endif
+            <?php endif; ?>
         </h1>
 
-        {{-- Description --}}
+        
         <p class="text-gray-500 text-base md:text-lg font-light leading-relaxed max-w-xl mb-10">
-            {{ $service->short_description }}
+            <?php echo e($service->short_description); ?>
+
         </p>
     </div>
 
-    {{-- Category tab bar --}}
-    @if($hasSubcategories)
+    
+    <?php if($hasSubcategories): ?>
     <div class="relative z-10 border-t border-white/[0.07]">
         <div class="container mx-auto px-6">
             <nav class="flex items-stretch overflow-x-auto" style="scrollbar-width:none;">
-                @foreach($subLabels as $key => $label)
-                @php $active = ($currentSub === $key); @endphp
-                <a href="{{ route('service.show', ['slug' => $service->slug, 'subcategory' => $key]) }}"
+                <?php $__currentLoopData = $subLabels; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $active = ($currentSub === $key); ?>
+                <a href="<?php echo e(route('service.show', ['slug' => $service->slug, 'subcategory' => $key])); ?>"
                    class="relative flex-shrink-0 px-8 py-5 text-xs font-black tracking-[0.22em] uppercase transition-all duration-300 focus:outline-none whitespace-nowrap
-                          {{ $active ? 'text-accent-300' : 'text-white/35 hover:text-white/70' }}">
-                    {{ $label }}
-                    @if($active)
+                          <?php echo e($active ? 'text-accent-300' : 'text-white/35 hover:text-white/70'); ?>">
+                    <?php echo e($label); ?>
+
+                    <?php if($active): ?>
                     <span class="absolute bottom-0 left-0 right-0 h-[2px] rounded-full"
                           style="background:linear-gradient(90deg,transparent 0%,#3AADAA 30%,#3AADAA 70%,transparent 100%);"></span>
                     <span class="absolute inset-0 pointer-events-none"
                           style="background:linear-gradient(to top,rgba(58,173,170,0.06),transparent);"></span>
-                    @endif
+                    <?php endif; ?>
                 </a>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </nav>
         </div>
     </div>
-    @else
+    <?php else: ?>
     <div class="h-8 relative z-10"></div>
-    @endif
+    <?php endif; ?>
 
 </section>
 
 <!-- Content Section -->
 <section class="py-20 relative">
-    @if($service->media->count() > 0)
+    <?php if($service->media->count() > 0): ?>
         <div class="w-full px-6 md:px-12 mt-4 mb-24">
-            @foreach($groupedMedia as $category => $categoryMedia)
+            <?php $__currentLoopData = $groupedMedia; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category => $categoryMedia): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div>
-                    @php
+                    <?php
                         $is360 = $service->slug === '360-views';
                         $numCols = 3;
                         $gridColsClass = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
-                    @endphp
-                    <div class="grid {{ $gridColsClass }} items-start w-full mb-16 pt-8">
-                    @php
+                    ?>
+                    <div class="grid <?php echo e($gridColsClass); ?> items-start w-full mb-16 pt-8">
+                    <?php
                         $columns = [[], [], []];
                         $index = 0;
                         foreach($categoryMedia->sortBy('sort_order') as $media) {
                             $columns[$index % 3][] = $media;
                             $index++;
                         }
-                    @endphp
+                    ?>
                     
-                    @foreach($columns as $colIndex => $columnMedia)
-                        @php
+                    <?php $__currentLoopData = $columns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $colIndex => $columnMedia): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
                             $staggerClass = match($colIndex) {
                                 1 => 'md:mt-12',
                                 2 => 'lg:mt-24',
                                 default => ''
                             };
                             $spaceClass = $is360 ? 'space-y-6' : 'space-y-4';
-                        @endphp
-                        <div class="{{ $spaceClass }} w-full {{ $staggerClass }}">
-                            @foreach($columnMedia as $media)
-                                @if($service->slug === '360-views')
-                                    {{-- 360 Click-to-Activate Viewer Card --}}
+                        ?>
+                        <div class="<?php echo e($spaceClass); ?> w-full <?php echo e($staggerClass); ?>">
+                            <?php $__currentLoopData = $columnMedia; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $media): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if($service->slug === '360-views'): ?>
+                                    
                                     <div class="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-brand-950 w-full"
                                          x-data="{ 
                                             activated: false,
@@ -349,41 +351,41 @@
                                          @keydown.escape.window="deactivate()"
                                          :class="activated ? 'ring-2 ring-accent-400/60' : ''">
 
-                                        {{-- The actual Pannellum container (hidden under overlay until activated) --}}
+                                        
                                         <div x-ref="panoEl"
-                                             data-src="{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}"
+                                             data-src="<?php echo e(parse_url(Storage::url($media->file_path), PHP_URL_PATH)); ?>"
                                              class="w-full transition-all duration-500"
                                              style="height: 480px;"
                                              :class="activated ? 'opacity-100' : 'opacity-0 pointer-events-none'">
                                         </div>
 
-                                        {{-- Overlay (shown when NOT activated) --}}
+                                        
                                         <div class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer transition-all duration-500 group/card"
                                              x-show="!activated"
                                              @click="activateViewer()">
 
-                                            {{-- Blurred preview background --}}
+                                            
                                             <div class="absolute inset-0 bg-cover bg-center scale-105"
-                                                 style="background-image:url('{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}');filter:blur(8px) brightness(0.35);"></div>
+                                                 style="background-image:url('<?php echo e(parse_url(Storage::url($media->file_path), PHP_URL_PATH)); ?>');filter:blur(8px) brightness(0.35);"></div>
 
-                                            {{-- Teal ambient glow --}}
+                                            
                                             <div class="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-brand-950/40"></div>
 
-                                            {{-- Title top-left --}}
-                                            @if($media->title)
+                                            
+                                            <?php if($media->title): ?>
                                             <div class="absolute top-5 left-5 z-10">
                                                 <p class="text-[10px] uppercase tracking-[0.3em] text-accent-400/70 font-black">360° Virtual Tour</p>
-                                                <p class="text-white font-bold text-sm mt-0.5">{{ $media->title }}</p>
+                                                <p class="text-white font-bold text-sm mt-0.5"><?php echo e($media->title); ?></p>
                                             </div>
-                                            @endif
+                                            <?php endif; ?>
 
-                                            {{-- Centre click-to-explore button --}}
+                                            
                                             <div class="relative z-10 flex flex-col items-center gap-4 group-hover/card:scale-105 transition-transform duration-300">
-                                                {{-- Pulsing ring --}}
+                                                
                                                 <div class="relative">
                                                     <div class="absolute inset-0 rounded-full bg-accent-400/20 animate-ping scale-150"></div>
                                                     <div class="relative w-20 h-20 rounded-full bg-brand-950/70 backdrop-blur-sm border-2 border-accent-400/60 flex items-center justify-center group-hover/card:border-accent-400 group-hover/card:bg-accent-400/10 transition-all duration-300">
-                                                        {{-- 360 Panorama icon --}}
+                                                        
                                                         <svg class="w-9 h-9 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
@@ -396,7 +398,7 @@
                                                 </div>
                                             </div>
 
-                                            {{-- Bottom hint bar --}}
+                                            
                                             <div class="absolute bottom-0 left-0 right-0 z-10 px-5 py-3 bg-brand-950/60 backdrop-blur-sm flex items-center justify-between">
                                                 <div class="flex items-center gap-2">
                                                     <svg class="w-4 h-4 text-accent-400/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
@@ -406,7 +408,7 @@
                                             </div>
                                         </div>
 
-                                        {{-- Active state: ESC hint overlay (shown at top when activated) --}}
+                                        
                                         <div class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-2 bg-brand-950/60 backdrop-blur-sm pointer-events-none"
                                              x-show="activated"
                                              x-transition:enter="transition ease-out duration-300"
@@ -426,8 +428,8 @@
 
                                     </div>
 
-                                @else
-                                    @php
+                                <?php else: ?>
+                                    <?php
                                         $isTallImage = false;
                                         if ($media->file_type !== 'video') {
                                             $filePath = public_path(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
@@ -441,17 +443,17 @@
                                                 }
                                             }
                                         }
-                                    @endphp
-                                    @php
+                                    ?>
+                                    <?php
                                          $mediaUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
                                          $mediaIndex = $lightboxImagesCollect->values()->filter(fn($x) => $x['url'] === $mediaUrl)->keys()->first() ?? 0;
-                                     @endphp
-                                     <div class="relative group overflow-hidden rounded-md shadow-xl tilt-card {{ $isTallImage ? 'max-w-[60%] md:max-w-[50%] mx-auto' : 'w-full' }}" 
-                                          @if($media->file_type !== 'video') 
-                                             @click="lightboxOpen = true; lightboxIndex = {{ $mediaIndex }}; lightboxUrl = '{{ $mediaUrl }}'; lightboxTitle = '{{ $media->title }}'; initPannellum('{{ $mediaUrl }}')" 
-                                          @endif>
-                                        @if($media->file_type === 'video')
-                                            @php
+                                     ?>
+                                     <div class="relative group overflow-hidden rounded-md shadow-xl tilt-card <?php echo e($isTallImage ? 'max-w-[60%] md:max-w-[50%] mx-auto' : 'w-full'); ?>" 
+                                          <?php if($media->file_type !== 'video'): ?> 
+                                             @click="lightboxOpen = true; lightboxIndex = <?php echo e($mediaIndex); ?>; lightboxUrl = '<?php echo e($mediaUrl); ?>'; lightboxTitle = '<?php echo e($media->title); ?>'; initPannellum('<?php echo e($mediaUrl); ?>')" 
+                                          <?php endif; ?>>
+                                        <?php if($media->file_type === 'video'): ?>
+                                            <?php
                                                 $isYoutube = false;
                                                 $youtubeId = '';
                                                 if (str_contains($media->file_path, 'youtube.com') || str_contains($media->file_path, 'youtu.be')) {
@@ -460,36 +462,36 @@
                                                         $youtubeId = $match[1];
                                                     }
                                                 }
-                                            @endphp
-                                            @if($isYoutube)
+                                            ?>
+                                            <?php if($isYoutube): ?>
                                                 <div class="relative w-full aspect-video overflow-hidden rounded-md shadow-xl bg-brand-900/50">
-                                                    <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=0&controls=1&rel=0" 
+                                                    <iframe src="https://www.youtube.com/embed/<?php echo e($youtubeId); ?>?autoplay=0&controls=1&rel=0" 
                                                             class="absolute inset-0 w-full h-full" 
                                                             frameborder="0" 
                                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                                             allowfullscreen>
                                                     </iframe>
                                                 </div>
-                                            @else
-                                                <video src="{{ Storage::url($media->file_path) }}" controls class="w-full h-auto block rounded-md shadow-xl"></video>
-                                            @endif
-                                        @else
+                                            <?php else: ?>
+                                                <video src="<?php echo e(Storage::url($media->file_path)); ?>" controls class="w-full h-auto block rounded-md shadow-xl"></video>
+                                            <?php endif; ?>
+                                        <?php else: ?>
                                             <div class="cursor-pointer overflow-hidden bg-brand-900/50 relative"
                                                  x-data="{ imgLoaded: false }">
                                                 <!-- Skeleton shimmer placeholder -->
                                                 <div class="absolute inset-0 skeleton-shimmer z-0 min-h-[200px]" x-show="!imgLoaded"></div>
-                                                @php
+                                                <?php
                                                      $imgOrigUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
                                                      $imgWebpUrl = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $imgOrigUrl);
                                                      $imgWebpPath = public_path($imgWebpUrl);
                                                      $hasWebp = file_exists($imgWebpPath);
-                                                 @endphp
+                                                 ?>
                                                  <picture>
-                                                     @if($hasWebp)
-                                                     <source srcset="{{ $imgWebpUrl }}" type="image/webp">
-                                                     @endif
-                                                     <img src="{{ $imgOrigUrl }}"
-                                                          alt="{{ $media->title }}"
+                                                     <?php if($hasWebp): ?>
+                                                     <source srcset="<?php echo e($imgWebpUrl); ?>" type="image/webp">
+                                                     <?php endif; ?>
+                                                     <img src="<?php echo e($imgOrigUrl); ?>"
+                                                          alt="<?php echo e($media->title); ?>"
                                                           loading="lazy"
                                                           decoding="async"
                                                           @load="imgLoaded = true"
@@ -497,12 +499,12 @@
                                                           :class="imgLoaded ? 'loaded' : ''">
                                                  </picture>
                                                 <!-- Hover caption overlay -->
-                                                @if($media->title)
+                                                <?php if($media->title): ?>
                                                 <div class="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out pointer-events-none"
                                                      style="background:linear-gradient(to top, rgba(8,14,14,0.92) 0%, transparent 100%); padding: 20px 16px 14px;">
-                                                    <p class="text-white text-xs font-semibold uppercase tracking-widest">{{ $media->title }}</p>
+                                                    <p class="text-white text-xs font-semibold uppercase tracking-widest"><?php echo e($media->title); ?></p>
                                                 </div>
-                                                @endif
+                                                <?php endif; ?>
                                                 <!-- Zoom icon -->
                                                 <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-3 pointer-events-none z-20">
                                                     <div class="bg-brand-900/80 backdrop-blur-sm p-2.5 rounded-full">
@@ -510,15 +512,15 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
-                                @endif
-                            @endforeach
+                                <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
             <!-- Lightbox Modal -->
             <template x-teleport="body">
@@ -566,7 +568,7 @@
                 </div>
             </template>
         </div>
-    @else
+    <?php else: ?>
         <!-- Empty Placeholder -->
         <div class="container mx-auto px-6 max-w-xl text-center py-20">
             <div class="glass-card rounded-xl border border-white/8 bg-brand-900/50 p-8 md:p-12 shadow-2xl relative overflow-hidden">
@@ -581,7 +583,7 @@
                     We construct layouts and renderings tailored to your exact specifications. If you have an upcoming project, contact us to receive custom, offline design samples.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="{{ route('contact') }}" class="btn-glow px-6 py-3.5 bg-accent-500 hover:bg-accent-400 text-white rounded-sm font-semibold uppercase tracking-wider text-xs transition-colors">
+                    <a href="<?php echo e(route('contact')); ?>" class="btn-glow px-6 py-3.5 bg-accent-500 hover:bg-accent-400 text-white rounded-sm font-semibold uppercase tracking-wider text-xs transition-colors">
                         Request Samples
                     </a>
                     <a href="https://wa.me/918121376325?text=Hi%20Space%20IQ%20Design%20Studio%2C%20I%27d%20like%20to%20request%20some%20offline%20design%20samples%20for%20my%20project." target="_blank" rel="noopener noreferrer" class="px-6 py-3.5 border border-white/10 hover:border-white/30 text-white rounded-sm font-semibold uppercase tracking-wider text-xs transition-colors bg-white/2 backdrop-blur-sm flex items-center justify-center gap-2">
@@ -590,7 +592,7 @@
                 </div>
             </div>
         </div>
-    @endif
+    <?php endif; ?>
 </section>
 </div>
 
@@ -601,11 +603,13 @@
         <p class="text-xs uppercase tracking-widest text-accent-400 font-bold mb-4">Ready to get started?</p>
         <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Love what you see?<br><span class="text-gradient">Let's work together.</span></h2>
         <p class="text-gray-400 font-light mb-10 max-w-xl mx-auto">Share your project details and our team will get back to you within 24 hours.</p>
-        <a href="{{ route('contact') }}" class="inline-flex items-center gap-3 px-10 py-4 bg-accent-500 hover:bg-accent-400 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 shadow-xl hover:-translate-y-1">
+        <a href="<?php echo e(route('contact')); ?>" class="inline-flex items-center gap-3 px-10 py-4 bg-accent-500 hover:bg-accent-400 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 shadow-xl hover:-translate-y-1">
             Start Your Project
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
     </div>
 </section>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Sahil\.gemini\antigravity\scratch\spaceiq_studio\resources\views/service.blade.php ENDPATH**/ ?>
