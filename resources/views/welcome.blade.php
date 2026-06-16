@@ -395,7 +395,7 @@
 
 <!-- Call to Action Section -->
 <section id="contact" class="py-32 relative bg-brand-950 overflow-hidden reveal">
-    <div class="absolute inset-0 z-0 bg-[url('/img/interior_render.png')] bg-cover bg-center opacity-20"></div>
+    <div class="absolute inset-0 z-0 bg-cover bg-center opacity-20" style="background-image: url('{{ asset('img/interior_render.webp') }}');"></div>
     <div class="container mx-auto px-6 max-w-4xl text-center relative z-10 bg-brand-900/80 backdrop-blur-md p-16 md:p-24 rounded-sm border border-white/10 shadow-2xl">
         <p class="text-xs uppercase tracking-widest text-accent-400 font-bold mb-6">Love What You See?</p>
         <h2 class="text-4xl md:text-5xl font-display font-bold mb-8 text-white uppercase tracking-wider">Ready to make your<br>vision a reality?</h2>

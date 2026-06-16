@@ -389,13 +389,24 @@
                                                  x-data="{ imgLoaded: false }">
                                                 <!-- Skeleton shimmer placeholder -->
                                                 <div class="absolute inset-0 skeleton-shimmer z-0 min-h-[200px]" x-show="!imgLoaded"></div>
-                                                <img src="{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}"
-                                                     alt="{{ $media->title }}"
-                                                     loading="lazy"
-                                                     decoding="async"
-                                                     @load="imgLoaded = true"
-                                                     class="w-full h-auto block transition-transform duration-700 group-hover:scale-110 grayscale-[10%] group-hover:grayscale-0 lazy-img relative z-10"
-                                                     :class="imgLoaded ? 'loaded' : ''">
+                                                @php
+                                                     $imgOrigUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
+                                                     $imgWebpUrl = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $imgOrigUrl);
+                                                     $imgWebpPath = public_path($imgWebpUrl);
+                                                     $hasWebp = file_exists($imgWebpPath);
+                                                 @endphp
+                                                 <picture>
+                                                     @if($hasWebp)
+                                                     <source srcset="{{ $imgWebpUrl }}" type="image/webp">
+                                                     @endif
+                                                     <img src="{{ $imgOrigUrl }}"
+                                                          alt="{{ $media->title }}"
+                                                          loading="lazy"
+                                                          decoding="async"
+                                                          @load="imgLoaded = true"
+                                                          class="w-full h-auto block transition-transform duration-700 group-hover:scale-110 grayscale-[10%] group-hover:grayscale-0 lazy-img relative z-10"
+                                                          :class="imgLoaded ? 'loaded' : ''">
+                                                 </picture>
                                                 <!-- Hover caption overlay -->
                                                 @if($media->title)
                                                 <div class="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out pointer-events-none"
