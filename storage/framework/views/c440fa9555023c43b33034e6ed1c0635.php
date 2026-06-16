@@ -173,40 +173,45 @@
     </div>
 </section>
 
-<!-- Services Showcase -->
-<section id="services" class="py-28 relative bg-brand-950 overflow-hidden">
+<!-- Services Filmstrip -->
+<section id="services" class="py-0 relative bg-brand-950 overflow-hidden">
 
-    <!-- Subtle background texture -->
-    <div class="absolute inset-0 opacity-[0.03]" style="background-image:radial-gradient(circle at 20% 50%, #1A9E96 0%, transparent 60%), radial-gradient(circle at 80% 20%, #0E7C7B 0%, transparent 50%);"></div>
-
-    <div class="container mx-auto px-6 xl:px-12" style="max-width:1536px">
-
-        <!-- Section Header -->
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+    <!-- Section Header — sits above the strip -->
+    <div class="container mx-auto px-6 xl:px-16 pt-24 pb-12" style="max-width:1536px">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="h-px w-10 bg-accent-400"></div>
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="h-px w-8 bg-accent-400"></div>
                     <p class="text-[10px] uppercase tracking-[0.35em] text-accent-400 font-black">What We Create</p>
                 </div>
                 <h2 class="text-5xl md:text-6xl font-display font-black text-white leading-none uppercase tracking-tight">
-                    Our<br><span style="background:linear-gradient(135deg,#7EC8C0,#1A9E96);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Services</span>
+                    Our <span style="-webkit-text-stroke:2px #3AADAA;color:transparent;">Services</span>
                 </h2>
             </div>
-            <p class="text-gray-400 text-sm max-w-xs font-light leading-relaxed md:text-right">
-                From hyper-realistic renders to immersive 360° virtual tours — we bring architecture to life.
-            </p>
+            <div class="flex items-center gap-3 text-white/30 text-xs uppercase tracking-widest font-semibold self-end pb-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <span>Scroll to explore</span>
+            </div>
         </div>
+    </div>
 
-        <?php
-            $homeServices = \App\Models\Service::where('is_active', true)
-                ->orderBy('sort_order')
-                ->take(5)
-                ->get();
-        ?>
+    <?php
+        $homeServices = \App\Models\Service::where('is_active', true)
+            ->orderBy('sort_order')
+            ->take(5)
+            ->get();
+    ?>
 
-        <?php if($homeServices->count() > 0): ?>
-        <!-- Bento Grid Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5" style="min-height:680px;">
+    <?php if($homeServices->count() > 0): ?>
+    <!-- Horizontal Filmstrip -->
+    <div class="relative pb-16">
+        <!-- Left edge fade -->
+        <div class="absolute left-0 top-0 bottom-16 w-24 bg-gradient-to-r from-brand-950 to-transparent z-10 pointer-events-none"></div>
+        <!-- Right edge fade -->
+        <div class="absolute right-0 top-0 bottom-16 w-24 bg-gradient-to-l from-brand-950 to-transparent z-10 pointer-events-none"></div>
+
+        <div class="flex gap-4 overflow-x-auto pl-6 pr-6 pb-4"
+             style="scrollbar-width:thin;scrollbar-color:rgba(26,158,150,0.4) transparent;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;">
 
             <?php $__currentLoopData = $homeServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php
@@ -226,122 +231,91 @@
                 if (!$cardImageUrl) {
                     $cardImageUrl = $index % 2 === 0 ? '/img/exterior_render.png' : '/img/interior_render.png';
                 }
-                $is360Card = $service->slug === '360-views';
+                $is360 = $service->slug === '360-views';
                 $num = str_pad($index + 1, 2, '0', STR_PAD_LEFT);
             ?>
 
-            <?php if($index === 0): ?>
-            
             <a href="<?php echo e(route('service.show', $service->slug)); ?>"
-               class="group relative overflow-hidden lg:col-span-7 rounded-2xl border border-white/5 hover:border-accent-400/40 transition-all duration-700 block bg-brand-900"
-               style="min-height:540px;">
+               class="group relative flex-shrink-0 overflow-hidden rounded-2xl border border-white/[0.06] hover:border-accent-400/50 transition-all duration-500 block"
+               style="width:clamp(280px,58vw,760px);height:480px;scroll-snap-align:start;">
 
-                <!-- BG image -->
-                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-[1200ms] ease-out group-hover:scale-110 <?php echo e($is360Card ? 'group-hover:blur-sm' : ''); ?>"
+                <!-- Full image background -->
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-[900ms] ease-out group-hover:scale-105"
                      style="background-image:url('<?php echo e($cardImageUrl); ?>');"></div>
 
-                <!-- Overlays -->
-                <div class="absolute inset-0 bg-gradient-to-br from-brand-950/30 via-transparent to-brand-950/80"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/40 to-transparent"></div>
+                <!-- Base dark gradient -->
+                <div class="absolute inset-0 bg-gradient-to-t from-brand-950/95 via-brand-950/30 to-brand-950/10"></div>
 
-                <?php if($is360Card): ?>
-                <!-- 360 hover cue -->
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div class="bg-brand-950/70 backdrop-blur-md rounded-2xl px-8 py-5 flex flex-col items-center gap-3 border border-accent-400/30">
-                        <svg class="w-10 h-10 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>
-                        <p class="text-white font-bold text-sm tracking-widest uppercase">Drag to Explore</p>
-                        <p class="text-accent-300 text-xs tracking-wider">360° Immersive View</p>
+                <!-- Top-left index number -->
+                <div class="absolute top-6 left-7">
+                    <span class="font-display font-black text-6xl leading-none"
+                          style="color:transparent;-webkit-text-stroke:1px rgba(58,173,170,0.35);"><?php echo e($num); ?></span>
+                </div>
+
+                <?php if($is360): ?>
+                <!-- 360 badge top-right -->
+                <div class="absolute top-5 right-5">
+                    <div class="flex items-center gap-1.5 bg-brand-950/60 backdrop-blur-sm border border-accent-400/30 rounded-full px-3 py-1.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-accent-400"></div>
+                        <span class="text-[10px] font-black tracking-widest text-accent-400 uppercase">360°</span>
                     </div>
                 </div>
                 <?php endif; ?>
 
-                <!-- Number tag -->
-                <span class="absolute top-6 left-6 text-[10px] font-black tracking-[0.3em] text-accent-400/60 uppercase"><?php echo e($num); ?></span>
-
-                <!-- Bottom content -->
-                <div class="absolute bottom-0 left-0 right-0 p-8">
-                    <p class="text-accent-400 text-[10px] font-black tracking-[0.3em] uppercase mb-2">Featured</p>
-                    <h3 class="text-white font-display font-black text-3xl uppercase tracking-tight mb-3 leading-tight"><?php echo e($service->title); ?></h3>
-                    <div class="flex items-center gap-2 text-white/50 text-xs font-semibold uppercase tracking-widest group-hover:text-accent-400 transition-colors duration-300">
-                        <span>Explore Gallery</span>
-                        <svg class="w-3.5 h-3.5 translate-x-0 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                <!-- Bottom content — slides up on hover -->
+                <div class="absolute bottom-0 left-0 right-0 p-7">
+                    <!-- Thin accent line -->
+                    <div class="w-8 h-px bg-accent-400 mb-4 group-hover:w-16 transition-all duration-500"></div>
+                    <h3 class="text-white font-display font-black uppercase tracking-tight leading-none mb-3"
+                        style="font-size:clamp(1.5rem,3vw,2.25rem);"><?php echo e($service->title); ?></h3>
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <span class="text-[11px] font-black uppercase tracking-[0.25em] text-white/0 group-hover:text-accent-400 transition-all duration-400 translate-y-3 group-hover:translate-y-0">Explore Gallery</span>
+                        <svg class="w-4 h-4 text-accent-400 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </div>
                 </div>
+
             </a>
-
-            <?php else: ?>
-            <?php if($index === 1): ?>
-            
-            <div class="lg:col-span-5 grid grid-cols-2 gap-4 lg:gap-5 content-start">
-            <?php endif; ?>
-
-            
-            <a href="<?php echo e(route('service.show', $service->slug)); ?>"
-               class="group relative overflow-hidden rounded-2xl border border-white/5 hover:border-accent-400/40 transition-all duration-500 block bg-brand-900"
-               style="aspect-ratio:4/3;">
-
-                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110 <?php echo e($is360Card ? 'group-hover:blur-sm' : ''); ?>"
-                     style="background-image:url('<?php echo e($cardImageUrl); ?>');"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-transparent"></div>
-
-                <?php if($is360Card): ?>
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-400">
-                    <div class="bg-brand-950/70 backdrop-blur-sm rounded-xl px-4 py-3 flex flex-col items-center gap-1.5 border border-accent-400/30">
-                        <svg class="w-6 h-6 text-accent-400 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>
-                        <p class="text-white font-bold text-[10px] tracking-widest uppercase">360° View</p>
-                    </div>
-                </div>
-                <?php endif; ?>
-
-                <span class="absolute top-4 left-4 text-[9px] font-black tracking-[0.3em] text-accent-400/50 uppercase"><?php echo e($num); ?></span>
-
-                <div class="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 class="text-white font-display font-bold text-sm uppercase tracking-wide leading-tight mb-1"><?php echo e($service->title); ?></h3>
-                    <div class="flex items-center gap-1 text-accent-400 text-[10px] font-semibold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span>View</span>
-                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </div>
-                </div>
-            </a>
-
-            <?php if($index === $homeServices->count() - 1 || $index === 4): ?>
-            </div>
-            <?php endif; ?>
-
-            <?php endif; ?>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
+            <!-- End spacer for fade effect -->
+            <div class="flex-shrink-0 w-4"></div>
         </div>
 
-        <!-- Stats bar -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-2xl overflow-hidden mt-5">
-            <?php
-                $stats = [
-                    ['value' => '500+', 'label' => 'Projects Delivered'],
-                    ['value' => '4K', 'label' => 'Ultra-HD Quality'],
-                    ['value' => '360°', 'label' => 'Immersive Tours'],
-                    ['value' => '100%', 'label' => 'Client Satisfaction'],
-                ];
-            ?>
-            <?php $__currentLoopData = $stats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $stat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <div class="bg-brand-900/60 px-6 py-5 text-center hover:bg-brand-800/60 transition-colors duration-300">
-                <p class="text-2xl font-display font-black text-white mb-1"><?php echo e($stat['value']); ?></p>
-                <p class="text-[10px] uppercase tracking-widest text-gray-500 font-semibold"><?php echo e($stat['label']); ?></p>
-            </div>
+        <!-- Scrollbar progress dots -->
+        <div class="flex justify-center gap-2 mt-2">
+            <?php $__currentLoopData = $homeServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div class="w-1.5 h-1.5 rounded-full <?php echo e($index === 0 ? 'bg-accent-400 w-4' : 'bg-white/20'); ?> transition-all duration-300"></div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-
-        <!-- View All -->
-        <div class="text-center mt-10">
-            <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>" class="inline-flex items-center gap-2 text-accent-400 hover:text-white text-sm font-semibold uppercase tracking-widest border-b border-accent-400/40 hover:border-white pb-1 transition-all duration-300">
-                View All Services
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </a>
-        </div>
-        <?php endif; ?>
-
     </div>
+
+    <!-- Bottom row: stats + CTA -->
+    <div class="container mx-auto px-6 xl:px-16 pb-20" style="max-width:1536px">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8 border-t border-white/[0.06] pt-10">
+            <!-- Stats -->
+            <div class="flex flex-wrap gap-10 md:gap-16">
+                <?php
+                    $stats = [['v'=>'500+','l'=>'Projects'],['v'=>'4K','l'=>'Resolution'],['v'=>'360°','l'=>'Virtual Tours'],['v'=>'100%','l'=>'Satisfaction']];
+                ?>
+                <?php $__currentLoopData = $stats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div>
+                    <p class="font-display font-black text-2xl text-white leading-none"><?php echo e($s['v']); ?></p>
+                    <p class="text-[10px] uppercase tracking-widest text-white/35 font-semibold mt-1"><?php echo e($s['l']); ?></p>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+            <!-- CTA link -->
+            <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>"
+               class="flex-shrink-0 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.25em] text-accent-400 hover:text-white border border-accent-400/30 hover:border-white/30 rounded-full px-6 py-3 transition-all duration-300 hover:bg-white/5">
+                All Services
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
+    </div>
+    <?php endif; ?>
+
 </section>
+
 
 
 

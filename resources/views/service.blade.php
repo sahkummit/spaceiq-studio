@@ -336,7 +336,7 @@
                                                             mouseZoom: true,
                                                             keyboardZoom: false,
                                                             showZoomCtrl: false,
-                                                            showFullscreenCtrl: true,
+                                                            showFullscreenCtrl: false,
                                                             friction: 0.5
                                                         });
                                                     }
@@ -344,12 +344,18 @@
                                             },
                                             deactivate() {
                                                 this.activated = false;
+                                            },
+                                            goFullscreen() {
+                                                const el = this.$el;
+                                                if (el.requestFullscreen) el.requestFullscreen();
+                                                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                                                else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
                                             }
                                          }"
                                          @keydown.escape.window="deactivate()"
                                          :class="activated ? 'ring-2 ring-accent-400/60' : ''">
 
-                                        {{-- The actual Pannellum container (hidden under overlay until activated) --}}
+                                        {{-- Pannellum container --}}
                                         <div x-ref="panoEl"
                                              data-src="{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}"
                                              class="w-full transition-all duration-500"
@@ -357,71 +363,82 @@
                                              :class="activated ? 'opacity-100' : 'opacity-0 pointer-events-none'">
                                         </div>
 
-                                        {{-- Overlay (shown when NOT activated) --}}
-                                        <div class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer transition-all duration-500 group/card"
+                                        {{-- Overlay (shown when NOT activated) — NO BLUR, clean image --}}
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer group/card"
                                              x-show="!activated"
                                              @click="activateViewer()">
 
-                                            {{-- Blurred preview background --}}
-                                            <div class="absolute inset-0 bg-cover bg-center scale-105"
-                                                 style="background-image:url('{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}');filter:blur(8px) brightness(0.35);"></div>
+                                            {{-- Sharp preview background (no blur) --}}
+                                            <div class="absolute inset-0 bg-cover bg-center"
+                                                 style="background-image:url('{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}');"></div>
 
-                                            {{-- Teal ambient glow --}}
-                                            <div class="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-brand-950/40"></div>
+                                            {{-- Dark overlay so text is legible --}}
+                                            <div class="absolute inset-0 bg-brand-950/55"></div>
+                                            <div class="absolute inset-0 bg-gradient-to-t from-brand-950/70 via-transparent to-brand-950/30"></div>
 
                                             {{-- Title top-left --}}
                                             @if($media->title)
-                                            <div class="absolute top-5 left-5 z-10">
-                                                <p class="text-[10px] uppercase tracking-[0.3em] text-accent-400/70 font-black">360° Virtual Tour</p>
+                                            <div class="absolute top-4 left-5 z-10">
+                                                <p class="text-[9px] uppercase tracking-[0.3em] text-accent-400/80 font-black">360° Virtual Tour</p>
                                                 <p class="text-white font-bold text-sm mt-0.5">{{ $media->title }}</p>
                                             </div>
                                             @endif
 
-                                            {{-- Centre click-to-explore button --}}
-                                            <div class="relative z-10 flex flex-col items-center gap-4 group-hover/card:scale-105 transition-transform duration-300">
-                                                {{-- Pulsing ring --}}
-                                                <div class="relative">
-                                                    <div class="absolute inset-0 rounded-full bg-accent-400/20 animate-ping scale-150"></div>
-                                                    <div class="relative w-20 h-20 rounded-full bg-brand-950/70 backdrop-blur-sm border-2 border-accent-400/60 flex items-center justify-center group-hover/card:border-accent-400 group-hover/card:bg-accent-400/10 transition-all duration-300">
-                                                        {{-- 360 Panorama icon --}}
-                                                        <svg class="w-9 h-9 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <div class="text-center">
-                                                    <p class="text-white font-black text-base tracking-widest uppercase">Click to Explore</p>
-                                                    <p class="text-accent-300/80 text-[11px] tracking-wider mt-1">360° Immersive View · Drag to Look Around</p>
+                                            {{-- Top-left fullscreen button (when not yet activated — hint) --}}
+                                            <div class="absolute top-4 right-4 z-10">
+                                                <div class="w-8 h-8 rounded-md bg-brand-950/60 backdrop-blur-sm border border-white/15 flex items-center justify-center text-white/50 group-hover/card:text-white group-hover/card:border-accent-400/40 transition-all duration-200">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
                                                 </div>
                                             </div>
 
-                                            {{-- Bottom hint bar --}}
-                                            <div class="absolute bottom-0 left-0 right-0 z-10 px-5 py-3 bg-brand-950/60 backdrop-blur-sm flex items-center justify-between">
-                                                <div class="flex items-center gap-2">
-                                                    <svg class="w-4 h-4 text-accent-400/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
-                                                    <span class="text-[10px] text-white/40 uppercase tracking-widest font-semibold">Equirectangular Panorama</span>
+                                            {{-- Centre click-to-explore button — smaller, no pulse ring --}}
+                                            <div class="relative z-10 flex flex-col items-center gap-3 group-hover/card:scale-105 transition-transform duration-300">
+                                                <div class="w-12 h-12 rounded-full bg-brand-950/70 backdrop-blur-sm border border-accent-400/50 flex items-center justify-center group-hover/card:border-accent-400 group-hover/card:bg-accent-400/10 transition-all duration-300">
+                                                    <svg class="w-5 h-5 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+                                                    </svg>
                                                 </div>
-                                                <span class="text-[10px] text-accent-400/50 uppercase tracking-widest font-black">360°</span>
+                                                <div class="text-center">
+                                                    <p class="text-white font-black text-sm tracking-widest uppercase">Click to Explore</p>
+                                                    <p class="text-white/50 text-[10px] tracking-wider mt-0.5">Drag to look around</p>
+                                                </div>
+                                            </div>
+
+                                            {{-- Bottom label bar --}}
+                                            <div class="absolute bottom-0 left-0 right-0 z-10 px-5 py-3 bg-brand-950/50 backdrop-blur-sm flex items-center justify-between">
+                                                <span class="text-[9px] text-white/30 uppercase tracking-widest font-semibold">360° Panoramic View</span>
+                                                <span class="text-[9px] text-accent-400/40 uppercase tracking-widest font-black">Space IQ</span>
                                             </div>
                                         </div>
 
-                                        {{-- Active state: ESC hint overlay (shown at top when activated) --}}
-                                        <div class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-2 bg-brand-950/60 backdrop-blur-sm pointer-events-none"
+                                        {{-- Active state top bar: fullscreen button top-LEFT + exit top-RIGHT --}}
+                                        <div class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-3 py-2 bg-brand-950/55 backdrop-blur-sm pointer-events-none"
                                              x-show="activated"
                                              x-transition:enter="transition ease-out duration-300"
                                              x-transition:enter-start="opacity-0 -translate-y-2"
                                              x-transition:enter-end="opacity-100 translate-y-0"
                                              style="display:none;">
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-2 h-2 rounded-full bg-accent-400 animate-pulse"></div>
-                                                <span class="text-[10px] text-white/70 uppercase tracking-widest font-semibold">Live 360° View · Drag to Explore</span>
-                                            </div>
-                                            <button class="text-[10px] text-white/50 uppercase tracking-widest font-black hover:text-white transition-colors pointer-events-auto flex items-center gap-1.5"
-                                                    @click="deactivate()">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                Exit
+
+                                            {{-- Fullscreen button — top LEFT --}}
+                                            <button class="pointer-events-auto w-8 h-8 rounded-md bg-brand-950/60 border border-white/15 hover:border-accent-400/50 flex items-center justify-center text-white/50 hover:text-white transition-all duration-200"
+                                                    title="Fullscreen"
+                                                    @click="goFullscreen()">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
                                             </button>
+
+                                            {{-- Status + exit --}}
+                                            <div class="flex items-center gap-3">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-1.5 h-1.5 rounded-full bg-accent-400 animate-pulse"></div>
+                                                    <span class="text-[9px] text-white/60 uppercase tracking-widest font-semibold">Drag · Scroll to zoom</span>
+                                                </div>
+                                                <button class="pointer-events-auto flex items-center gap-1.5 text-[9px] text-white/40 uppercase tracking-widest font-black hover:text-white transition-colors"
+                                                        @click="deactivate()">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    Exit
+                                                </button>
+                                            </div>
                                         </div>
 
                                     </div>
