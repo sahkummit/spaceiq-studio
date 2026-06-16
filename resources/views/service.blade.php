@@ -318,12 +318,11 @@
                         <div class="{{ $spaceClass }} w-full {{ $staggerClass }}">
                             @foreach($columnMedia as $media)
                                 @if($service->slug === '360-views')
-                                    {{-- 360° Viewer: manual setInterval rotation (avoids Pannellum autoRotate drag conflict) --}}
+                                    {{-- 360° Viewer: Pannellum autoRotate stops on interaction --}}
                                     <div class="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-brand-950 w-full"
                                          x-data="{
                                             viewer: null,
                                             hintVisible: true,
-                                            rotateTimer: null,
                                             init() {
                                                 this.$nextTick(() => {
                                                     this.viewer = pannellum.viewer(this.$refs.panoEl, {
@@ -331,7 +330,8 @@
                                                         panorama: '{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}',
                                                         autoLoad: true,
                                                         compass: false,
-                                                        autoRotate: 0,
+                                                        autoRotate: -2,
+                                                        autoRotateInactivityDelay: -1,
                                                         mouseZoom: false,
                                                         keyboardZoom: false,
                                                         showZoomCtrl: false,
@@ -339,22 +339,16 @@
                                                         showControls: false,
                                                         friction: 0.15
                                                     });
-                                                    /* Start manual rotation immediately */
-                                                    this.rotateTimer = setInterval(() => {
-                                                        if (this.viewer) {
-                                                            this.viewer.setYaw(this.viewer.getYaw() - 0.04);
-                                                        }
-                                                    }, 30);
                                                     /* Stop rotation on first user interaction */
                                                     const stopRotate = () => {
-                                                        if (this.rotateTimer) {
-                                                            clearInterval(this.rotateTimer);
-                                                            this.rotateTimer = null;
+                                                        if (this.viewer) {
+                                                            this.viewer.stopAutoRotate();
                                                         }
                                                         this.hintVisible = false;
                                                     };
                                                     this.$refs.panoEl.addEventListener('mousedown', stopRotate, { once: true });
                                                     this.$refs.panoEl.addEventListener('touchstart', stopRotate, { once: true });
+                                                    this.$refs.panoEl.addEventListener('pointerdown', stopRotate, { once: true });
                                                 });
                                             },
                                             goFullscreen() {
