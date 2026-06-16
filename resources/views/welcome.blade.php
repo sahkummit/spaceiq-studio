@@ -275,49 +275,94 @@
                             @else
                                 @php
                                     $imageUrls = collect();
-                                    // Group media by category and take a few from each category to ensure variety, up to 5 total.
-                                    $categoryMediaGrouped = $service->media->where('file_type', '!=', 'video')->groupBy('category');
+                                    $selected = [];
+                                    $seenGenres = [];
                                     
-                                    $collectedCount = 0;
-                                    $maxImages = 5;
-                                    
-                                    if ($categoryMediaGrouped->count() > 0) {
-                                        // Round robin selection
-                                        while ($collectedCount < $maxImages) {
-                                            $addedAny = false;
-                                            foreach ($categoryMediaGrouped as $catName => $items) {
-                                                if ($items->count() > 0) {
-                                                    $item = $items->shift(); // take the first item
-                                                    $imageUrls->push(parse_url(Storage::url($item->file_path), PHP_URL_PATH));
-                                                    $collectedCount++;
-                                                    $addedAny = true;
-                                                    if ($collectedCount >= $maxImages) {
-                                                        break 2;
-                                                    }
-                                                }
+                                    foreach ($service->media->where('file_type', '!=', 'video')->sortBy('sort_order') as $media) {
+                                        $path = public_path(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                        
+                                        // Ensure width > height (landscape) to fit the frame perfectly
+                                        $isLandscape = true;
+                                        if (file_exists($path)) {
+                                            $size = @getimagesize($path);
+                                            if ($size && ($size[1] > $size[0])) {
+                                                $isLandscape = false; // skip vertical/portrait images
                                             }
-                                            if (!$addedAny) {
+                                        }
+                                        
+                                        if (!$isLandscape) {
+                                            continue;
+                                        }
+                                        
+                                        // Classify by genre keywords in title or category
+                                        $genre = 'other';
+                                        $title = strtolower($media->title);
+                                        $cat = strtolower($media->category ?? '');
+                                        
+                                        if (str_contains($title, 'bedroom')) {
+                                            $genre = 'bedroom';
+                                        } elseif (str_contains($title, 'living')) {
+                                            $genre = 'living';
+                                        } elseif (str_contains($title, 'bath')) {
+                                            $genre = 'bathroom';
+                                        } elseif (str_contains($title, 'dining') || str_contains($title, 'kitchen') || str_contains($title, 'cafe') || str_contains($title, 'bar')) {
+                                            $genre = 'dining_kitchen_bar';
+                                        } elseif (str_contains($title, 'office') || str_contains($title, 'conference') || str_contains($title, 'reception') || str_contains($title, 'study') || str_contains($title, 'library')) {
+                                            $genre = 'workspace';
+                                        } elseif (str_contains($title, 'gym')) {
+                                            $genre = 'gym';
+                                        } elseif (str_contains($title, 'mansion') || str_contains($title, 'house') || str_contains($title, 'home') || str_contains($title, 'townhouse') || str_contains($title, 'residence') || str_contains($title, 'suburban')) {
+                                            $genre = 'residential_elevation';
+                                        } elseif (str_contains($title, 'commercial') || str_contains($title, 'building') || str_contains($title, 'retail') || str_contains($title, 'theatre') || str_contains($title, 'office complex')) {
+                                            $genre = 'commercial_elevation';
+                                        } elseif (str_contains($title, 'landscape') || str_contains($title, 'pool') || str_contains($title, 'garden') || str_contains($title, 'backyard') || str_contains($title, 'lawn')) {
+                                            $genre = 'landscape_design';
+                                        } elseif (str_contains($title, 'black & white') || str_contains($title, 'b&w') || $cat === 'b&w' || $cat === 'b-w' || $cat === 'bw') {
+                                            $genre = 'floorplan_bw';
+                                        } elseif (str_contains($title, 'colour') || str_contains($title, 'color') || $cat === 'color') {
+                                            $genre = 'floorplan_color';
+                                        } elseif (str_contains($title, 'site plan') || $cat === 'site plan' || $cat === 'site-plan') {
+                                            $genre = 'floorplan_site';
+                                        } elseif ($cat === 'residential') {
+                                            $genre = 'floorplan_residential';
+                                        }
+                                        
+                                        // Round robin/unique check
+                                        if ($genre === 'other' || !in_array($genre, $seenGenres)) {
+                                            if ($genre !== 'other') {
+                                                $seenGenres[] = $genre;
+                                            }
+                                            $imageUrls->push(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                            if ($imageUrls->count() >= 5) {
                                                 break;
                                             }
                                         }
                                     }
                                     
-                                    // Fallback if no media items found or is empty
-                                    if ($imageUrls->isEmpty()) {
-                                        foreach($service->media as $media) {
-                                            if ($media->file_type === 'video') {
-                                                if (str_contains($media->file_path, 'youtube.com') || str_contains($media->file_path, 'youtu.be')) {
-                                                    if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $media->file_path, $match)) {
-                                                        $youtubeId = $match[1];
-                                                        $imageUrls->push("https://img.youtube.com/vi/{$youtubeId}/hqdefault.jpg");
+                                    // Fallback if we have less than 5 unique-genre landscape images
+                                    if ($imageUrls->count() < 5) {
+                                        foreach ($service->media->where('file_type', '!=', 'video')->sortBy('sort_order') as $media) {
+                                            $url = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
+                                            if (!$imageUrls->contains($url)) {
+                                                $path = public_path($url);
+                                                $isLandscape = true;
+                                                if (file_exists($path)) {
+                                                    $size = @getimagesize($path);
+                                                    if ($size && ($size[1] > $size[0])) {
+                                                        $isLandscape = false;
                                                     }
                                                 }
-                                            } else {
-                                                $imageUrls->push(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                                if ($isLandscape) {
+                                                    $imageUrls->push($url);
+                                                    if ($imageUrls->count() >= 5) {
+                                                        break;
+                                                    }
+                                                }
                                             }
-                                            if ($imageUrls->count() >= $maxImages) break;
                                         }
                                     }
+                                    
+                                    // Extreme fallback: any image
                                     if ($imageUrls->isEmpty()) {
                                         $imageUrls->push($index % 2 == 0 ? '/img/exterior_render.png' : '/img/interior_render.png');
                                     }
