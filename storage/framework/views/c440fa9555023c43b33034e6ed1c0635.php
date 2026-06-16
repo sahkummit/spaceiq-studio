@@ -173,95 +173,94 @@
     </div>
 </section>
 
-<!-- Services — Original Card Grid -->
-<section id="services" class="py-20 bg-brand-950">
+<!-- Services — Matching spaceiqstudio.com style -->
+<section id="services" class="py-24 bg-brand-950">
     <div class="container mx-auto px-6 xl:px-12" style="max-width:1536px">
 
         <?php
-            $homeServices = \App\Models\Service::where('is_active', true)->orderBy('sort_order')->take(4)->get();
-            $serviceImages = [];
-            foreach ($homeServices as $idx => $svc) {
+            $homeServices = \App\Models\Service::where('is_active', true)->orderBy('sort_order')->take(5)->get();
+            // One representative image per service
+            $serviceData = [];
+            foreach ($homeServices as $svc) {
                 $img = null;
+                $desc = null;
                 foreach ($svc->media->sortBy('sort_order') as $m) {
                     if ($m->file_type === 'video') {
                         if (preg_match('%(?:youtu(?:be\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|\.be/))([^"&?/\s]{11})%i', $m->file_path, $yt)) {
-                            $img = "https://img.youtube.com/vi/{$yt[1]}/maxresdefault.jpg";
+                            $img = $img ?: "https://img.youtube.com/vi/{$yt[1]}/maxresdefault.jpg";
                         }
                     } else {
-                        $img = parse_url(Storage::url($m->file_path), PHP_URL_PATH);
+                        $img = $img ?: parse_url(Storage::url($m->file_path), PHP_URL_PATH);
                     }
-                    if ($img) break;
                 }
-                $serviceImages[] = $img ?: ($idx % 2 === 0 ? '/img/exterior_render.png' : '/img/interior_render.png');
+                $serviceData[] = [
+                    'service' => $svc,
+                    'img'     => $img ?: '/img/exterior_render.png',
+                ];
             }
         ?>
 
         
-        <div class="flex items-end justify-between mb-10">
-            <div>
-                <p class="text-[10px] uppercase tracking-[0.35em] text-accent-400 font-black mb-2">What We Create</p>
-                <h2 class="text-4xl md:text-5xl font-display font-black text-white uppercase leading-tight">Our Services</h2>
-            </div>
-            <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>"
-               class="hidden md:flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-accent-400 hover:text-white transition-colors duration-200">
-                View All
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </a>
+        <div class="text-center mb-14">
+            <p class="text-[10px] uppercase tracking-[0.4em] text-accent-400 font-black mb-3">What We Create</p>
+            <h2 class="text-4xl md:text-5xl font-display font-black text-white uppercase leading-tight">Our Services</h2>
         </div>
 
-        <?php if($homeServices->count() > 0): ?>
+        <?php if(count($serviceData) > 0): ?>
         
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-0 rounded-2xl overflow-hidden border border-white/[0.07]">
-            <?php $__currentLoopData = $homeServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $svc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <a href="<?php echo e(route('service.show', $svc->slug)); ?>"
-               class="group relative overflow-hidden block"
-               style="aspect-ratio:3/4;">
+        <div class="grid gap-6"
+             style="grid-template-columns: repeat(<?php echo e(min(count($serviceData), 3)); ?>, 1fr);">
+
+            <?php $__currentLoopData = $serviceData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $sd): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
+                // Short description per service type
+                $descriptions = [
+                    'exterior-renders'           => 'Stunning photorealistic exterior renders that elevate your project.',
+                    'interior-renders'           => 'Photorealistic interiors that make your spaces feel real and inviting.',
+                    '3d-animation'               => 'Cinematic walkthroughs that make your project impossible to ignore.',
+                    'walkthrough-animation'      => 'Cinematic walkthroughs that make your project impossible to ignore.',
+                    '360-views'                  => 'Immersive 360° virtual tours — explore your space from anywhere.',
+                    'floor-plans'                => 'Clean, professional floor plans ready for marketing and permits.',
+                    'autocad-drafting'           => 'Precision CAD drafts transformed from sketches and PDFs.',
+                    'interior-design-consultation' => 'Expert design guidance to bring your interior vision to life.',
+                ];
+                $blurb = $descriptions[$sd['service']->slug] ?? 'High-quality architectural visualisation services.';
+            ?>
+            <a href="<?php echo e(route('service.show', $sd['service']->slug)); ?>"
+               class="group relative overflow-hidden rounded-2xl block bg-brand-900 border border-white/[0.06] hover:border-accent-400/30 transition-all duration-300"
+               style="height: 340px;">
 
                 
-                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-108"
-                     style="background-image:url('<?php echo e($serviceImages[$idx]); ?>');"></div>
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
+                     style="background-image:url('<?php echo e($sd['img']); ?>');"></div>
 
                 
-                <div class="absolute inset-0 bg-gradient-to-t from-brand-950/95 via-brand-950/30 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/50 to-transparent"></div>
 
                 
-                <?php if($idx < $homeServices->count() - 1): ?>
-                <div class="absolute top-0 right-0 bottom-0 w-px bg-white/[0.07]"></div>
-                <?php endif; ?>
-
-                
-                <?php if($svc->slug === '360-views'): ?>
-                <div class="absolute top-4 right-4 flex items-center gap-1 bg-brand-950/70 backdrop-blur-sm border border-accent-400/30 rounded-full px-2.5 py-1">
-                    <div class="w-1 h-1 rounded-full bg-accent-400"></div>
+                <?php if($sd['service']->slug === '360-views'): ?>
+                <div class="absolute top-4 right-4 flex items-center gap-1.5 bg-accent-400/20 border border-accent-400/40 rounded-full px-3 py-1">
+                    <div class="w-1.5 h-1.5 rounded-full bg-accent-400 animate-pulse"></div>
                     <span class="text-[9px] font-black tracking-widest text-accent-400 uppercase">360°</span>
                 </div>
                 <?php endif; ?>
 
                 
-                <div class="absolute bottom-0 left-0 right-0 p-5 translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
-                    <div class="w-6 h-px bg-accent-400 mb-3 group-hover:w-10 transition-all duration-500"></div>
-                    <h3 class="text-white font-display font-black text-base uppercase tracking-wide leading-tight"><?php echo e($svc->title); ?></h3>
-                    <div class="flex items-center gap-1.5 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-accent-400">View Gallery</span>
-                        <svg class="w-3 h-3 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </div>
+                <div class="absolute bottom-0 left-0 right-0 p-6">
+                    <div class="w-6 h-px bg-accent-400 mb-3 group-hover:w-12 transition-all duration-500"></div>
+                    <h3 class="text-white font-display font-black text-xl uppercase tracking-tight leading-none mb-2"><?php echo e($sd['service']->title); ?></h3>
+                    <p class="text-white/50 text-xs leading-relaxed mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 max-h-0 group-hover:max-h-12 overflow-hidden transition-all"><?php echo e($blurb); ?></p>
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-accent-400 group-hover:text-white transition-colors duration-300">
+                        View Gallery
+                        <svg class="w-3 h-3 translate-x-0 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </span>
                 </div>
             </a>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-
-        
-        <div class="text-center mt-8 md:hidden">
-            <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>"
-               class="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-accent-400 hover:text-white transition-colors">
-                View All Services <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </a>
-        </div>
         <?php endif; ?>
     </div>
 </section>
-
-
 
 
 

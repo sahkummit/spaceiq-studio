@@ -318,12 +318,11 @@
                         <div class="{{ $spaceClass }} w-full {{ $staggerClass }}">
                             @foreach($columnMedia as $media)
                                 @if($service->slug === '360-views')
-                                    {{-- 360° Auto-rotating viewer (cgdrops.com style) --}}
-                                    <div class="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-brand-950 w-full group/pano"
+                                    {{-- 360° Auto-rotating viewer — no blocking shield --}}
+                                    <div class="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-brand-950 w-full"
                                          x-data="{
                                             viewer: null,
                                             hintVisible: true,
-                                            focused: false,
                                             init() {
                                                 this.$nextTick(() => {
                                                     this.viewer = pannellum.viewer(this.$refs.panoEl, {
@@ -339,17 +338,13 @@
                                                         showControls: false,
                                                         friction: 0.4
                                                     });
-                                                    /* Stop autorotate + hide hint when user first interacts */
-                                                    this.viewer.on('mousedown', () => {
+                                                    /* First drag: stop autorotate + hide hint */
+                                                    const stopRotate = () => {
                                                         this.hintVisible = false;
-                                                        this.focused = true;
-                                                        this.viewer.setAutoRotate(0);
-                                                    });
-                                                    this.viewer.on('touchstart', () => {
-                                                        this.hintVisible = false;
-                                                        this.focused = true;
-                                                        this.viewer.setAutoRotate(0);
-                                                    });
+                                                        if (this.viewer) this.viewer.setAutoRotate(0);
+                                                    };
+                                                    this.viewer.on('mousedown', stopRotate);
+                                                    this.viewer.on('touchstart', stopRotate);
                                                 });
                                             },
                                             goFullscreen() {
@@ -358,33 +353,18 @@
                                          }"
                                          x-init="init()">
 
-                                        {{-- Pannellum container — always visible --}}
+                                        {{-- Pannellum container — always visible, always interactive --}}
                                         <div x-ref="panoEl"
                                              class="w-full"
                                              style="height: 480px;"></div>
 
-                                        {{-- Scroll-intercept shield: prevents page scroll from zooming viewer until user clicks inside --}}
-                                        <div class="absolute inset-0 z-10 cursor-grab"
-                                             x-show="!focused"
-                                             @click="focused = true; hintVisible = false;"
-                                             @wheel.stop
-                                             style="background:transparent;"></div>
-
-                                        {{-- "Click to Explore" hint badge — fades out after first interaction --}}
-                                        <div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700"
+                                        {{-- Hint text: small, bottom-center, fades out on first drag --}}
+                                        <div class="absolute bottom-3 left-0 right-0 z-20 flex justify-center pointer-events-none transition-opacity duration-500"
                                              :class="hintVisible ? 'opacity-100' : 'opacity-0'">
-                                            <div class="flex flex-col items-center gap-2 bg-brand-950/50 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4">
-                                                {{-- Rotating circle icon --}}
-                                                <svg class="w-8 h-8 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="animation:spin 8s linear infinite;">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4"/>
-                                                </svg>
-                                                <p class="text-white font-bold text-sm tracking-widest uppercase">Click to Explore</p>
-                                                <p class="text-white/50 text-[10px] tracking-wider">Drag to look around · 360°</p>
-                                            </div>
+                                            <span class="text-[10px] text-white/60 tracking-widest font-semibold uppercase bg-brand-950/50 backdrop-blur-sm rounded-full px-3 py-1">Click to explore · drag to look around</span>
                                         </div>
 
-                                        {{-- Always-visible top bar: title left, fullscreen right --}}
+                                        {{-- Top bar: title + fullscreen button --}}
                                         <div class="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-2.5 bg-gradient-to-b from-brand-950/70 to-transparent pointer-events-none">
                                             <div class="flex items-center gap-2">
                                                 <div class="w-1.5 h-1.5 rounded-full bg-accent-400 animate-pulse"></div>
