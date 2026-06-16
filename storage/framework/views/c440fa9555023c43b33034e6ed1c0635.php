@@ -173,144 +173,96 @@
     </div>
 </section>
 
-<!-- Services — Vertical Tab Showcase -->
-<section id="services" class="relative bg-brand-950">
+<!-- Services — Original Card Grid -->
+<section id="services" class="py-20 bg-brand-950">
+    <div class="container mx-auto px-6 xl:px-12" style="max-width:1536px">
 
-    <?php
-        $homeServices = \App\Models\Service::where('is_active', true)->orderBy('sort_order')->take(5)->get();
-        $serviceImages = [];
-        foreach ($homeServices as $idx => $svc) {
-            $img = null;
-            foreach ($svc->media->sortBy('sort_order') as $m) {
-                if ($m->file_type === 'video') {
-                    if (preg_match('%(?:youtu(?:be\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|\.be/))([^"&?/\s]{11})%i', $m->file_path, $yt)) {
-                        $img = "https://img.youtube.com/vi/{$yt[1]}/maxresdefault.jpg";
+        <?php
+            $homeServices = \App\Models\Service::where('is_active', true)->orderBy('sort_order')->take(4)->get();
+            $serviceImages = [];
+            foreach ($homeServices as $idx => $svc) {
+                $img = null;
+                foreach ($svc->media->sortBy('sort_order') as $m) {
+                    if ($m->file_type === 'video') {
+                        if (preg_match('%(?:youtu(?:be\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|\.be/))([^"&?/\s]{11})%i', $m->file_path, $yt)) {
+                            $img = "https://img.youtube.com/vi/{$yt[1]}/maxresdefault.jpg";
+                        }
+                    } else {
+                        $img = parse_url(Storage::url($m->file_path), PHP_URL_PATH);
                     }
-                } else {
-                    $img = parse_url(Storage::url($m->file_path), PHP_URL_PATH);
+                    if ($img) break;
                 }
-                if ($img) break;
+                $serviceImages[] = $img ?: ($idx % 2 === 0 ? '/img/exterior_render.png' : '/img/interior_render.png');
             }
-            $serviceImages[] = $img ?: ($idx % 2 === 0 ? '/img/exterior_render.png' : '/img/interior_render.png');
-        }
-    ?>
-
-    <?php if($homeServices->count() > 0): ?>
-    <div x-data="{ active: 0 }"
-         class="grid grid-cols-1 lg:grid-cols-2 min-h-[700px]">
+        ?>
 
         
-        <div class="flex flex-col justify-center px-8 md:px-16 xl:px-24 py-20 lg:py-0 border-r border-white/[0.06]">
-
-            
-            <div class="mb-12">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="h-px w-6 bg-accent-400"></div>
-                    <p class="text-[10px] uppercase tracking-[0.35em] text-accent-400 font-black">What We Do</p>
-                </div>
-                <h2 class="text-4xl md:text-5xl font-display font-black text-white leading-tight uppercase">
-                    What We<br><em class="not-italic" style="-webkit-text-stroke:1.5px #3AADAA;color:transparent;">Create</em>
-                </h2>
+        <div class="flex items-end justify-between mb-10">
+            <div>
+                <p class="text-[10px] uppercase tracking-[0.35em] text-accent-400 font-black mb-2">What We Create</p>
+                <h2 class="text-4xl md:text-5xl font-display font-black text-white uppercase leading-tight">Our Services</h2>
             </div>
-
-            
-            <div class="flex flex-col divide-y divide-white/[0.06]">
-                <?php $__currentLoopData = $homeServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $svc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <?php $num = str_pad($idx + 1, 2, '0', STR_PAD_LEFT); ?>
-                <a href="<?php echo e(route('service.show', $svc->slug)); ?>"
-                   class="group flex items-center justify-between py-5 md:py-6 cursor-pointer transition-all duration-200"
-                   @mouseenter="active = <?php echo e($idx); ?>">
-
-                    <div class="flex items-center gap-5 md:gap-8">
-                        
-                        <span class="font-display font-black text-sm tabular-nums transition-colors duration-200"
-                              :class="active === <?php echo e($idx); ?> ? 'text-accent-400' : 'text-white/15'"><?php echo e($num); ?></span>
-
-                        
-                        <span class="font-display font-black text-xl md:text-2xl uppercase tracking-tight transition-colors duration-200"
-                              :class="active === <?php echo e($idx); ?> ? 'text-white' : 'text-white/40 group-hover:text-white/70'">
-                            <?php echo e($svc->title); ?>
-
-                        </span>
-
-                        <?php if($svc->slug === '360-views'): ?>
-                        <span class="hidden sm:inline-flex items-center gap-1 border border-accent-400/30 rounded-full px-2 py-0.5 text-[9px] font-black tracking-widest text-accent-400 uppercase">
-                            360°
-                        </span>
-                        <?php endif; ?>
-                    </div>
-
-                    
-                    <svg class="w-4 h-4 transition-all duration-300 flex-shrink-0"
-                         :class="active === <?php echo e($idx); ?> ? 'text-accent-400 translate-x-0 opacity-100' : 'text-white/15 -translate-x-2 opacity-0 group-hover:opacity-50 group-hover:translate-x-0'"
-                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                    </svg>
-                </a>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </div>
-
-            
-            <div class="mt-12 pt-8 border-t border-white/[0.06] flex flex-wrap gap-8 items-center justify-between">
-                <div class="flex gap-8">
-                    <div>
-                        <p class="font-display font-black text-xl text-white">500+</p>
-                        <p class="text-[9px] uppercase tracking-widest text-white/30 font-semibold mt-0.5">Projects</p>
-                    </div>
-                    <div>
-                        <p class="font-display font-black text-xl text-white">4K</p>
-                        <p class="text-[9px] uppercase tracking-widest text-white/30 font-semibold mt-0.5">Resolution</p>
-                    </div>
-                    <div>
-                        <p class="font-display font-black text-xl text-white">100%</p>
-                        <p class="text-[9px] uppercase tracking-widest text-white/30 font-semibold mt-0.5">Satisfaction</p>
-                    </div>
-                </div>
-                <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>"
-                   class="text-[10px] font-black uppercase tracking-[0.25em] text-accent-400 hover:text-white transition-colors duration-200 flex items-center gap-2">
-                    All Services
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </a>
-            </div>
+            <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>"
+               class="hidden md:flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-accent-400 hover:text-white transition-colors duration-200">
+                View All
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
         </div>
 
+        <?php if($homeServices->count() > 0): ?>
         
-        <div class="relative overflow-hidden hidden lg:block" style="min-height:700px;">
-
-            
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-0 rounded-2xl overflow-hidden border border-white/[0.07]">
             <?php $__currentLoopData = $homeServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $svc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <div class="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
-                 style="background-image:url('<?php echo e($serviceImages[$idx]); ?>');"
-                 :class="active === <?php echo e($idx); ?> ? 'opacity-100' : 'opacity-0'">
-            </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <a href="<?php echo e(route('service.show', $svc->slug)); ?>"
+               class="group relative overflow-hidden block"
+               style="aspect-ratio:3/4;">
 
-            
-            <div class="absolute inset-0 bg-gradient-to-r from-brand-950/20 to-transparent"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-brand-950/60 via-transparent to-transparent"></div>
+                
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-108"
+                     style="background-image:url('<?php echo e($serviceImages[$idx]); ?>');"></div>
 
-            
-            <div class="absolute bottom-8 left-8 z-10">
-                <?php $__currentLoopData = $homeServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $svc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div x-show="active === <?php echo e($idx); ?>"
-                     x-transition:enter="transition ease-out duration-300"
-                     x-transition:enter-start="opacity-0 translate-y-2"
-                     x-transition:enter-end="opacity-100 translate-y-0"
-                     style="<?php echo e($idx !== 0 ? 'display:none;' : ''); ?>">
-                    <p class="text-[10px] uppercase tracking-[0.3em] text-accent-400/80 font-black mb-1">
-                        <?php echo e(str_pad($idx + 1, 2, '0', STR_PAD_LEFT)); ?> / <?php echo e(str_pad($homeServices->count(), 2, '0', STR_PAD_LEFT)); ?>
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-brand-950/95 via-brand-950/30 to-transparent"></div>
 
-                    </p>
-                    <p class="text-white font-display font-black text-2xl uppercase tracking-tight"><?php echo e($svc->title); ?></p>
+                
+                <?php if($idx < $homeServices->count() - 1): ?>
+                <div class="absolute top-0 right-0 bottom-0 w-px bg-white/[0.07]"></div>
+                <?php endif; ?>
+
+                
+                <?php if($svc->slug === '360-views'): ?>
+                <div class="absolute top-4 right-4 flex items-center gap-1 bg-brand-950/70 backdrop-blur-sm border border-accent-400/30 rounded-full px-2.5 py-1">
+                    <div class="w-1 h-1 rounded-full bg-accent-400"></div>
+                    <span class="text-[9px] font-black tracking-widest text-accent-400 uppercase">360°</span>
                 </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </div>
+                <?php endif; ?>
+
+                
+                <div class="absolute bottom-0 left-0 right-0 p-5 translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+                    <div class="w-6 h-px bg-accent-400 mb-3 group-hover:w-10 transition-all duration-500"></div>
+                    <h3 class="text-white font-display font-black text-base uppercase tracking-wide leading-tight"><?php echo e($svc->title); ?></h3>
+                    <div class="flex items-center gap-1.5 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-accent-400">View Gallery</span>
+                        <svg class="w-3 h-3 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </div>
+                </div>
+            </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
+        
+        <div class="text-center mt-8 md:hidden">
+            <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>"
+               class="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-accent-400 hover:text-white transition-colors">
+                View All Services <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
+        <?php endif; ?>
     </div>
-    <?php endif; ?>
-
 </section>
+
+
+
 
 
 
