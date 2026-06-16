@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Space IQ - Architectural Renderings')</title>
+    <title>@yield('title', 'Space IQ')</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <meta name="description" content="@yield('meta_description', \App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'Hyper-realistic 4K renders that captivate clients.')">
@@ -13,13 +13,13 @@
     <meta name="theme-color" content="#0E7C7B">
     
     <!-- Open Graph SEO -->
-    <meta property="og:title" content="@yield('title', 'Space IQ - Architectural Renderings')">
+    <meta property="og:title" content="@yield('title', 'Space IQ')">
     <meta property="og:description" content="@yield('meta_description', 'High-Fidelity Renders. Professional Delivery. Zero Compromise.')">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request()->url() }}">
     <meta property="og:image" content="@yield('og_image', asset('img/exterior_render.png'))">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'Space IQ - Architectural Renderings')">
+    <meta name="twitter:title" content="@yield('title', 'Space IQ')">
     <meta name="twitter:description" content="@yield('meta_description', 'High-Fidelity Renders. Professional Delivery. Zero Compromise.')">
     <meta name="twitter:image" content="@yield('og_image', asset('img/exterior_render.png'))">
 
@@ -284,8 +284,15 @@
             <div class="flex items-center justify-between gap-8 w-full">
                 <!-- Logo (Extreme Left) -->
                 <a href="{{ route('home') }}" class="flex-shrink-0 flex items-center gap-3 group">
-                    <img src="{{ asset('img/logo.png') }}" alt="SpaceIQ Design Studio" class="w-auto drop-shadow-lg transition-all duration-300 group-hover:scale-105 rounded-full" :class="scrolled ? 'h-10' : 'h-14'">
-                    <span class="font-display font-bold tracking-wider text-white transition-all duration-300" :class="scrolled ? 'text-base' : 'text-xl'">Space<span class="text-accent-400">IQ</span></span>
+                    <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" 
+                         class="w-auto drop-shadow-lg transition-all duration-300 group-hover:scale-105"
+                         :class="scrolled ? 'h-9' : 'h-12'">
+                    <div class="flex flex-col leading-tight">
+                        <span class="font-display font-bold tracking-wider text-white transition-all duration-300"
+                              :class="scrolled ? 'text-sm' : 'text-lg'">Space IQ</span>
+                        <span class="font-display font-light tracking-widest text-white/70 uppercase transition-all duration-300"
+                              :class="scrolled ? 'text-[8px]' : 'text-[10px]'">Design Studio</span>
+                    </div>
                 </a>
 
                 <!-- Services Links (Middle) -->
@@ -487,8 +494,12 @@
                 <!-- Column 1: About -->
                 <div class="col-span-1 md:col-span-4">
                     <a href="{{ route('home') }}" class="flex items-center gap-3 mb-6 group">
-                        <img src="{{ asset('img/logo.png') }}" alt="SpaceIQ Design Studio" class="h-12 w-auto rounded-full drop-shadow-[0_0_15px_rgba(26,158,150,0.15)] opacity-90 group-hover:opacity-100 transition-opacity">
-                        <span class="font-display font-bold text-xl tracking-wider text-white">Space<span class="text-accent-400">IQ</span></span>
+                        <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" 
+                             class="h-12 w-auto drop-shadow-[0_0_15px_rgba(26,158,150,0.15)] opacity-90 group-hover:opacity-100 transition-opacity">
+                        <div class="flex flex-col leading-tight">
+                            <span class="font-display font-bold text-lg tracking-wider text-white">Space IQ</span>
+                            <span class="font-display font-light text-[10px] tracking-widest text-white/60 uppercase">Design Studio</span>
+                        </div>
                     </a>
                     <p class="text-gray-400 text-sm leading-relaxed mb-6 font-light max-w-sm">
                         {{ \App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'High-Fidelity Renders. Professional Delivery. Zero Compromise.' }}
