@@ -341,14 +341,12 @@
                                                         showControls: false,
                                                         friction: 0.15
                                                     });
-                                                    /* Start manual rotation after image loads */
-                                                    this.viewer.on('load', () => {
-                                                        this.rotateTimer = setInterval(() => {
-                                                            if (this.viewer) {
-                                                                this.viewer.setYaw(this.viewer.getYaw() - 0.04);
-                                                            }
-                                                        }, 30);
-                                                    });
+                                                    /* Start manual rotation immediately */
+                                                    this.rotateTimer = setInterval(() => {
+                                                        if (this.viewer) {
+                                                            this.viewer.setYaw(this.viewer.getYaw() - 0.04);
+                                                        }
+                                                    }, 30);
                                                     /* Stop rotation on first user interaction */
                                                     const stopRotate = () => {
                                                         if (this.rotateTimer) {
