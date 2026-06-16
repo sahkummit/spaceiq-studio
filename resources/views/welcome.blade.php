@@ -175,86 +175,71 @@
     </div>
 </section>
 
-<!-- Services — Matching spaceiqstudio.com style -->
-<section id="services" class="py-24 bg-brand-950">
-    <div class="container mx-auto px-6 xl:px-12" style="max-width:1536px">
+<!-- Services — matching spaceiqstudio.com -->
+<section id="services" class="bg-brand-950">
+    <div class="w-full">
 
         @php
             $homeServices = \App\Models\Service::where('is_active', true)->orderBy('sort_order')->take(5)->get();
-            // One representative image per service
-            $serviceData = [];
-            foreach ($homeServices as $svc) {
+            $serviceDescriptions = [
+                'exterior-renders'             => 'Stunning exterior 3D renders that elevate your project\'s value and presence.',
+                'interior-renders'             => 'Photorealistic interior renders that make your spaces feel real, inviting, and ready to present.',
+                '3d-animation'                 => 'Cinematic 3D walkthrough animations that make your project look premium and impossible to ignore.',
+                'walkthrough-animation'        => 'Cinematic 3D walkthrough animations that make your project look premium and impossible to ignore.',
+                '360-views'                    => 'Immersive 360° virtual tours that let clients explore your spaces interactively — from anywhere in the world.',
+                'floor-plans'                  => 'Clean, professional floor plans and site plans transformed from sketches, PDFs, and CAD files — ready for marketing.',
+                'autocad-drafting'             => 'Precision 2D drafting and CAD services — permit-ready drawings from your sketches or existing plans.',
+                'interior-design-consultation' => 'Expert interior design consultation to bring your vision to life with curated spaces.',
+            ];
+        @endphp
+
+        @if($homeServices->count() > 0)
+        {{-- Full-width card row: n equal columns, no padding, no gap --}}
+        <div style="display:flex; width:100%;">
+            @foreach($homeServices as $idx => $svc)
+            @php
                 $img = null;
-                $desc = null;
                 foreach ($svc->media->sortBy('sort_order') as $m) {
                     if ($m->file_type === 'video') {
                         if (preg_match('%(?:youtu(?:be\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|\.be/))([^"&?/\s]{11})%i', $m->file_path, $yt)) {
-                            $img = $img ?: "https://img.youtube.com/vi/{$yt[1]}/maxresdefault.jpg";
+                            $img = "https://img.youtube.com/vi/{$yt[1]}/maxresdefault.jpg";
                         }
                     } else {
-                        $img = $img ?: parse_url(Storage::url($m->file_path), PHP_URL_PATH);
+                        $img = parse_url(Storage::url($m->file_path), PHP_URL_PATH);
                     }
+                    if ($img) break;
                 }
-                $serviceData[] = [
-                    'service' => $svc,
-                    'img'     => $img ?: '/img/exterior_render.png',
-                ];
-            }
-        @endphp
-
-        {{-- Section heading --}}
-        <div class="text-center mb-14">
-            <p class="text-[10px] uppercase tracking-[0.4em] text-accent-400 font-black mb-3">What We Create</p>
-            <h2 class="text-4xl md:text-5xl font-display font-black text-white uppercase leading-tight">Our Services</h2>
-        </div>
-
-        @if(count($serviceData) > 0)
-        {{-- Service cards — equal height, no gap, rounded outer container --}}
-        <div class="grid gap-6"
-             style="grid-template-columns: repeat({{ min(count($serviceData), 3) }}, 1fr);">
-
-            @foreach($serviceData as $i => $sd)
-            @php
-                // Short description per service type
-                $descriptions = [
-                    'exterior-renders'           => 'Stunning photorealistic exterior renders that elevate your project.',
-                    'interior-renders'           => 'Photorealistic interiors that make your spaces feel real and inviting.',
-                    '3d-animation'               => 'Cinematic walkthroughs that make your project impossible to ignore.',
-                    'walkthrough-animation'      => 'Cinematic walkthroughs that make your project impossible to ignore.',
-                    '360-views'                  => 'Immersive 360° virtual tours — explore your space from anywhere.',
-                    'floor-plans'                => 'Clean, professional floor plans ready for marketing and permits.',
-                    'autocad-drafting'           => 'Precision CAD drafts transformed from sketches and PDFs.',
-                    'interior-design-consultation' => 'Expert design guidance to bring your interior vision to life.',
-                ];
-                $blurb = $descriptions[$sd['service']->slug] ?? 'High-quality architectural visualisation services.';
+                $img = $img ?: '/img/exterior_render.png';
+                $desc = $serviceDescriptions[$svc->slug] ?? '';
+                $isLast = $idx === $homeServices->count() - 1;
             @endphp
-            <a href="{{ route('service.show', $sd['service']->slug) }}"
-               class="group relative overflow-hidden rounded-2xl block bg-brand-900 border border-white/[0.06] hover:border-accent-400/30 transition-all duration-300"
-               style="height: 340px;">
 
-                {{-- Image --}}
-                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
-                     style="background-image:url('{{ $sd['img'] }}');"></div>
+            <a href="{{ route('service.show', $svc->slug) }}"
+               class="group relative overflow-hidden block flex-1"
+               style="height:440px; {{ !$isLast ? 'border-right:1px solid rgba(255,255,255,0.07);' : '' }}">
 
-                {{-- Gradient: strong bottom, light top --}}
-                <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/50 to-transparent"></div>
+                {{-- Full-bleed image --}}
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-in-out group-hover:scale-[1.07]"
+                     style="background-image:url('{{ $img }}');"></div>
 
-                {{-- 360 badge --}}
-                @if($sd['service']->slug === '360-views')
-                <div class="absolute top-4 right-4 flex items-center gap-1.5 bg-accent-400/20 border border-accent-400/40 rounded-full px-3 py-1">
+                {{-- Dark gradient: strong at bottom --}}
+                <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(4,10,10,0.98) 0%, rgba(4,10,10,0.5) 40%, rgba(4,10,10,0.0) 100%);"></div>
+
+                {{-- 360° badge --}}
+                @if($svc->slug === '360-views')
+                <div class="absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-full px-2.5 py-1" style="background:rgba(0,0,0,0.55);border:1px solid rgba(58,173,170,0.5);">
                     <div class="w-1.5 h-1.5 rounded-full bg-accent-400 animate-pulse"></div>
-                    <span class="text-[9px] font-black tracking-widest text-accent-400 uppercase">360°</span>
+                    <span style="font-size:9px;font-weight:700;letter-spacing:0.15em;color:#3AADAA;text-transform:uppercase;">360°</span>
                 </div>
                 @endif
 
-                {{-- Bottom text content --}}
-                <div class="absolute bottom-0 left-0 right-0 p-6">
-                    <div class="w-6 h-px bg-accent-400 mb-3 group-hover:w-12 transition-all duration-500"></div>
-                    <h3 class="text-white font-display font-black text-xl uppercase tracking-tight leading-none mb-2">{{ $sd['service']->title }}</h3>
-                    <p class="text-white/50 text-xs leading-relaxed mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 max-h-0 group-hover:max-h-12 overflow-hidden transition-all">{{ $blurb }}</p>
-                    <span class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-accent-400 group-hover:text-white transition-colors duration-300">
+                {{-- Bottom text —  always visible, matching site style --}}
+                <div class="absolute bottom-0 left-0 right-0 px-6 pb-7 pt-12">
+                    <h4 class="text-white font-semibold text-base mb-2 leading-snug" style="font-family:'Montserrat',sans-serif;letter-spacing:0.02em;">{{ $svc->title }}</h4>
+                    <p class="text-white/45 text-xs leading-relaxed mb-4" style="font-size:11px;line-height:1.6;">{{ $desc }}</p>
+                    <span class="inline-flex items-center gap-2 font-semibold text-xs uppercase tracking-wider transition-colors duration-200" style="color:#3AADAA;font-size:11px;">
                         View Gallery
-                        <svg class="w-3 h-3 translate-x-0 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                     </span>
                 </div>
             </a>
@@ -263,7 +248,6 @@
         @endif
     </div>
 </section>
-
 
 
 

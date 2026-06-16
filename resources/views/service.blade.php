@@ -318,11 +318,12 @@
                         <div class="{{ $spaceClass }} w-full {{ $staggerClass }}">
                             @foreach($columnMedia as $media)
                                 @if($service->slug === '360-views')
-                                    {{-- 360° Auto-rotating viewer — no blocking shield --}}
+                                    {{-- 360° Viewer: manual setInterval rotation (avoids Pannellum autoRotate drag conflict) --}}
                                     <div class="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-brand-950 w-full"
                                          x-data="{
                                             viewer: null,
                                             hintVisible: true,
+                                            rotateTimer: null,
                                             init() {
                                                 this.$nextTick(() => {
                                                     this.viewer = pannellum.viewer(this.$refs.panoEl, {
@@ -330,21 +331,32 @@
                                                         panorama: '{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}',
                                                         autoLoad: true,
                                                         compass: false,
-                                                        autoRotate: -2,
+                                                        autoRotate: 0,
                                                         mouseZoom: false,
                                                         keyboardZoom: false,
                                                         showZoomCtrl: false,
                                                         showFullscreenCtrl: false,
                                                         showControls: false,
-                                                        friction: 0.4
+                                                        friction: 0.15
                                                     });
-                                                    /* First drag: stop autorotate + hide hint */
+                                                    /* Start manual rotation after image loads */
+                                                    this.viewer.on('load', () => {
+                                                        this.rotateTimer = setInterval(() => {
+                                                            if (this.viewer) {
+                                                                this.viewer.setYaw(this.viewer.getYaw() - 0.04);
+                                                            }
+                                                        }, 30);
+                                                    });
+                                                    /* Stop rotation on first user interaction */
                                                     const stopRotate = () => {
+                                                        if (this.rotateTimer) {
+                                                            clearInterval(this.rotateTimer);
+                                                            this.rotateTimer = null;
+                                                        }
                                                         this.hintVisible = false;
-                                                        if (this.viewer) this.viewer.setAutoRotate(0);
                                                     };
-                                                    this.viewer.on('mousedown', stopRotate);
-                                                    this.viewer.on('touchstart', stopRotate);
+                                                    this.$refs.panoEl.addEventListener('mousedown', stopRotate, { once: true });
+                                                    this.$refs.panoEl.addEventListener('touchstart', stopRotate, { once: true });
                                                 });
                                             },
                                             goFullscreen() {
@@ -353,15 +365,15 @@
                                          }"
                                          x-init="init()">
 
-                                        {{-- Pannellum container — always visible, always interactive --}}
+                                        {{-- Pannellum container: touch-action:none prevents mobile page scroll conflict --}}
                                         <div x-ref="panoEl"
                                              class="w-full"
-                                             style="height: 480px;"></div>
+                                             style="height: 480px; touch-action: none;"></div>
 
-                                        {{-- Hint text: small, bottom-center, fades out on first drag --}}
+                                        {{-- Small hint text bottom-center, fades on first drag --}}
                                         <div class="absolute bottom-3 left-0 right-0 z-20 flex justify-center pointer-events-none transition-opacity duration-500"
                                              :class="hintVisible ? 'opacity-100' : 'opacity-0'">
-                                            <span class="text-[10px] text-white/60 tracking-widest font-semibold uppercase bg-brand-950/50 backdrop-blur-sm rounded-full px-3 py-1">Click to explore · drag to look around</span>
+                                            <span class="text-[10px] text-white/55 tracking-widest font-medium uppercase bg-brand-950/40 backdrop-blur-sm rounded-full px-3 py-1">Click to explore</span>
                                         </div>
 
                                         {{-- Top bar: title + fullscreen button --}}
