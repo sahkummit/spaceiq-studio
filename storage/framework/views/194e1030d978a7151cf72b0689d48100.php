@@ -325,7 +325,7 @@
                                          x-data="{ 
                                             activated: false,
                                             viewer: null,
-                                            activateViewer() {
+                                            activateViewer(andFullscreen) {
                                                 this.activated = true;
                                                 this.$nextTick(() => {
                                                     if (!this.viewer) {
@@ -341,6 +341,14 @@
                                                             showFullscreenCtrl: false,
                                                             friction: 0.5
                                                         });
+                                                        if (andFullscreen) {
+                                                            // Wait for Pannellum to finish loading before going fullscreen
+                                                            this.viewer.on('load', () => {
+                                                                setTimeout(() => this.viewer.toggleFullscreen(), 100);
+                                                            });
+                                                        }
+                                                    } else if (andFullscreen) {
+                                                        this.viewer.toggleFullscreen();
                                                     }
                                                 });
                                             },
@@ -348,14 +356,16 @@
                                                 this.activated = false;
                                             },
                                             goFullscreen() {
-                                                const el = this.$el;
-                                                if (el.requestFullscreen) el.requestFullscreen();
-                                                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-                                                else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+                                                if (!this.activated) {
+                                                    this.activateViewer(true);
+                                                } else if (this.viewer) {
+                                                    this.viewer.toggleFullscreen();
+                                                }
                                             }
                                          }"
                                          @keydown.escape.window="deactivate()"
                                          :class="activated ? 'ring-2 ring-accent-400/60' : ''">
+
 
                                         
                                         <div x-ref="panoEl"

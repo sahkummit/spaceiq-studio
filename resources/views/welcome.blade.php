@@ -175,149 +175,142 @@
     </div>
 </section>
 
-<!-- Services Filmstrip -->
-<section id="services" class="py-0 relative bg-brand-950 overflow-hidden">
-
-    <!-- Section Header — sits above the strip -->
-    <div class="container mx-auto px-6 xl:px-16 pt-24 pb-12" style="max-width:1536px">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="h-px w-8 bg-accent-400"></div>
-                    <p class="text-[10px] uppercase tracking-[0.35em] text-accent-400 font-black">What We Create</p>
-                </div>
-                <h2 class="text-5xl md:text-6xl font-display font-black text-white leading-none uppercase tracking-tight">
-                    Our <span style="-webkit-text-stroke:2px #3AADAA;color:transparent;">Services</span>
-                </h2>
-            </div>
-            <div class="flex items-center gap-3 text-white/30 text-xs uppercase tracking-widest font-semibold self-end pb-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <span>Scroll to explore</span>
-            </div>
-        </div>
-    </div>
+<!-- Services — Vertical Tab Showcase -->
+<section id="services" class="relative bg-brand-950">
 
     @php
-        $homeServices = \App\Models\Service::where('is_active', true)
-            ->orderBy('sort_order')
-            ->take(5)
-            ->get();
+        $homeServices = \App\Models\Service::where('is_active', true)->orderBy('sort_order')->take(5)->get();
+        $serviceImages = [];
+        foreach ($homeServices as $idx => $svc) {
+            $img = null;
+            foreach ($svc->media->sortBy('sort_order') as $m) {
+                if ($m->file_type === 'video') {
+                    if (preg_match('%(?:youtu(?:be\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|\.be/))([^"&?/\s]{11})%i', $m->file_path, $yt)) {
+                        $img = "https://img.youtube.com/vi/{$yt[1]}/maxresdefault.jpg";
+                    }
+                } else {
+                    $img = parse_url(Storage::url($m->file_path), PHP_URL_PATH);
+                }
+                if ($img) break;
+            }
+            $serviceImages[] = $img ?: ($idx % 2 === 0 ? '/img/exterior_render.png' : '/img/interior_render.png');
+        }
     @endphp
 
     @if($homeServices->count() > 0)
-    <!-- Horizontal Filmstrip -->
-    <div class="relative pb-16">
-        <!-- Left edge fade -->
-        <div class="absolute left-0 top-0 bottom-16 w-24 bg-gradient-to-r from-brand-950 to-transparent z-10 pointer-events-none"></div>
-        <!-- Right edge fade -->
-        <div class="absolute right-0 top-0 bottom-16 w-24 bg-gradient-to-l from-brand-950 to-transparent z-10 pointer-events-none"></div>
+    <div x-data="{ active: 0 }"
+         class="grid grid-cols-1 lg:grid-cols-2 min-h-[700px]">
 
-        <div class="flex gap-4 overflow-x-auto pl-6 pr-6 pb-4"
-             style="scrollbar-width:thin;scrollbar-color:rgba(26,158,150,0.4) transparent;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;">
+        {{-- LEFT: service list --}}
+        <div class="flex flex-col justify-center px-8 md:px-16 xl:px-24 py-20 lg:py-0 border-r border-white/[0.06]">
 
-            @foreach($homeServices as $index => $service)
-            @php
-                $cardImageUrl = null;
-                foreach($service->media->sortBy('sort_order') as $media) {
-                    if ($media->file_type === 'video') {
-                        if (str_contains($media->file_path, 'youtube.com') || str_contains($media->file_path, 'youtu.be')) {
-                            if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $media->file_path, $ytMatch)) {
-                                $cardImageUrl = "https://img.youtube.com/vi/{$ytMatch[1]}/maxresdefault.jpg";
-                            }
-                        }
-                    } else {
-                        $cardImageUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
-                    }
-                    if ($cardImageUrl) break;
-                }
-                if (!$cardImageUrl) {
-                    $cardImageUrl = $index % 2 === 0 ? '/img/exterior_render.png' : '/img/interior_render.png';
-                }
-                $is360 = $service->slug === '360-views';
-                $num = str_pad($index + 1, 2, '0', STR_PAD_LEFT);
-            @endphp
-
-            <a href="{{ route('service.show', $service->slug) }}"
-               class="group relative flex-shrink-0 overflow-hidden rounded-2xl border border-white/[0.06] hover:border-accent-400/50 transition-all duration-500 block"
-               style="width:clamp(280px,58vw,760px);height:480px;scroll-snap-align:start;">
-
-                <!-- Full image background -->
-                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-[900ms] ease-out group-hover:scale-105"
-                     style="background-image:url('{{ $cardImageUrl }}');"></div>
-
-                <!-- Base dark gradient -->
-                <div class="absolute inset-0 bg-gradient-to-t from-brand-950/95 via-brand-950/30 to-brand-950/10"></div>
-
-                <!-- Top-left index number -->
-                <div class="absolute top-6 left-7">
-                    <span class="font-display font-black text-6xl leading-none"
-                          style="color:transparent;-webkit-text-stroke:1px rgba(58,173,170,0.35);">{{ $num }}</span>
+            {{-- Header --}}
+            <div class="mb-12">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="h-px w-6 bg-accent-400"></div>
+                    <p class="text-[10px] uppercase tracking-[0.35em] text-accent-400 font-black">What We Do</p>
                 </div>
+                <h2 class="text-4xl md:text-5xl font-display font-black text-white leading-tight uppercase">
+                    What We<br><em class="not-italic" style="-webkit-text-stroke:1.5px #3AADAA;color:transparent;">Create</em>
+                </h2>
+            </div>
 
-                @if($is360)
-                <!-- 360 badge top-right -->
-                <div class="absolute top-5 right-5">
-                    <div class="flex items-center gap-1.5 bg-brand-950/60 backdrop-blur-sm border border-accent-400/30 rounded-full px-3 py-1.5">
-                        <div class="w-1.5 h-1.5 rounded-full bg-accent-400"></div>
-                        <span class="text-[10px] font-black tracking-widest text-accent-400 uppercase">360°</span>
+            {{-- Service rows --}}
+            <div class="flex flex-col divide-y divide-white/[0.06]">
+                @foreach($homeServices as $idx => $svc)
+                @php $num = str_pad($idx + 1, 2, '0', STR_PAD_LEFT); @endphp
+                <a href="{{ route('service.show', $svc->slug) }}"
+                   class="group flex items-center justify-between py-5 md:py-6 cursor-pointer transition-all duration-200"
+                   @mouseenter="active = {{ $idx }}">
+
+                    <div class="flex items-center gap-5 md:gap-8">
+                        {{-- Number --}}
+                        <span class="font-display font-black text-sm tabular-nums transition-colors duration-200"
+                              :class="active === {{ $idx }} ? 'text-accent-400' : 'text-white/15'">{{ $num }}</span>
+
+                        {{-- Title --}}
+                        <span class="font-display font-black text-xl md:text-2xl uppercase tracking-tight transition-colors duration-200"
+                              :class="active === {{ $idx }} ? 'text-white' : 'text-white/40 group-hover:text-white/70'">
+                            {{ $svc->title }}
+                        </span>
+
+                        @if($svc->slug === '360-views')
+                        <span class="hidden sm:inline-flex items-center gap-1 border border-accent-400/30 rounded-full px-2 py-0.5 text-[9px] font-black tracking-widest text-accent-400 uppercase">
+                            360°
+                        </span>
+                        @endif
+                    </div>
+
+                    {{-- Arrow --}}
+                    <svg class="w-4 h-4 transition-all duration-300 flex-shrink-0"
+                         :class="active === {{ $idx }} ? 'text-accent-400 translate-x-0 opacity-100' : 'text-white/15 -translate-x-2 opacity-0 group-hover:opacity-50 group-hover:translate-x-0'"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+                @endforeach
+            </div>
+
+            {{-- Bottom stats + CTA --}}
+            <div class="mt-12 pt-8 border-t border-white/[0.06] flex flex-wrap gap-8 items-center justify-between">
+                <div class="flex gap-8">
+                    <div>
+                        <p class="font-display font-black text-xl text-white">500+</p>
+                        <p class="text-[9px] uppercase tracking-widest text-white/30 font-semibold mt-0.5">Projects</p>
+                    </div>
+                    <div>
+                        <p class="font-display font-black text-xl text-white">4K</p>
+                        <p class="text-[9px] uppercase tracking-widest text-white/30 font-semibold mt-0.5">Resolution</p>
+                    </div>
+                    <div>
+                        <p class="font-display font-black text-xl text-white">100%</p>
+                        <p class="text-[9px] uppercase tracking-widest text-white/30 font-semibold mt-0.5">Satisfaction</p>
                     </div>
                 </div>
-                @endif
-
-                <!-- Bottom content — slides up on hover -->
-                <div class="absolute bottom-0 left-0 right-0 p-7">
-                    <!-- Thin accent line -->
-                    <div class="w-8 h-px bg-accent-400 mb-4 group-hover:w-16 transition-all duration-500"></div>
-                    <h3 class="text-white font-display font-black uppercase tracking-tight leading-none mb-3"
-                        style="font-size:clamp(1.5rem,3vw,2.25rem);">{{ $service->title }}</h3>
-                    <div class="flex items-center gap-3 overflow-hidden">
-                        <span class="text-[11px] font-black uppercase tracking-[0.25em] text-white/0 group-hover:text-accent-400 transition-all duration-400 translate-y-3 group-hover:translate-y-0">Explore Gallery</span>
-                        <svg class="w-4 h-4 text-accent-400 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </div>
-                </div>
-
-            </a>
-            @endforeach
-
-            <!-- End spacer for fade effect -->
-            <div class="flex-shrink-0 w-4"></div>
+                <a href="{{ route('service.show', 'exterior-renders') }}"
+                   class="text-[10px] font-black uppercase tracking-[0.25em] text-accent-400 hover:text-white transition-colors duration-200 flex items-center gap-2">
+                    All Services
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
         </div>
 
-        <!-- Scrollbar progress dots -->
-        <div class="flex justify-center gap-2 mt-2">
-            @foreach($homeServices as $index => $service)
-            <div class="w-1.5 h-1.5 rounded-full {{ $index === 0 ? 'bg-accent-400 w-4' : 'bg-white/20' }} transition-all duration-300"></div>
-            @endforeach
-        </div>
-    </div>
+        {{-- RIGHT: image panel --}}
+        <div class="relative overflow-hidden hidden lg:block" style="min-height:700px;">
 
-    <!-- Bottom row: stats + CTA -->
-    <div class="container mx-auto px-6 xl:px-16 pb-20" style="max-width:1536px">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-8 border-t border-white/[0.06] pt-10">
-            <!-- Stats -->
-            <div class="flex flex-wrap gap-10 md:gap-16">
-                @php
-                    $stats = [['v'=>'500+','l'=>'Projects'],['v'=>'4K','l'=>'Resolution'],['v'=>'360°','l'=>'Virtual Tours'],['v'=>'100%','l'=>'Satisfaction']];
-                @endphp
-                @foreach($stats as $s)
-                <div>
-                    <p class="font-display font-black text-2xl text-white leading-none">{{ $s['v'] }}</p>
-                    <p class="text-[10px] uppercase tracking-widest text-white/35 font-semibold mt-1">{{ $s['l'] }}</p>
+            {{-- Images — one per service, cross-fade --}}
+            @foreach($homeServices as $idx => $svc)
+            <div class="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
+                 style="background-image:url('{{ $serviceImages[$idx] }}');"
+                 :class="active === {{ $idx }} ? 'opacity-100' : 'opacity-0'">
+            </div>
+            @endforeach
+
+            {{-- Permanent dark overlay + left-side fade --}}
+            <div class="absolute inset-0 bg-gradient-to-r from-brand-950/20 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-950/60 via-transparent to-transparent"></div>
+
+            {{-- Active service name — bottom-left of image --}}
+            <div class="absolute bottom-8 left-8 z-10">
+                @foreach($homeServices as $idx => $svc)
+                <div x-show="active === {{ $idx }}"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     style="{{ $idx !== 0 ? 'display:none;' : '' }}">
+                    <p class="text-[10px] uppercase tracking-[0.3em] text-accent-400/80 font-black mb-1">
+                        {{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }} / {{ str_pad($homeServices->count(), 2, '0', STR_PAD_LEFT) }}
+                    </p>
+                    <p class="text-white font-display font-black text-2xl uppercase tracking-tight">{{ $svc->title }}</p>
                 </div>
                 @endforeach
             </div>
-            <!-- CTA link -->
-            <a href="{{ route('service.show', 'exterior-renders') }}"
-               class="flex-shrink-0 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.25em] text-accent-400 hover:text-white border border-accent-400/30 hover:border-white/30 rounded-full px-6 py-3 transition-all duration-300 hover:bg-white/5">
-                All Services
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </a>
         </div>
+
     </div>
     @endif
 
 </section>
-
 
 
 
