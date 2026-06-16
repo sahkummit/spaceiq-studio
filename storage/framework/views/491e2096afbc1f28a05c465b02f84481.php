@@ -3,36 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Space IQ - Architectural Renderings')</title>
-    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <meta name="description" content="@yield('meta_description', \App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'Hyper-realistic 4K renders that captivate clients.')">
+    <title><?php echo $__env->yieldContent('title', 'Space IQ - Architectural Renderings'); ?></title>
+    <link rel="icon" type="image/png" href="<?php echo e(asset('img/logo.png')); ?>">
+    <link rel="shortcut icon" type="image/png" href="<?php echo e(asset('img/logo.png')); ?>">
+    <meta name="description" content="<?php echo $__env->yieldContent('meta_description', \App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'Hyper-realistic 4K renders that captivate clients.'); ?>">
     <meta name="keywords" content="architectural rendering, 3D visualization, exterior render, interior render, floor plans, 360 views, walkthrough animation, CGI, architectural visualization studio">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="{{ request()->url() }}">
+    <link rel="canonical" href="<?php echo e(request()->url()); ?>">
     <meta name="theme-color" content="#0E7C7B">
     
     <!-- Open Graph SEO -->
-    <meta property="og:title" content="@yield('title', 'Space IQ - Architectural Renderings')">
-    <meta property="og:description" content="@yield('meta_description', 'High-Fidelity Renders. Professional Delivery. Zero Compromise.')">
+    <meta property="og:title" content="<?php echo $__env->yieldContent('title', 'Space IQ - Architectural Renderings'); ?>">
+    <meta property="og:description" content="<?php echo $__env->yieldContent('meta_description', 'High-Fidelity Renders. Professional Delivery. Zero Compromise.'); ?>">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ request()->url() }}">
-    <meta property="og:image" content="@yield('og_image', asset('img/exterior_render.png'))">
+    <meta property="og:url" content="<?php echo e(request()->url()); ?>">
+    <meta property="og:image" content="<?php echo $__env->yieldContent('og_image', asset('img/exterior_render.png')); ?>">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'Space IQ - Architectural Renderings')">
-    <meta name="twitter:description" content="@yield('meta_description', 'High-Fidelity Renders. Professional Delivery. Zero Compromise.')">
-    <meta name="twitter:image" content="@yield('og_image', asset('img/exterior_render.png'))">
+    <meta name="twitter:title" content="<?php echo $__env->yieldContent('title', 'Space IQ - Architectural Renderings'); ?>">
+    <meta name="twitter:description" content="<?php echo $__env->yieldContent('meta_description', 'High-Fidelity Renders. Professional Delivery. Zero Compromise.'); ?>">
+    <meta name="twitter:image" content="<?php echo $__env->yieldContent('og_image', asset('img/exterior_render.png')); ?>">
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
-        "@@context": "https://schema.org",
-        "@@type": "ProfessionalService",
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
         "name": "Space IQ Design Studio",
         "description": "Hyper-realistic 4K architectural renders, 360 virtual tours, walkthrough animations, and floor plans.",
-        "url": "{{ url('/') }}",
-        "logo": "{{ asset('img/logo.png') }}",
-        "image": "{{ asset('img/exterior_render.png') }}",
+        "url": "<?php echo e(url('/')); ?>",
+        "logo": "<?php echo e(asset('img/logo.png')); ?>",
+        "image": "<?php echo e(asset('img/exterior_render.png')); ?>",
         "sameAs": [],
         "serviceType": ["Architectural Visualization", "3D Rendering", "360 Virtual Tours", "Walkthrough Animation", "Floor Plans"],
         "areaServed": "Worldwide"
@@ -268,7 +268,7 @@
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
-    @yield('head')
+    <?php echo $__env->yieldContent('head'); ?>
 </head>
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
     <!-- Page Loading Bar -->
@@ -280,11 +280,11 @@
             class="fixed w-full left-0 z-50 transition-all duration-300 pointer-events-none"
             :class="scrolled ? 'top-4 px-4' : 'top-0 px-0'">
         <div class="w-full transition-all duration-300 pointer-events-auto"
-             :class="scrolled ? 'max-w-5xl mx-auto px-6 py-2 bg-brand-900/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl' : 'px-6 md:px-12 py-5 {{ request()->routeIs('home') ? 'bg-transparent border-transparent' : 'border-b border-white/5 bg-brand-950/20 backdrop-blur-sm' }}'">
+             :class="scrolled ? 'max-w-5xl mx-auto px-6 py-2 bg-brand-900/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl' : 'px-6 md:px-12 py-5 <?php echo e(request()->routeIs('home') ? 'bg-transparent border-transparent' : 'border-b border-white/5 bg-brand-950/20 backdrop-blur-sm'); ?>'">
             <div class="flex items-center justify-between gap-8 w-full">
                 <!-- Logo (Extreme Left) -->
-                <a href="{{ route('home') }}" class="flex-shrink-0 flex items-center gap-3 group">
-                    <img src="{{ asset('img/logo.png') }}" alt="SpaceIQ Design Studio" class="w-auto drop-shadow-lg transition-all duration-300 group-hover:scale-105 rounded-full" :class="scrolled ? 'h-10' : 'h-14'">
+                <a href="<?php echo e(route('home')); ?>" class="flex-shrink-0 flex items-center gap-3 group">
+                    <img src="<?php echo e(asset('img/logo.png')); ?>" alt="SpaceIQ Design Studio" class="w-auto drop-shadow-lg transition-all duration-300 group-hover:scale-105 rounded-full" :class="scrolled ? 'h-10' : 'h-14'">
                     <span class="font-display font-bold tracking-wider text-white transition-all duration-300" :class="scrolled ? 'text-base' : 'text-xl'">Space<span class="text-accent-400">IQ</span></span>
                 </a>
 
@@ -293,7 +293,7 @@
                     
                     <!-- Exterior Renders Dropdown -->
                     <div class="relative" @mouseenter="activeMenu = 'exterior'" @mouseleave="activeMenu = null">
-                        <a href="{{ route('service.show', 'exterior-renders') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
+                        <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
                             Exterior Renders
                             <svg class="w-3 h-3 transition-transform duration-200" :class="activeMenu === 'exterior' ? 'rotate-180 text-accent-400' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </a>
@@ -307,10 +307,10 @@
                              class="absolute left-1/2 -translate-x-1/2 mt-3 w-48 bg-brand-900/98 backdrop-blur-md border border-white/10 shadow-2xl rounded-md py-2 z-50 text-left"
                              style="display: none;">
 
-                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'residential']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Residential</a>
-                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'commercial']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Commercial</a>
-                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'aerial']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Aerial</a>
-                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'landscape']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Landscape</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'residential'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Residential</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'commercial'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Commercial</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'aerial'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Aerial</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'landscape'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Landscape</a>
                         </div>
                     </div>
 
@@ -318,7 +318,7 @@
 
                     <!-- Interior Renders Dropdown -->
                     <div class="relative" @mouseenter="activeMenu = 'interior'" @mouseleave="activeMenu = null">
-                        <a href="{{ route('service.show', 'interior-renders') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
+                        <a href="<?php echo e(route('service.show', 'interior-renders')); ?>" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
                             Interior Renders
                             <svg class="w-3 h-3 transition-transform duration-200" :class="activeMenu === 'interior' ? 'rotate-180 text-accent-400' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </a>
@@ -332,26 +332,26 @@
                              class="absolute left-1/2 -translate-x-1/2 mt-3 w-48 bg-brand-900/98 backdrop-blur-md border border-white/10 shadow-2xl rounded-md py-2 z-50 text-left"
                              style="display: none;">
 
-                            <a href="{{ route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'residential']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Residential</a>
-                            <a href="{{ route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'commercial']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Commercial</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'residential'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Residential</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'commercial'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Commercial</a>
                         </div>
                     </div>
 
                     <span class="text-white/20">|</span>
 
                     <!-- 3D Animation Link -->
-                    <a href="{{ route('service.show', 'walkthrough-animation') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">3D Animation</a>
+                    <a href="<?php echo e(route('service.show', 'walkthrough-animation')); ?>" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">3D Animation</a>
 
                     <span class="text-white/20">|</span>
 
                     <!-- 360 Views Link -->
-                    <a href="{{ route('service.show', '360-views') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">360 Views</a>
+                    <a href="<?php echo e(route('service.show', '360-views')); ?>" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">360 Views</a>
 
                     <span class="text-white/20">|</span>
 
                     <!-- Floor Plans Dropdown -->
                     <div class="relative" @mouseenter="activeMenu = 'floorplans'" @mouseleave="activeMenu = null">
-                        <a href="{{ route('service.show', 'floor-plans') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
+                        <a href="<?php echo e(route('service.show', 'floor-plans')); ?>" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
                             Floor Plans
                             <svg class="w-3 h-3 transition-transform duration-200" :class="activeMenu === 'floorplans' ? 'rotate-180 text-accent-400' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </a>
@@ -365,26 +365,26 @@
                              class="absolute left-1/2 -translate-x-1/2 mt-3 w-48 bg-brand-900/98 backdrop-blur-md border border-white/10 shadow-2xl rounded-md py-2 z-50 text-left"
                              style="display: none;">
 
-                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'b-w']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">B&W</a>
-                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'color']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Color</a>
-                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'site-plan']) }}" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Site Plan</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'b-w'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">B&W</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'color'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Color</a>
+                            <a href="<?php echo e(route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'site-plan'])); ?>" class="block px-4 py-2.5 text-[10px] text-gray-300 hover:text-white hover:bg-brand-800 transition-colors tracking-widest font-semibold uppercase">Site Plan</a>
                         </div>
                     </div>
 
                     <span class="text-white/20">|</span>
 
                     <!-- 2D Drafting Link -->
-                    <a href="{{ route('service.show', 'autocad-drafting') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">2D Drafting</a>
+                    <a href="<?php echo e(route('service.show', 'autocad-drafting')); ?>" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">2D Drafting</a>
 
                     <span class="text-white/20">|</span>
 
                     <!-- Design Link -->
-                    <a href="{{ route('service.show', 'interior-design-consultation') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">Design</a>
+                    <a href="<?php echo e(route('service.show', 'interior-design-consultation')); ?>" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">Design</a>
                 </div>
 
                 <!-- Contact Us (Extreme Right) -->
                 <nav class="hidden lg:flex flex-shrink-0 items-center">
-                    <a href="{{ route('contact') }}" 
+                    <a href="<?php echo e(route('contact')); ?>" 
                        class="text-[11px] uppercase tracking-widest font-bold bg-accent-500 hover:bg-accent-400 text-white transition-all duration-300 shadow-lg whitespace-nowrap"
                        :class="scrolled ? 'rounded-full px-5 py-2.5' : 'rounded-sm px-6 py-3'">CONTACT US</a>
                 </nav>
@@ -416,10 +416,10 @@
                 </button>
                 <div x-show="activeMobileSub === 'exterior'" x-transition class="pl-4 mt-2 flex flex-col gap-2 border-l border-white/10" style="display: none;">
 
-                    <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'residential']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Residential</a>
-                    <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'commercial']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Commercial</a>
-                    <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'aerial']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Aerial</a>
-                    <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'landscape']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Landscape</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'residential'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Residential</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'commercial'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Commercial</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'aerial'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Aerial</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'landscape'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Landscape</a>
                 </div>
             </div>
 
@@ -431,16 +431,16 @@
                 </button>
                 <div x-show="activeMobileSub === 'interior'" x-transition class="pl-4 mt-2 flex flex-col gap-2 border-l border-white/10" style="display: none;">
 
-                    <a href="{{ route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'residential']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Residential</a>
-                    <a href="{{ route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'commercial']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Commercial</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'residential'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Residential</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'commercial'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Commercial</a>
                 </div>
             </div>
 
             <!-- 3D Animation Link -->
-            <a href="{{ route('service.show', 'walkthrough-animation') }}" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">3D Animation</a>
+            <a href="<?php echo e(route('service.show', 'walkthrough-animation')); ?>" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">3D Animation</a>
             
             <!-- 360 Views Link -->
-            <a href="{{ route('service.show', '360-views') }}" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">360 Views</a>
+            <a href="<?php echo e(route('service.show', '360-views')); ?>" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">360 Views</a>
             
             <!-- Floor Plans Accordion -->
             <div>
@@ -450,32 +450,32 @@
                 </button>
                 <div x-show="activeMobileSub === 'floorplans'" x-transition class="pl-4 mt-2 flex flex-col gap-2 border-l border-white/10" style="display: none;">
 
-                    <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'b-w']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">B&W</a>
-                    <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'color']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Color</a>
-                    <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'site-plan']) }}" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Site Plan</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'b-w'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">B&W</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'color'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Color</a>
+                    <a href="<?php echo e(route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'site-plan'])); ?>" @click="mobileMenuOpen = false" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white py-1">Site Plan</a>
                 </div>
             </div>
 
             <!-- 2D Drafting Link -->
-            <a href="{{ route('service.show', 'autocad-drafting') }}" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">2D Drafting</a>
+            <a href="<?php echo e(route('service.show', 'autocad-drafting')); ?>" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">2D Drafting</a>
             
             <!-- Design Link -->
-            <a href="{{ route('service.show', 'interior-design-consultation') }}" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">Design</a>
+            <a href="<?php echo e(route('service.show', 'interior-design-consultation')); ?>" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">Design</a>
             
             <hr class="border-white/10 my-2">
             
-            <a href="{{ route('contact') }}" @click="mobileMenuOpen = false"
+            <a href="<?php echo e(route('contact')); ?>" @click="mobileMenuOpen = false"
                class="block w-full text-center text-sm font-bold uppercase tracking-widest bg-accent-500 hover:bg-accent-400 text-white py-3 px-6 transition-colors duration-300 shadow-lg">CONTACT US</a>
         </div>
     </header>
 
     <main class="min-h-screen page-entrance" :class="pageLoaded ? 'loaded' : ''">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
 
-    @php
+    <?php
         $settings = \App\Models\Setting::pluck('value', 'key');
-    @endphp
+    ?>
 
     <!-- Footer -->
     <footer class="relative border-t border-white/5 bg-brand-950 pt-20 pb-10">
@@ -486,12 +486,13 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
                 <!-- Column 1: About -->
                 <div class="col-span-1 md:col-span-4">
-                    <a href="{{ route('home') }}" class="flex items-center gap-3 mb-6 group">
-                        <img src="{{ asset('img/logo.png') }}" alt="SpaceIQ Design Studio" class="h-12 w-auto rounded-full drop-shadow-[0_0_15px_rgba(26,158,150,0.15)] opacity-90 group-hover:opacity-100 transition-opacity">
+                    <a href="<?php echo e(route('home')); ?>" class="flex items-center gap-3 mb-6 group">
+                        <img src="<?php echo e(asset('img/logo.png')); ?>" alt="SpaceIQ Design Studio" class="h-12 w-auto rounded-full drop-shadow-[0_0_15px_rgba(26,158,150,0.15)] opacity-90 group-hover:opacity-100 transition-opacity">
                         <span class="font-display font-bold text-xl tracking-wider text-white">Space<span class="text-accent-400">IQ</span></span>
                     </a>
                     <p class="text-gray-400 text-sm leading-relaxed mb-6 font-light max-w-sm">
-                        {{ \App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'High-Fidelity Renders. Professional Delivery. Zero Compromise.' }}
+                        <?php echo e(\App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'High-Fidelity Renders. Professional Delivery. Zero Compromise.'); ?>
+
                     </p>
                 </div>
                 
@@ -499,13 +500,14 @@
                 <div class="col-span-1 md:col-span-3">
                     <h3 class="text-white font-bold uppercase tracking-widest text-xs mb-4 text-accent-400">Services</h3>
                     <ul class="space-y-2">
-                        @foreach(\App\Models\Service::where('is_active', true)->orderBy('sort_order')->get() as $service)
+                        <?php $__currentLoopData = \App\Models\Service::where('is_active', true)->orderBy('sort_order')->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <li>
-                            <a href="{{ route('service.show', $service->slug) }}" class="inline-block text-gray-400 hover:text-accent-300 text-sm transition-all duration-300 font-light hover:translate-x-1 transform">
-                                {{ $service->title }}
+                            <a href="<?php echo e(route('service.show', $service->slug)); ?>" class="inline-block text-gray-400 hover:text-accent-300 text-sm transition-all duration-300 font-light hover:translate-x-1 transform">
+                                <?php echo e($service->title); ?>
+
                             </a>
                         </li>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
                 
@@ -514,17 +516,17 @@
                     <h3 class="text-white font-bold uppercase tracking-widest text-xs mb-4 text-accent-400">Company</h3>
                     <ul class="space-y-2">
                         <li>
-                            <a href="{{ route('home') }}#process" class="inline-block text-gray-400 hover:text-accent-300 text-sm transition-all duration-300 font-light hover:translate-x-1 transform">
+                            <a href="<?php echo e(route('home')); ?>#process" class="inline-block text-gray-400 hover:text-accent-300 text-sm transition-all duration-300 font-light hover:translate-x-1 transform">
                                 Our Process
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('contact') }}" class="inline-block text-gray-400 hover:text-accent-300 text-sm transition-all duration-300 font-light hover:translate-x-1 transform">
+                            <a href="<?php echo e(route('contact')); ?>" class="inline-block text-gray-400 hover:text-accent-300 text-sm transition-all duration-300 font-light hover:translate-x-1 transform">
                                 Contact Us
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('page.show', 'privacy-policy') }}" class="inline-block text-gray-400 hover:text-accent-300 text-sm transition-all duration-300 font-light hover:translate-x-1 transform">
+                            <a href="<?php echo e(route('page.show', 'privacy-policy')); ?>" class="inline-block text-gray-400 hover:text-accent-300 text-sm transition-all duration-300 font-light hover:translate-x-1 transform">
                                 Privacy Policy
                             </a>
                         </li>
@@ -576,7 +578,7 @@
                         <p class="text-xs uppercase tracking-widest text-accent-400 font-bold mb-2">Ready to get started?</p>
                         <h3 class="text-2xl md:text-3xl font-display font-bold text-white">Turn your vision into reality.<br class="hidden md:block"> <span class="text-gradient">Let's talk today.</span></h3>
                     </div>
-                    <a href="{{ route('contact') }}" class="flex-shrink-0 px-10 py-4 bg-accent-500 hover:bg-accent-400 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 rounded-sm shadow-xl hover:shadow-accent-400/30 hover:-translate-y-1">
+                    <a href="<?php echo e(route('contact')); ?>" class="flex-shrink-0 px-10 py-4 bg-accent-500 hover:bg-accent-400 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 rounded-sm shadow-xl hover:shadow-accent-400/30 hover:-translate-y-1">
                         Book a Free Consultation
                     </a>
                 </div>
@@ -584,7 +586,7 @@
 
             <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-gray-500 text-xs font-light uppercase tracking-widest">
-                    &copy; {{ date('Y') }} Space IQ Design Studio. All rights reserved.
+                    &copy; <?php echo e(date('Y')); ?> Space IQ Design Studio. All rights reserved.
                 </p>
                 <div class="text-gray-500 text-xs font-light uppercase tracking-widest">
                     High-Fidelity Renders. Professional Delivery. Zero Compromise.
@@ -701,6 +703,7 @@
             setInterval(initTilt, 2000);
         })();
     </script>
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 </html>
+<?php /**PATH C:\Users\Sahil\.gemini\antigravity\scratch\spaceiq_studio\resources\views/layouts/app.blade.php ENDPATH**/ ?>

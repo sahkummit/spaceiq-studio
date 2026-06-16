@@ -1,8 +1,6 @@
-@extends('layouts.app')
-
-@section('head')
-    <link rel="stylesheet" href="{{ asset('css/pannellum.css') }}"/>
-    <script src="{{ asset('js/pannellum.js') }}"></script>
+<?php $__env->startSection('head'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/pannellum.css')); ?>"/>
+    <script src="<?php echo e(asset('js/pannellum.js')); ?>"></script>
     <style>
         /* ── Pannellum styles ── */
         .pnlm-container {
@@ -79,9 +77,9 @@
             color: #ffffff !important;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <!-- Hero Section -->
 <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-screen flex items-center">
@@ -112,7 +110,7 @@
         </p>
         
         <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="{{ route('contact') }}" class="btn-glow px-10 py-5 bg-brand-600 hover:bg-brand-500 rounded-sm font-semibold text-white transition-all flex items-center justify-center gap-2 uppercase tracking-wide text-sm">
+            <a href="<?php echo e(route('contact')); ?>" class="btn-glow px-10 py-5 bg-brand-600 hover:bg-brand-500 rounded-sm font-semibold text-white transition-all flex items-center justify-center gap-2 uppercase tracking-wide text-sm">
                 Book a Consultation
             </a>
             <a href="#services" class="px-10 py-5 border border-white/20 hover:border-white/50 rounded-sm font-semibold text-white transition-all text-center uppercase tracking-wide text-sm bg-black/20 backdrop-blur-sm">
@@ -184,18 +182,18 @@
             <p class="text-gray-400 text-base max-w-xl mx-auto font-light">From hyper-realistic renders to immersive 360° tours — we bring your architecture to life.</p>
         </div>
         
-        @php
+        <?php
             $homeServices = \App\Models\Service::where('is_active', true)
                 ->orderBy('sort_order')
                 ->take(5)
                 ->get();
-        @endphp
+        ?>
 
         <!-- 3-column masonry-style card grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            @forelse($homeServices as $index => $service)
+            <?php $__empty_1 = true; $__currentLoopData = $homeServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
 
-            @php
+            <?php
                 /* Collect a representative image for this service card */
                 $cardImageUrl = null;
                 foreach($service->media->sortBy('sort_order') as $media) {
@@ -214,24 +212,24 @@
                     $cardImageUrl = $index % 2 === 0 ? '/img/exterior_render.png' : '/img/interior_render.png';
                 }
                 $is360Card = $service->slug === '360-views';
-            @endphp
+            ?>
 
             <!-- Card: spans 2 cols for the first card to make it a hero card -->
-            <a href="{{ route('service.show', $service->slug) }}"
-               class="group relative overflow-hidden rounded-xl border border-white/5 hover:border-accent-400/40 transition-all duration-500 bg-brand-900 block {{ $index === 0 ? 'sm:col-span-2 lg:col-span-1' : '' }}"
-               style="aspect-ratio: {{ $index === 0 ? '16/10' : '4/3' }};">
+            <a href="<?php echo e(route('service.show', $service->slug)); ?>"
+               class="group relative overflow-hidden rounded-xl border border-white/5 hover:border-accent-400/40 transition-all duration-500 bg-brand-900 block <?php echo e($index === 0 ? 'sm:col-span-2 lg:col-span-1' : ''); ?>"
+               style="aspect-ratio: <?php echo e($index === 0 ? '16/10' : '4/3'); ?>;">
 
                 <!-- Thumbnail image -->
-                <img src="{{ $cardImageUrl }}"
-                     alt="{{ $service->title }}"
+                <img src="<?php echo e($cardImageUrl); ?>"
+                     alt="<?php echo e($service->title); ?>"
                      loading="lazy"
                      decoding="async"
-                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 {{ $is360Card ? 'group-hover:blur-sm' : '' }}">
+                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 <?php echo e($is360Card ? 'group-hover:blur-sm' : ''); ?>">
 
                 <!-- Always-on dark gradient overlay at the bottom -->
                 <div class="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-transparent"></div>
 
-                @if($is360Card)
+                <?php if($is360Card): ?>
                 <!-- 360 blur overlay with drag icon -->
                 <div class="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-400">
                     <div class="bg-brand-950/60 backdrop-blur-sm rounded-2xl px-6 py-4 flex flex-col items-center gap-2 border border-accent-400/30">
@@ -242,11 +240,11 @@
                         <p class="text-accent-300 text-xs tracking-wider">360° Immersive View</p>
                     </div>
                 </div>
-                @endif
+                <?php endif; ?>
 
                 <!-- Bottom text overlay -->
                 <div class="absolute bottom-0 left-0 right-0 p-5 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                    <h3 class="text-white font-display font-bold text-lg uppercase tracking-wide mb-1">{{ $service->title }}</h3>
+                    <h3 class="text-white font-display font-bold text-lg uppercase tracking-wide mb-1"><?php echo e($service->title); ?></h3>
                     <div class="flex items-center gap-2 text-accent-400 text-xs font-semibold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <span>View Gallery</span>
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -254,16 +252,16 @@
                 </div>
             </a>
 
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <div class="col-span-3 text-center py-12">
                 <p class="text-gray-500">More services coming soon!</p>
             </div>
-            @endforelse
+            <?php endif; ?>
         </div>
 
         <!-- View All Services link -->
         <div class="text-center mt-12">
-            <a href="{{ route('service.show', 'exterior-renders') }}" class="inline-flex items-center gap-2 text-accent-400 hover:text-white text-sm font-semibold uppercase tracking-widest border-b border-accent-400/50 hover:border-white pb-1 transition-all duration-300">
+            <a href="<?php echo e(route('service.show', 'exterior-renders')); ?>" class="inline-flex items-center gap-2 text-accent-400 hover:text-white text-sm font-semibold uppercase tracking-widest border-b border-accent-400/50 hover:border-white pb-1 transition-all duration-300">
                 View All Services
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
@@ -400,15 +398,15 @@
         <p class="text-xs uppercase tracking-widest text-accent-400 font-bold mb-6">Love What You See?</p>
         <h2 class="text-4xl md:text-5xl font-display font-bold mb-8 text-white uppercase tracking-wider">Ready to make your<br>vision a reality?</h2>
         <p class="text-gray-300 text-lg font-light mb-12 max-w-2xl mx-auto">Let's work together to bring your architectural project to life with stunning hyper-realistic renders.</p>
-        <a href="{{ route('contact') }}" class="btn-glow inline-block px-12 py-5 bg-accent-500 hover:bg-accent-400 text-brand-950 font-bold uppercase tracking-widest text-sm transition-colors duration-300 shadow-xl">
+        <a href="<?php echo e(route('contact')); ?>" class="btn-glow inline-block px-12 py-5 bg-accent-500 hover:bg-accent-400 text-brand-950 font-bold uppercase tracking-widest text-sm transition-colors duration-300 shadow-xl">
             Book a Consultation
         </a>
     </div>
 </section>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 // ── Animated Stat Counters ──
 (function() {
@@ -454,4 +452,6 @@
     steps.forEach(step => observer.observe(step));
 })();
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Sahil\.gemini\antigravity\scratch\spaceiq_studio\resources\views/welcome.blade.php ENDPATH**/ ?>
