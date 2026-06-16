@@ -18,9 +18,15 @@ Route::get('/services/{slug}/{subcategory?}', function ($slug, $subcategory = nu
     return view('service', compact('service', 'subcategory'));
 })->name('service.show');
 
+Route::get('/robots.txt', function () {
+    $content = "User-agent: *\nDisallow: /admin/\nAllow: /\n\nSitemap: " . url('/sitemap.xml');
+    return response($content, 200)->header('Content-Type', 'text/plain');
+});
+
 Route::get('/sitemap.xml', function () {
     $services = \App\Models\Service::where('is_active', true)->get();
-    return response()->view('sitemap', compact('services'))->header('Content-Type', 'text/xml');
+    $pages = \App\Models\Page::where('is_published', true)->get();
+    return response()->view('sitemap', compact('services', 'pages'))->header('Content-Type', 'text/xml');
 });
 
 Route::get('/contact', function () {

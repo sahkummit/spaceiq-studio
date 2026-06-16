@@ -1,8 +1,13 @@
 @extends('layouts.app')
 
+@php
+    $firstImage = $service->media->where('file_type', '!=', 'video')->sortBy('sort_order')->first();
+    $firstImagePath = $firstImage ? parse_url(Storage::url($firstImage->file_path), PHP_URL_PATH) : null;
+@endphp
+
 @section('title', $service->title . ' - Space IQ')
 @section('meta_description', $service->short_description)
-@section('og_image', $service->og_image ?? asset('img/social-share.png'))
+@section('og_image', $service->og_image ?? ($firstImagePath ? asset(ltrim($firstImagePath, '/')) : asset('img/social-share.png')))
 
 @if($service->slug === '360-views')
 @section('head')
@@ -124,6 +129,8 @@
     lightboxImages: {{ json_encode($lightboxImagesCollect->values()->toArray()) }},
     is360: {{ $service->slug === '360-views' ? 'true' : 'false' }},
     pannellumViewer: null,
+    touchStartX: 0,
+    touchEndX: 0,
     prevImage() {
         if (this.lightboxImages.length === 0) return;
         this.lightboxIndex = (this.lightboxIndex - 1 + this.lightboxImages.length) % this.lightboxImages.length;
@@ -360,7 +367,7 @@
                                         {{-- Pannellum container: touch-action:none prevents mobile page scroll conflict --}}
                                         <div x-ref="panoEl"
                                              class="w-full"
-                                             style="height: 480px; touch-action: none;"></div>
+                                             style="height: clamp(300px, 50vh, 480px); touch-action: none;"></div>
 
                                         {{-- Small hint text bottom-center, fades on first drag --}}
                                         <div class="absolute bottom-3 left-0 right-0 z-20 flex justify-center pointer-events-none transition-opacity duration-500"
@@ -453,7 +460,7 @@
                                                      <source srcset="{{ $imgWebpUrl }}" type="image/webp">
                                                      @endif
                                                      <img src="{{ $imgOrigUrl }}"
-                                                          alt="{{ $media->title }}"
+                                                          alt="{{ $media->alt_text ?? $media->title ?? $service->title . ' - ' . ($media->category ?? 'Portfolio Project') }}"
                                                           loading="lazy"
                                                           decoding="async"
                                                           @load="imgLoaded = true"
@@ -508,13 +515,17 @@
                     
                     <!-- Standard Image Container with Nav Buttons -->
                     <template x-if="!is360">
-                        <div class="relative max-w-full max-h-[85vh] flex items-center justify-center z-[105]" @click.away="closeLightbox()">
+                        <div class="relative max-w-full max-h-[85vh] flex items-center justify-center z-[105]" 
+                             @click.away="closeLightbox()"
+                             @touchstart="touchStartX = $event.touches[0].clientX"
+                             @touchend="touchEndX = $event.changedTouches[0].clientX; if (touchStartX - touchEndX > 40) nextImage(); if (touchEndX - touchStartX > 40) prevImage();"
+                             style="touch-action: pan-y;">
                             <!-- Left Arrow -->
                             <button type="button" x-show="lightboxImages.length > 1" @click.stop="prevImage()" class="absolute left-4 md:-left-20 text-white/70 hover:text-white transition-all bg-black/50 hover:bg-black/80 rounded-full p-3 border border-white/10 hover:scale-110 transform z-[115] cursor-pointer">
                                 <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
                             </button>
                             
-                            <img :src="lightboxUrl" class="max-w-full max-h-[80vh] rounded-sm shadow-2xl object-contain">
+                            <img :src="lightboxUrl" :alt="lightboxTitle || 'Space IQ Portfolio Project'" class="max-w-full max-h-[80vh] rounded-sm shadow-2xl object-contain">
                             
                             <!-- Right Arrow -->
                             <button type="button" x-show="lightboxImages.length > 1" @click.stop="nextImage()" class="absolute right-4 md:-right-20 text-white/70 hover:text-white transition-all bg-black/50 hover:bg-black/80 rounded-full p-3 border border-white/10 hover:scale-110 transform z-[115] cursor-pointer">

@@ -218,7 +218,7 @@
                                         }
                                     }
                                 @endphp
-                                <div class="w-full md:w-1/2 relative overflow-hidden h-[400px] bg-brand-950">
+                                <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
                                     @if($videoMedia)
                                         @if($isYoutube)
                                             <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&controls=1&rel=0" 
@@ -241,7 +241,7 @@
                                     $panoramaMedia = $service->media->where('id', 105)->first() ?? $service->media->first();
                                     $panoPath = $panoramaMedia ? parse_url(Storage::url($panoramaMedia->file_path), PHP_URL_PATH) : null;
                                 @endphp
-                                <div class="w-full md:w-1/2 relative overflow-hidden h-[400px] bg-brand-950">
+                                <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
                                     @if($panoPath)
                                         <div id="home-panorama-{{ $panoramaMedia->id }}" 
                                              class="w-full h-full"
@@ -325,14 +325,15 @@
                                             $genre = 'floorplan_site';
                                         } elseif ($cat === 'residential') {
                                             $genre = 'floorplan_residential';
-                                        }
-                                        
-                                        // Round robin/unique check
+                                        }                                        // Round robin/unique check
                                         if ($genre === 'other' || !in_array($genre, $seenGenres)) {
                                             if ($genre !== 'other') {
                                                 $seenGenres[] = $genre;
                                             }
-                                            $imageUrls->push(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                            $imageUrls->push([
+                                                'url' => parse_url(Storage::url($media->file_path), PHP_URL_PATH),
+                                                'title' => $media->title ?? $service->title . ' - Project ' . ($imageUrls->count() + 1)
+                                            ]);
                                             if ($imageUrls->count() >= 5) {
                                                 break;
                                             }
@@ -343,7 +344,7 @@
                                     if ($imageUrls->count() < 5) {
                                         foreach ($service->media->where('file_type', '!=', 'video')->sortBy('sort_order') as $media) {
                                             $url = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
-                                            if (!$imageUrls->contains($url)) {
+                                            if (!$imageUrls->pluck('url')->contains($url)) {
                                                 $path = public_path($url);
                                                 $isLandscape = true;
                                                 if (file_exists($path)) {
@@ -353,7 +354,10 @@
                                                     }
                                                 }
                                                 if ($isLandscape) {
-                                                    $imageUrls->push($url);
+                                                    $imageUrls->push([
+                                                        'url' => $url,
+                                                        'title' => $media->title ?? $service->title . ' - Project ' . ($imageUrls->count() + 1)
+                                                    ]);
                                                     if ($imageUrls->count() >= 5) {
                                                         break;
                                                     }
@@ -364,29 +368,54 @@
                                     
                                     // Extreme fallback: any image
                                     if ($imageUrls->isEmpty()) {
-                                        $imageUrls->push($index % 2 == 0 ? '/img/exterior_render.png' : '/img/interior_render.png');
+                                        $imageUrls->push([
+                                            'url' => $index % 2 == 0 ? '/img/exterior_render.png' : '/img/interior_render.png',
+                                            'title' => $service->title . ' - Project Placeholder'
+                                        ]);
                                     }
                                 @endphp
-                                <div class="w-full md:w-1/2 relative overflow-hidden h-[400px] bg-brand-950" 
+                                <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950" 
                                      x-data="{ 
                                          currentIndex: 0, 
                                          images: {{ json_encode($imageUrls->values()->toArray()) }},
                                          total: {{ $imageUrls->count() }},
+                                         touchStartX: 0,
+                                         touchEndX: 0,
                                          next() {
                                              this.currentIndex = (this.currentIndex + 1) % this.total;
                                          },
                                          prev() {
                                              this.currentIndex = (this.currentIndex - 1 + this.total) % this.total;
                                          },
+                                         handleTouchStart(e) {
+                                             this.touchStartX = e.touches[0].clientX;
+                                         },
+                                         handleTouchEnd(e) {
+                                             this.touchEndX = e.changedTouches[0].clientX;
+                                             this.handleSwipe();
+                                         },
+                                         handleSwipe() {
+                                             const diff = this.touchStartX - this.touchEndX;
+                                             if (Math.abs(diff) > 40) {
+                                                 if (diff > 0) {
+                                                     this.next();
+                                                 } else {
+                                                     this.prev();
+                                                 }
+                                             }
+                                         },
                                          init() {
                                              if (this.total > 1) {
                                                  setInterval(() => this.next(), 10000);
                                              }
                                          }
-                                     }">
+                                     }"
+                                     @touchstart="handleTouchStart($event)"
+                                     @touchend="handleTouchEnd($event)"
+                                     style="touch-action: pan-y;">
                                     
                                     <div class="w-full h-full relative">
-                                        <template x-for="(img, idx) in images" :key="idx">
+                                        <template x-for="(item, idx) in images" :key="idx">
                                             <div x-show="currentIndex === idx" 
                                                  x-transition:enter="transition ease-out duration-700"
                                                  x-transition:enter-start="opacity-0 scale-105"
@@ -399,20 +428,20 @@
                                                  <!-- Skeleton shimmer shown until both images load -->
                                                  <div class="absolute inset-0 skeleton-shimmer z-0" x-show="!fgLoaded"></div>
                                                  <!-- Blurred Ambient Background Image -->
-                                                 <img :src="img"
+                                                 <img :src="item.url"
                                                       loading="lazy"
                                                       decoding="async"
                                                       @load="bgLoaded = true"
                                                       class="absolute inset-0 w-full h-full object-cover blur-xl opacity-30 scale-110 pointer-events-none lazy-img animate-kenburns"
                                                       :class="bgLoaded ? 'loaded' : ''">
                                                  <!-- Main Foreground Image (Fully Visible) -->
-                                                 <img :src="img"
+                                                 <img :src="item.url"
                                                       loading="lazy"
                                                       decoding="async"
                                                       @load="fgLoaded = true"
                                                       class="relative z-10 max-w-full max-h-full object-contain grayscale-[15%] hover:grayscale-0 transition-all duration-700 lazy-img animate-kenburns"
                                                       :class="fgLoaded ? 'loaded' : ''"
-                                                      alt="Portfolio image">
+                                                      :alt="item.title || 'Space IQ Portfolio Project'">
                                             </div>
                                         </template>
                                         <div class="absolute inset-0 bg-black/10 pointer-events-none z-10"></div>
@@ -431,10 +460,10 @@
 
                                     <template x-if="total > 1">
                                         <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20 bg-brand-950/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/5">
-                                            <template x-for="(img, idx) in images" :key="idx">
+                                            <template x-for="(item, idx) in images" :key="idx">
                                                 <button @click="currentIndex = idx" 
-                                                        class="w-1.5 h-1.5 rounded-full transition-all focus:outline-none cursor-pointer"
-                                                        :class="currentIndex === idx ? 'bg-accent-400 w-3' : 'bg-white/40 hover:bg-white/70'"></button>
+                                                         class="w-1.5 h-1.5 rounded-full transition-all focus:outline-none cursor-pointer"
+                                                         :class="currentIndex === idx ? 'bg-accent-400 w-3' : 'bg-white/40 hover:bg-white/70'"></button>
                                             </template>
                                         </div>
                                     </template>
@@ -475,39 +504,163 @@
             <span class="text-gray-400 text-sm font-light ml-3 self-center">5.0 · Rated by our clients</span>
         </div>
 
-        <!-- Review Cards Grid -->
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:24px;">
+        <!-- Review Cards Container (Grid on desktop, Slider on mobile) -->
+        <div x-data="{ 
+                 activeSlide: 0, 
+                 totalSlides: 4,
+                 touchStartX: 0,
+                 touchEndX: 0,
+                 handleTouchStart(e) {
+                     this.touchStartX = e.touches[0].clientX;
+                 },
+                 handleTouchEnd(e) {
+                     this.touchEndX = e.changedTouches[0].clientX;
+                     this.handleSwipe();
+                 },
+                 handleSwipe() {
+                     const diff = this.touchStartX - this.touchEndX;
+                     if (Math.abs(diff) > 40) {
+                         if (diff > 0) {
+                             this.next();
+                         } else {
+                             this.prev();
+                         }
+                     }
+                 },
+                 next() {
+                     this.activeSlide = (this.activeSlide + 1) % this.totalSlides;
+                 },
+                 prev() {
+                     this.activeSlide = (this.activeSlide - 1 + this.totalSlides) % this.totalSlides;
+                 }
+             }">
+            
+            <!-- Mobile Slider View (Visible only on mobile) -->
+            <div class="md:hidden relative" 
+                 @touchstart="handleTouchStart($event)"
+                 @touchend="handleTouchEnd($event)"
+                 style="touch-action: pan-y;">
+                 
+                 <!-- Review Card wrapper -->
+                 <div class="relative min-h-[340px] overflow-hidden">
+                     <!-- Anthony -->
+                     <div x-show="activeSlide === 0" 
+                          x-transition:enter="transition ease-out duration-300 transform"
+                          x-transition:enter-start="opacity-0 translate-x-8"
+                          x-transition:enter-end="opacity-100 translate-x-0"
+                          x-transition:leave="transition ease-in duration-200 absolute inset-0 transform"
+                          x-transition:leave-start="opacity-100 translate-x-0"
+                          x-transition:leave-end="opacity-0 -translate-x-8"
+                          class="bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300 h-full">
+                         <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6 text-sm">"Space IQ is a one-of-a-kind studio. I have been so impressed with the quality of their work and their work ethic. They delivered my plans before schedule which helped me immensely. They were also extremely accurate and very patient and diligent. Will hire them again in a heartbeat!"</p>
+                         <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
+                         <p class="text-white font-bold uppercase tracking-widest text-sm">Anthony</p>
+                         <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Engineer</p>
+                     </div>
 
-            <!-- Anthony -->
-            <div class="reveal bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300">
-                <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6">"Space IQ is a one-of-a-kind studio. I have been so impressed with the quality of their work and their work ethic. They delivered my plans before schedule which helped me immensely. They were also extremely accurate and very patient and diligent. Will hire them again in a heartbeat!"</p>
-                <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
-                <p class="text-white font-bold uppercase tracking-widest text-sm">Anthony</p>
-                <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Engineer</p>
+                     <!-- Ryan -->
+                     <div x-show="activeSlide === 1" 
+                          x-transition:enter="transition ease-out duration-300 transform"
+                          x-transition:enter-start="opacity-0 translate-x-8"
+                          x-transition:enter-end="opacity-100 translate-x-0"
+                          x-transition:leave="transition ease-in duration-200 absolute inset-0 transform"
+                          x-transition:leave-start="opacity-100 translate-x-0"
+                          x-transition:leave-end="opacity-0 -translate-x-8"
+                          class="bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300 h-full"
+                          style="display: none;">
+                         <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6 text-sm">"The 3D walkthrough animation Space IQ created for our luxury residential development was nothing short of outstanding. Our sales team used it at every presentation and it completely changed how buyers engaged with the project. Closed three units in the first week alone."</p>
+                         <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
+                         <p class="text-white font-bold uppercase tracking-widest text-sm">Ryan</p>
+                         <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Real Estate Developer</p>
+                     </div>
+
+                     <!-- Justin -->
+                     <div x-show="activeSlide === 2" 
+                          x-transition:enter="transition ease-out duration-300 transform"
+                          x-transition:enter-start="opacity-0 translate-x-8"
+                          x-transition:enter-end="opacity-100 translate-x-0"
+                          x-transition:leave="transition ease-in duration-200 absolute inset-0 transform"
+                          x-transition:leave-start="opacity-100 translate-x-0"
+                          x-transition:leave-end="opacity-0 -translate-x-8"
+                          class="bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300 h-full"
+                          style="display: none;">
+                         <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6 text-sm">"We needed high-quality exterior renders for a commercial project under a very tight deadline. Space IQ delivered ahead of schedule with incredible attention to detail — lighting, materials, landscaping, everything was spot on. Our client was blown away. We will absolutely work with them again."</p>
+                         <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
+                         <p class="text-white font-bold uppercase tracking-widest text-sm">Justin</p>
+                         <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Project Manager</p>
+                     </div>
+
+                     <!-- Robert -->
+                     <div x-show="activeSlide === 3" 
+                          x-transition:enter="transition ease-out duration-300 transform"
+                          x-transition:enter-start="opacity-0 translate-x-8"
+                          x-transition:enter-end="opacity-100 translate-x-0"
+                          x-transition:leave="transition ease-in duration-200 absolute inset-0 transform"
+                          x-transition:leave-start="opacity-100 translate-x-0"
+                          x-transition:leave-end="opacity-0 -translate-x-8"
+                          class="bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300 h-full"
+                          style="display: none;">
+                         <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6 text-sm">"The 360° virtual tours Space IQ produced for our properties transformed our international sales process entirely. Buyers from the UK and UAE were able to walk through apartments remotely and make decisions with full confidence. It is a complete game-changer for off-plan sales."</p>
+                         <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
+                         <p class="text-white font-bold uppercase tracking-widest text-sm">Robert</p>
+                         <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Interior Designer</p>
+                     </div>
+                 </div>
+
+                 <!-- Slider Navigation Controls for Mobile -->
+                 <div class="flex justify-between items-center mt-6 px-2">
+                     <button @click="prev()" class="w-9 h-9 rounded-full bg-brand-950/80 border border-white/10 text-white hover:text-accent-400 hover:scale-105 flex items-center justify-center transition-all cursor-pointer">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                     </button>
+                     
+                     <!-- Pagination Dots -->
+                     <div class="flex gap-2">
+                         <template x-for="idx in [0, 1, 2, 3]">
+                             <button @click="activeSlide = idx" 
+                                     class="w-2 h-2 rounded-full transition-all focus:outline-none"
+                                     :class="activeSlide === idx ? 'bg-accent-400 w-5' : 'bg-white/30'"></button>
+                         </template>
+                     </div>
+                     
+                     <button @click="next()" class="w-9 h-9 rounded-full bg-brand-950/80 border border-white/10 text-white hover:text-accent-400 hover:scale-105 flex items-center justify-center transition-all cursor-pointer">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                     </button>
+                 </div>
             </div>
 
-            <!-- Ryan -->
-            <div class="reveal bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300" style="transition-delay:0.2s">
-                <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6">"The 3D walkthrough animation Space IQ created for our luxury residential development was nothing short of outstanding. Our sales team used it at every presentation and it completely changed how buyers engaged with the project. Closed three units in the first week alone."</p>
-                <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
-                <p class="text-white font-bold uppercase tracking-widest text-sm">Ryan</p>
-                <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Real Estate Developer</p>
-            </div>
+            <!-- Desktop Grid View (Visible on tablet/desktop) -->
+            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Anthony -->
+                <div class="reveal bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300">
+                    <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6">"Space IQ is a one-of-a-kind studio. I have been so impressed with the quality of their work and their work ethic. They delivered my plans before schedule which helped me immensely. They were also extremely accurate and very patient and diligent. Will hire them again in a heartbeat!"</p>
+                    <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
+                    <p class="text-white font-bold uppercase tracking-widest text-sm">Anthony</p>
+                    <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Engineer</p>
+                </div>
 
-            <!-- Justin -->
-            <div class="reveal bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300" style="transition-delay:0.3s">
-                <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6">"We needed high-quality exterior renders for a commercial project under a very tight deadline. Space IQ delivered ahead of schedule with incredible attention to detail — lighting, materials, landscaping, everything was spot on. Our client was blown away. We will absolutely work with them again."</p>
-                <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
-                <p class="text-white font-bold uppercase tracking-widest text-sm">Justin</p>
-                <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Project Manager</p>
-            </div>
+                <!-- Ryan -->
+                <div class="reveal bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300" style="transition-delay:0.1s">
+                    <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6">"The 3D walkthrough animation Space IQ created for our luxury residential development was nothing short of outstanding. Our sales team used it at every presentation and it completely changed how buyers engaged with the project. Closed three units in the first week alone."</p>
+                    <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
+                    <p class="text-white font-bold uppercase tracking-widest text-sm">Ryan</p>
+                    <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Real Estate Developer</p>
+                </div>
 
-            <!-- Robert -->
-            <div class="reveal bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300" style="transition-delay:0.4s">
-                <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6">"The 360° virtual tours Space IQ produced for our properties transformed our international sales process entirely. Buyers from the UK and UAE were able to walk through apartments remotely and make decisions with full confidence. It is a complete game-changer for off-plan sales."</p>
-                <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
-                <p class="text-white font-bold uppercase tracking-widest text-sm">Robert</p>
-                <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Interior Designer</p>
+                <!-- Justin -->
+                <div class="reveal bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300" style="transition-delay:0.2s">
+                    <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6">"We needed high-quality exterior renders for a commercial project under a very tight deadline. Space IQ delivered ahead of schedule with incredible attention to detail — lighting, materials, landscaping, everything was spot on. Our client was blown away. We will absolutely work with them again."</p>
+                    <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
+                    <p class="text-white font-bold uppercase tracking-widest text-sm">Justin</p>
+                    <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Project Manager</p>
+                </div>
+
+                <!-- Robert -->
+                <div class="reveal bg-brand-950/60 border border-white/8 rounded-xl p-8 flex flex-col hover:border-accent-400/30 transition-colors duration-300" style="transition-delay:0.3s">
+                    <p class="text-gray-300 font-light leading-relaxed italic flex-1 mb-6">"The 360° virtual tours Space IQ produced for our properties transformed our international sales process entirely. Buyers from the UK and UAE were able to walk through apartments remotely and make decisions with full confidence. It is a complete game-changer for off-plan sales."</p>
+                    <div class="w-8 h-px bg-accent-400/40 mb-4"></div>
+                    <p class="text-white font-bold uppercase tracking-widest text-sm">Robert</p>
+                    <p class="text-accent-400 text-xs uppercase tracking-wider mt-1">Interior Designer</p>
+                </div>
             </div>
 
         </div>
