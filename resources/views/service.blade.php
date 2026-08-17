@@ -109,7 +109,7 @@
             foreach($categoryMedia->sortBy('sort_order') as $media) {
                 if ($media->file_type !== 'video' && $service->slug !== '360-views') {
                     $lightboxImagesCollect->push([
-                        'url' => parse_url(Storage::url($media->file_path), PHP_URL_PATH),
+                        'url' => webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH)),
                         'title' => $media->title ?? ''
                     ]);
                 }
@@ -178,7 +178,7 @@
     {{-- First portfolio image as blurred hero background --}}
     @php $heroMedia = $service->media->sortBy('sort_order')->first(); @endphp
     @if($heroMedia && $heroMedia->file_type !== 'video')
-    <div class="absolute inset-0 z-0" style="background-image:url('{{ parse_url(Storage::url($heroMedia->file_path), PHP_URL_PATH) }}');background-size:cover;background-position:center;filter:blur(8px) brightness(0.18);transform:scale(1.05);"></div>
+    <div class="absolute inset-0 z-0" style="background-image:url('{{ webp_asset(parse_url(Storage::url($heroMedia->file_path), PHP_URL_PATH)) }}');background-size:cover;background-position:center;filter:blur(8px) brightness(0.18);transform:scale(1.05);"></div>
     @else
     {{-- Background gradient fallback --}}
     <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-900 to-[#0b2020]"></div>
@@ -334,7 +334,7 @@
                                                 this.$nextTick(() => {
                                                     this.viewer = pannellum.viewer(this.$refs.panoEl, {
                                                         type: 'equirectangular',
-                                                        panorama: '{{ parse_url(Storage::url($media->file_path), PHP_URL_PATH) }}',
+                                                        panorama: '{{ webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH)) }}',
                                                         autoLoad: true,
                                                         compass: false,
                                                         autoRotate: -2,
@@ -414,7 +414,7 @@
                                         }
                                     @endphp
                                     @php
-                                         $mediaUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
+                                         $mediaUrl = webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
                                          $mediaIndex = $lightboxImagesCollect->values()->filter(fn($x) => $x['url'] === $mediaUrl)->keys()->first() ?? 0;
                                      @endphp
                                      <div class="relative group overflow-hidden rounded-md shadow-xl tilt-card {{ $isTallImage ? 'max-w-[60%] md:max-w-[50%] mx-auto' : 'w-full' }}" 

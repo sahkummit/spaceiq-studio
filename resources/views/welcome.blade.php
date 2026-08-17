@@ -196,85 +196,9 @@
                     <h3 class="text-2xl text-accent-400 uppercase tracking-widest font-bold mb-10 border-b border-white/10 pb-4 inline-block">{{ $category }}</h3>
                     <div class="grid grid-cols-1 gap-12">
                         @foreach($services as $index => $service)
-                        <div class="flex flex-col {{ $index % 2 == 0 ? 'md:flex-row' : 'md:flex-row-reverse' }} items-center group bg-brand-900/30 border border-white/5 hover:border-accent-400/20 rounded-xl overflow-hidden transition-colors duration-500 tilt-card">
-                            <div class="w-full md:w-1/2 p-8 md:p-10 xl:p-12 z-10 relative">
-                                <h4 class="text-3xl font-display font-bold text-white mb-4 uppercase">{{ $service->title }}</h4>
-                                <p class="text-gray-400 mb-8 font-light text-lg leading-relaxed">{{ $service->short_description ?? Str::limit(strip_tags($service->description), 100) }}</p>
-                                <a href="{{ route('service.show', $service->slug) }}" class="text-accent-400 hover:text-white font-medium flex items-center gap-2 group-hover:gap-4 transition-all w-max uppercase tracking-wider text-sm border-b border-accent-400 hover:border-white pb-1">
-                                    View Gallery <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                </a>
-                            </div>
-                            @if($service->slug === 'walkthrough-animation')
-                                @php
-                                    $videoMedia = $service->media->sortBy('sort_order')->first();
-                                    $isYoutube = false;
-                                    $youtubeId = '';
-                                    if ($videoMedia) {
-                                        if (str_contains($videoMedia->file_path, 'youtube.com') || str_contains($videoMedia->file_path, 'youtu.be')) {
-                                            $isYoutube = true;
-                                            if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $videoMedia->file_path, $match)) {
-                                                $youtubeId = $match[1];
-                                            }
-                                        }
-                                    }
-                                @endphp
-                                <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
-                                    @if($videoMedia)
-                                        @if($isYoutube)
-                                            <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&controls=1&rel=0" 
-                                                    class="w-full h-full" 
-                                                    frameborder="0" 
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                                    allowfullscreen>
-                                            </iframe>
-                                        @else
-                                            <video src="{{ Storage::url($videoMedia->file_path) }}" autoplay muted loop playsinline controls class="w-full h-full object-cover"></video>
-                                        @endif
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                                            Video Showcase Coming Soon
-                                        </div>
-                                    @endif
-                                </div>
-                            @elseif($service->slug === '360-views')
-                                @php
-                                    $panoramaMedia = $service->media->where('id', 105)->first() ?? $service->media->first();
-                                    $panoPath = $panoramaMedia ? parse_url(Storage::url($panoramaMedia->file_path), PHP_URL_PATH) : null;
-                                @endphp
-                                <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
-                                    @if($panoPath)
-                                        <div id="home-panorama-{{ $panoramaMedia->id }}" 
-                                             class="w-full h-full"
-                                             x-data="{ viewer: null }"
-                                             x-init="$nextTick(() => {
-                                                 viewer = pannellum.viewer('home-panorama-{{ $panoramaMedia->id }}', {
-                                                     type: 'equirectangular',
-                                                     panorama: '{{ $panoPath }}',
-                                                     autoLoad: true,
-                                                     compass: false,
-                                                     autoRotate: -2,
-                                                     autoRotateInactivityDelay: -1,
-                                                     mouseZoom: false,
-                                                     showZoomCtrl: false,
-                                                     showFullscreenCtrl: true
-                                                 });
-                                                 const stopRotate = () => {
-                                                     if (viewer) viewer.stopAutoRotate();
-                                                 };
-                                                 $el.addEventListener('mousedown', stopRotate, { once: true });
-                                                 $el.addEventListener('touchstart', stopRotate, { once: true });
-                                                 $el.addEventListener('pointerdown', stopRotate, { once: true });
-                                             })">
-                                        </div>
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                                            360 View Showcase Coming Soon
-                                        </div>
-                                    @endif
-                                </div>
-                            @else
-                                @php
-                                    $imageUrls = collect();
+                            @php
+                                $imageUrls = collect();
+                                if ($service->slug !== 'walkthrough-animation' && $service->slug !== '360-views') {
                                     $selected = [];
                                     $seenGenres = [];
                                     
@@ -286,7 +210,7 @@
                                         if (file_exists($path)) {
                                             $size = @getimagesize($path);
                                             if ($size && ($size[1] > $size[0])) {
-                                                $isLandscape = false; // skip vertical/portrait images
+                                                $isLandscape = false;
                                             }
                                         }
                                         
@@ -294,7 +218,6 @@
                                             continue;
                                         }
                                         
-                                        // Classify by genre keywords in title or category
                                         $genre = 'other';
                                         $title = strtolower($media->title);
                                         $cat = strtolower($media->category ?? '');
@@ -325,13 +248,14 @@
                                             $genre = 'floorplan_site';
                                         } elseif ($cat === 'residential') {
                                             $genre = 'floorplan_residential';
-                                        }                                        // Round robin/unique check
+                                        }
+                                        
                                         if ($genre === 'other' || !in_array($genre, $seenGenres)) {
                                             if ($genre !== 'other') {
                                                 $seenGenres[] = $genre;
                                             }
                                             $imageUrls->push([
-                                                'url' => parse_url(Storage::url($media->file_path), PHP_URL_PATH),
+                                                'url' => webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH)),
                                                 'title' => $media->title ?? $service->title . ' - Project ' . ($imageUrls->count() + 1)
                                             ]);
                                             if ($imageUrls->count() >= 5) {
@@ -340,11 +264,10 @@
                                         }
                                     }
                                     
-                                    // Fallback if we have less than 5 unique-genre landscape images
                                     if ($imageUrls->count() < 5) {
                                         foreach ($service->media->where('file_type', '!=', 'video')->sortBy('sort_order') as $media) {
                                             $url = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
-                                            if (!$imageUrls->pluck('url')->contains($url)) {
+                                            if (!$imageUrls->pluck('url')->contains(webp_asset($url))) {
                                                 $path = public_path($url);
                                                 $isLandscape = true;
                                                 if (file_exists($path)) {
@@ -355,7 +278,7 @@
                                                 }
                                                 if ($isLandscape) {
                                                     $imageUrls->push([
-                                                        'url' => $url,
+                                                        'url' => webp_asset($url),
                                                         'title' => $media->title ?? $service->title . ' - Project ' . ($imageUrls->count() + 1)
                                                     ]);
                                                     if ($imageUrls->count() >= 5) {
@@ -366,108 +289,193 @@
                                         }
                                     }
                                     
-                                    // Extreme fallback: any image
                                     if ($imageUrls->isEmpty()) {
                                         $imageUrls->push([
-                                            'url' => $index % 2 == 0 ? '/img/exterior_render.png' : '/img/interior_render.png',
+                                            'url' => $index % 2 == 0 ? webp_asset('/img/exterior_render.png') : webp_asset('/img/interior_render.png'),
                                             'title' => $service->title . ' - Project Placeholder'
                                         ]);
                                     }
-                                @endphp
-                                <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950" 
-                                     x-data="{ 
-                                         currentIndex: 0, 
-                                         images: {{ json_encode($imageUrls->values()->toArray()) }},
-                                         total: {{ $imageUrls->count() }},
-                                         touchStartX: 0,
-                                         touchEndX: 0,
-                                         next() {
-                                             this.currentIndex = (this.currentIndex + 1) % this.total;
-                                         },
-                                         prev() {
-                                             this.currentIndex = (this.currentIndex - 1 + this.total) % this.total;
-                                         },
-                                         handleTouchStart(e) {
-                                             this.touchStartX = e.touches[0].clientX;
-                                         },
-                                         handleTouchEnd(e) {
-                                             this.touchEndX = e.changedTouches[0].clientX;
-                                             this.handleSwipe();
-                                         },
-                                         handleSwipe() {
-                                             const diff = this.touchStartX - this.touchEndX;
-                                             if (Math.abs(diff) > 40) {
-                                                 if (diff > 0) {
-                                                     this.next();
-                                                 } else {
-                                                     this.prev();
-                                                 }
-                                             }
-                                         },
-                                         init() {
-                                             if (this.total > 1) {
-                                                 setInterval(() => this.next(), 10000);
-                                             }
+                                }
+                            @endphp
+                        <div class="relative group/card w-full"
+                             @if($service->slug !== 'walkthrough-animation' && $service->slug !== '360-views')
+                             x-data="{ 
+                                 currentIndex: 0, 
+                                 images: {{ json_encode($imageUrls->values()->toArray()) }},
+                                 total: {{ $imageUrls->count() }},
+                                 touchStartX: 0,
+                                 touchEndX: 0,
+                                 next() {
+                                     this.currentIndex = (this.currentIndex + 1) % this.total;
+                                 },
+                                 prev() {
+                                     this.currentIndex = (this.currentIndex - 1 + this.total) % this.total;
+                                 },
+                                 handleTouchStart(e) {
+                                     this.touchStartX = e.touches[0].clientX;
+                                 },
+                                 handleTouchEnd(e) {
+                                     this.touchEndX = e.changedTouches[0].clientX;
+                                     this.handleSwipe();
+                                 },
+                                 handleSwipe() {
+                                     const diff = this.touchStartX - this.touchEndX;
+                                     if (Math.abs(diff) > 40) {
+                                         if (diff > 0) {
+                                             this.next();
+                                         } else {
+                                             this.prev();
                                          }
-                                     }"
-                                     @touchstart="handleTouchStart($event)"
-                                     @touchend="handleTouchEnd($event)"
-                                     style="touch-action: pan-y;">
-                                    
-                                    <div class="w-full h-full relative">
-                                        <template x-for="(item, idx) in images" :key="idx">
-                                            <div x-show="currentIndex === idx" 
-                                                 x-transition:enter="transition ease-out duration-700"
-                                                 x-transition:enter-start="opacity-0 scale-105"
-                                                 x-transition:enter-end="opacity-100 scale-100"
-                                                 x-transition:leave="transition ease-in duration-500"
-                                                 x-transition:leave-start="opacity-100"
-                                                 x-transition:leave-end="opacity-0"
-                                                 class="absolute inset-0 w-full h-full flex items-center justify-center bg-brand-950 overflow-hidden"
-                                                 x-data="{ bgLoaded: false, fgLoaded: false }">
-                                                 <!-- Skeleton shimmer shown until both images load -->
-                                                 <div class="absolute inset-0 skeleton-shimmer z-0" x-show="!fgLoaded"></div>
-                                                 <!-- Blurred Ambient Background Image -->
-                                                 <img :src="item.url"
-                                                      loading="lazy"
-                                                      decoding="async"
-                                                      @load="bgLoaded = true"
-                                                      class="absolute inset-0 w-full h-full object-cover blur-xl opacity-30 scale-110 pointer-events-none lazy-img animate-kenburns"
-                                                      :class="bgLoaded ? 'loaded' : ''">
-                                                 <!-- Main Foreground Image (Fully Visible) -->
-                                                 <img :src="item.url"
-                                                      loading="lazy"
-                                                      decoding="async"
-                                                      @load="fgLoaded = true"
-                                                      class="relative z-10 max-w-full max-h-full object-contain grayscale-[15%] hover:grayscale-0 transition-all duration-700 lazy-img animate-kenburns"
-                                                      :class="fgLoaded ? 'loaded' : ''"
-                                                      :alt="item.title || 'Space IQ Portfolio Project'">
+                                     }
+                                 },
+                                 init() {
+                                     if (this.total > 1) {
+                                         setInterval(() => this.next(), 10000);
+                                     }
+                                 }
+                             }"
+                             @touchstart="handleTouchStart($event)"
+                             @touchend="handleTouchEnd($event)"
+                             style="touch-action: pan-y;"
+                             @endif
+                        >
+                            <!-- Tilting Card Container -->
+                            <div class="flex flex-col {{ $index % 2 == 0 ? 'md:flex-row' : 'md:flex-row-reverse' }} items-center group bg-brand-900/30 border border-white/5 hover:border-accent-400/20 rounded-xl overflow-hidden transition-colors duration-500 tilt-card">
+                                <div class="w-full md:w-1/2 p-8 md:p-10 xl:p-12 z-10 relative">
+                                    <h4 class="text-3xl font-display font-bold text-white mb-4 uppercase">{{ $service->title }}</h4>
+                                    <p class="text-gray-400 mb-8 font-light text-lg leading-relaxed">{{ $service->short_description ?? Str::limit(strip_tags($service->description), 100) }}</p>
+                                    <a href="{{ route('service.show', $service->slug) }}" class="text-accent-400 hover:text-white font-medium flex items-center gap-2 group-hover:gap-4 transition-all w-max uppercase tracking-wider text-sm border-b border-accent-400 hover:border-white pb-1">
+                                        View Gallery <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </a>
+                                </div>
+                                @if($service->slug === 'walkthrough-animation')
+                                    @php
+                                        $videoMedia = $service->media->sortBy('sort_order')->first();
+                                        $isYoutube = false;
+                                        $youtubeId = '';
+                                        if ($videoMedia) {
+                                            if (str_contains($videoMedia->file_path, 'youtube.com') || str_contains($videoMedia->file_path, 'youtu.be')) {
+                                                $isYoutube = true;
+                                                if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $videoMedia->file_path, $match)) {
+                                                    $youtubeId = $match[1];
+                                                }
+                                            }
+                                        }
+                                    @endphp
+                                    <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
+                                        @if($videoMedia)
+                                            @if($isYoutube)
+                                                <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&controls=1&rel=0" 
+                                                        class="w-full h-full" 
+                                                        frameborder="0" 
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                                        allowfullscreen>
+                                                </iframe>
+                                            @else
+                                                <video src="{{ Storage::url($videoMedia->file_path) }}" autoplay muted loop playsinline controls class="w-full h-full object-cover"></video>
+                                            @endif
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center text-gray-500 text-sm">
+                                                Video Showcase Coming Soon
+                                            </div>
+                                        @endif
+                                    </div>
+                                @elseif($service->slug === '360-views')
+                                    @php
+                                        $panoramaMedia = $service->media->where('id', 105)->first() ?? $service->media->first();
+                                        $panoPath = $panoramaMedia ? webp_asset(parse_url(Storage::url($panoramaMedia->file_path), PHP_URL_PATH)) : null;
+                                    @endphp
+                                    <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
+                                        @if($panoPath)
+                                            <div id="home-panorama-{{ $panoramaMedia->id }}" 
+                                                 class="w-full h-full"
+                                                 x-data="{ viewer: null }"
+                                                 x-init="$nextTick(() => {
+                                                     viewer = pannellum.viewer('home-panorama-{{ $panoramaMedia->id }}', {
+                                                         type: 'equirectangular',
+                                                         panorama: '{{ $panoPath }}',
+                                                         autoLoad: true,
+                                                         compass: false,
+                                                         autoRotate: -2,
+                                                         autoRotateInactivityDelay: -1,
+                                                         mouseZoom: false,
+                                                         showZoomCtrl: false,
+                                                         showFullscreenCtrl: true
+                                                     });
+                                                     const stopRotate = () => {
+                                                         if (viewer) viewer.stopAutoRotate();
+                                                     };
+                                                     $el.addEventListener('mousedown', stopRotate, { once: true });
+                                                     $el.addEventListener('touchstart', stopRotate, { once: true });
+                                                     $el.addEventListener('pointerdown', stopRotate, { once: true });
+                                                 })">
+                                            </div>
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center text-gray-500 text-sm">
+                                                360 View Showcase Coming Soon
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
+                                        <div class="w-full h-full relative">
+                                            <template x-for="(item, idx) in images" :key="idx">
+                                                <div x-show="currentIndex === idx" 
+                                                     x-transition:enter="transition ease-out duration-700"
+                                                     x-transition:enter-start="opacity-0 scale-105"
+                                                     x-transition:enter-end="opacity-100 scale-100"
+                                                     x-transition:leave="transition ease-in duration-500"
+                                                     x-transition:leave-start="opacity-100"
+                                                     x-transition:leave-end="opacity-0"
+                                                     class="absolute inset-0 w-full h-full flex items-center justify-center bg-brand-950 overflow-hidden"
+                                                     x-data="{ bgLoaded: false, fgLoaded: false }">
+                                                     <!-- Skeleton shimmer shown until both images load -->
+                                                     <div class="absolute inset-0 skeleton-shimmer z-0" x-show="!fgLoaded"></div>
+                                                     <!-- Blurred Ambient Background Image -->
+                                                     <img :src="item.url"
+                                                          loading="lazy"
+                                                          decoding="async"
+                                                          @load="bgLoaded = true"
+                                                          class="absolute inset-0 w-full h-full object-cover blur-xl opacity-30 scale-110 pointer-events-none lazy-img animate-kenburns"
+                                                          :class="bgLoaded ? 'loaded' : ''">
+                                                     <!-- Main Foreground Image (Fully Visible) -->
+                                                     <img :src="item.url"
+                                                          loading="lazy"
+                                                          decoding="async"
+                                                          @load="fgLoaded = true"
+                                                          class="relative z-10 max-w-full max-h-full object-contain grayscale-[15%] hover:grayscale-0 transition-all duration-700 lazy-img animate-kenburns"
+                                                          :class="fgLoaded ? 'loaded' : ''"
+                                                          :alt="item.title || 'Space IQ Portfolio Project'">
+                                                </div>
+                                            </template>
+                                            <div class="absolute inset-0 bg-black/10 pointer-events-none z-10"></div>
+                                        </div>
+
+                                        <template x-if="total > 1">
+                                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20 bg-brand-950/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/5">
+                                                <template x-for="(item, idx) in images" :key="idx">
+                                                    <button @click="currentIndex = idx" 
+                                                             class="w-1.5 h-1.5 rounded-full transition-all focus:outline-none cursor-pointer"
+                                                             :class="currentIndex === idx ? 'bg-accent-400 w-3' : 'bg-white/40 hover:bg-white/70'"></button>
+                                                </template>
                                             </div>
                                         </template>
-                                        <div class="absolute inset-0 bg-black/10 pointer-events-none z-10"></div>
                                     </div>
+                                @endif
+                            </div>
 
-                                    <template x-if="total > 1">
-                                        <div class="absolute inset-0 flex items-center justify-between px-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                                            <button @click="prev()" class="p-2 rounded-full bg-brand-950/80 border border-white/10 text-white hover:text-accent-400 hover:scale-110 transition-all focus:outline-none pointer-events-auto cursor-pointer">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-                                            </button>
-                                            <button @click="next()" class="p-2 rounded-full bg-brand-950/80 border border-white/10 text-white hover:text-accent-400 hover:scale-110 transition-all focus:outline-none pointer-events-auto cursor-pointer">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                                            </button>
-                                        </div>
-                                    </template>
-
-                                    <template x-if="total > 1">
-                                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20 bg-brand-950/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/5">
-                                            <template x-for="(item, idx) in images" :key="idx">
-                                                <button @click="currentIndex = idx" 
-                                                         class="w-1.5 h-1.5 rounded-full transition-all focus:outline-none cursor-pointer"
-                                                         :class="currentIndex === idx ? 'bg-accent-400 w-3' : 'bg-white/40 hover:bg-white/70'"></button>
-                                            </template>
-                                        </div>
-                                    </template>
+                            <!-- Fixed Navigation Arrows (Outside tilt-card) -->
+                            @if($service->slug !== 'walkthrough-animation' && $service->slug !== '360-views')
+                            <template x-if="total > 1">
+                                <div class="absolute bottom-0 md:top-0 md:bottom-0 {{ $index % 2 == 0 ? 'right-0' : 'left-0 md:right-auto' }} w-full md:w-1/2 h-[300px] sm:h-[350px] md:h-auto flex items-center justify-between px-4 z-30 pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
+                                    <button @click="prev()" class="p-2 rounded-full bg-brand-950/80 border border-white/10 text-white hover:text-accent-400 hover:scale-110 transition-all focus:outline-none pointer-events-auto cursor-pointer">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                                    </button>
+                                    <button @click="next()" class="p-2 rounded-full bg-brand-950/80 border border-white/10 text-white hover:text-accent-400 hover:scale-110 transition-all focus:outline-none pointer-events-auto cursor-pointer">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                                    </button>
                                 </div>
+                            </template>
                             @endif
                         </div>
                         @endforeach

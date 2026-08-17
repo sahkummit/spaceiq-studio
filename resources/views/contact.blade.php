@@ -7,7 +7,7 @@
 <!-- Header Section -->
 <section class="relative pt-32 pb-16 lg:pt-48 lg:pb-24 overflow-hidden border-b border-white/5 bg-brand-950">
     <!-- Blurred background image for visual richness -->
-    <div class="absolute inset-0 z-0" style="background-image:url('{{ asset('img/exterior_render.png') }}');background-size:cover;background-position:center;filter:blur(6px) brightness(0.15);transform:scale(1.05);"></div>
+    <div class="absolute inset-0 z-0" style="background-image:url('{{ webp_asset('img/exterior_render.png') }}');background-size:cover;background-position:center;filter:blur(6px) brightness(0.15);transform:scale(1.05);"></div>
     <div class="absolute inset-0 z-0 bg-gradient-to-b from-brand-950/60 via-brand-900/70 to-brand-950"></div>
     
     <div class="container mx-auto px-6 relative z-10 text-center">
