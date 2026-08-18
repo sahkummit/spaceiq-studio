@@ -264,8 +264,15 @@
                 transform-style: preserve-3d;
                 will-change: transform;
             }
-        @if(request()->routeIs('home'))
-        /* ── BIG.dk Style Intro Animation ── */
+        </style>
+    @else
+        <!-- Vite Compiled Production Assets (Production environment) -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
+
+    @if(request()->routeIs('home'))
+    <style>
+        /* ── BIG.dk Style Intro Animation (Universal for all environments) ── */
         #intro-curtain {
             position: fixed;
             inset: 0;
@@ -356,11 +363,7 @@
                 }
             }
         }
-        @endif
     </style>
-    @else
-        <!-- Vite Compiled Production Assets (Production environment) -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 
     <!-- Alpine.js -->
