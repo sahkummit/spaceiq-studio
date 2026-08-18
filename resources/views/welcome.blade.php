@@ -95,11 +95,10 @@
 <section class="relative overflow-hidden bg-brand-950" style="height: 100svh; min-height: 600px;">
     <!-- Background Video Wrapper -->
     <div class="absolute inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
-        <!-- Direct YouTube Autoplay Video (no image fallback) -->
-        <iframe class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] pointer-events-none opacity-85 select-none scale-[1.35]"
-                src="https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&showinfo=0&rel=0&modestbranding=1&start=26&iv_load_policy=3&disablekb=1&fs=0"
-                frameborder="0"
-                allow="autoplay; encrypted-media"
+        <!-- Direct YouTube Autoplay Video -->
+        <iframe style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.35); width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; pointer-events: none; opacity: 1; border: 0;"
+                src="https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&rel=0&modestbranding=1&enablejsapi=1"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen></iframe>
         <!-- Transparent click shield -->
         <div class="absolute inset-0 bg-transparent z-10 pointer-events-auto"></div>
