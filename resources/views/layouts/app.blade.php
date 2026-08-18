@@ -277,15 +277,15 @@
 </head>
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
     @if(request()->routeIs('home'))
-    <!-- BIG.dk Opening Curtain & Centered High-Res Exact Brand Lockup -->
+    <!-- BIG.dk Opening Curtain & Centered Exact Brand Lockup -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
     
     <div id="intro-brand" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
-        <div class="flex items-center" style="gap: 36px;">
-            <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" style="height: 144px; width: auto; filter: drop-shadow(0 10px 25px rgba(0,0,0,0.5));">
-            <div class="flex flex-col" style="line-height: 1.25;">
-                <span class="font-display font-bold text-white" style="font-size: 54px; letter-spacing: 0.05em;">Space IQ</span>
-                <span class="font-display font-light uppercase text-white/70" style="font-size: 30px; letter-spacing: 0.1em;">Design Studio</span>
+        <div class="flex items-center gap-3">
+            <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" class="h-12 w-auto drop-shadow-lg" style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+            <div class="flex flex-col leading-tight">
+                <span class="font-display font-bold tracking-wider text-white text-lg">Space IQ</span>
+                <span class="font-display font-light tracking-widest text-white/70 uppercase text-[10px]">Design Studio</span>
             </div>
         </div>
     </div>
@@ -301,43 +301,47 @@
 
             const introImg = brand.querySelector('img');
             function startSequence() {
-                // Measure rendered position in center
-                const startRect = brand.getBoundingClientRect();
+                // Ensure fonts and images are fully rendered
+                const initialScale = window.innerWidth < 640 ? 2.2 : (window.innerWidth < 1024 ? 2.8 : 3.4);
                 
-                // Convert brand from translate(-50%,-50%) to direct pixel coordinates with origin 0 0
-                brand.style.top = startRect.top + 'px';
-                brand.style.left = startRect.left + 'px';
-                brand.style.transform = 'none';
+                // Get starting natural bounding box
+                const naturalRect = brand.getBoundingClientRect();
+                
+                // Calculate centered starting coordinates
+                const startX = (window.innerWidth - (naturalRect.width * initialScale)) / 2;
+                const startY = (window.innerHeight - (naturalRect.height * initialScale)) / 2;
+
+                brand.style.top = '0px';
+                brand.style.left = '0px';
                 brand.style.transformOrigin = '0 0';
+                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${initialScale})`;
 
                 // Hold for 750ms on pure black screen
                 setTimeout(() => {
                     const targetRect = navContainer.getBoundingClientRect();
-                    const deltaX = targetRect.left - startRect.left;
-                    const deltaY = targetRect.top - startRect.top;
-                    const scaleX = targetRect.width / startRect.width;
-                    const scaleY = targetRect.height / startRect.height;
+                    const targetX = targetRect.left;
+                    const targetY = targetRect.top;
 
                     const brandDuration   = 1400; // 1.4s silky smooth
                     const curtainDuration = 1800; // 1.8s smooth architectural lift
-                    const ease = 'cubic-bezier(0.65, 0, 0.35, 1)';
+                    const ease = 'cubic-bezier(0.76, 0, 0.24, 1)';
 
                     // GPU-only hardware-accelerated transitions
-                    brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 200ms ease ${brandDuration - 80}ms`;
+                    brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 250ms ease ${brandDuration - 100}ms`;
                     curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
 
-                    // Glide and downscale directly onto navbar coordinates
-                    brand.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
-                    curtain.style.transform = 'translateY(-100%)';
+                    // Glide and scale down directly to scale(1) landing exactly on top of navbar
+                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(1)`;
+                    curtain.style.transform = 'translate3d(0, -100%, 0)';
 
-                    // Exact 1:1 seamless handoff to navbar container
+                    // Seamless overlapping handoff to navbar container
                     setTimeout(() => {
-                        navContainer.style.transition = 'opacity 200ms ease';
+                        navContainer.style.transition = 'opacity 250ms ease';
                         navContainer.style.opacity = '1';
                         brand.style.opacity = '0';
-                    }, brandDuration - 80);
+                    }, brandDuration - 100);
 
-                    // Clean up elements from DOM
+                    // Clean up elements from DOM after full completion
                     setTimeout(() => {
                         brand.remove();
                     }, brandDuration + 200);
