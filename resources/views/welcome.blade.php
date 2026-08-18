@@ -86,6 +86,10 @@
             height: 40px;
             align-self: center;
         }
+    </style>
+@endsection
+
+@section('content')
 
 <!-- Hero Section — full screen video, no text overlay except stats bar -->
 <section class="relative overflow-hidden bg-brand-950" style="height: 100svh; min-height: 600px;">
