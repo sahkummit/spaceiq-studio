@@ -88,7 +88,7 @@
             pointer-events: none;
             will-change: transform;
             transform: translateY(0%);
-            transition: transform 0.95s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: transform 1.1s cubic-bezier(0.77, 0, 0.175, 1);
         }
         #intro-curtain.lift {
             transform: translateY(-100%);
@@ -100,17 +100,17 @@
             pointer-events: none;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(1);
             transform-origin: top left;
-            font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-weight: 800;
-            font-size: clamp(3.5rem, 12vw, 8.5rem);
+            font-size: clamp(3.2rem, 11vw, 8rem);
             color: #ffffff;
-            letter-spacing: 0.04em;
+            letter-spacing: -0.01em;
             white-space: nowrap;
             line-height: 1;
             will-change: transform;
-            transition: transform 0.95s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: transform 1.1s cubic-bezier(0.77, 0, 0.175, 1);
         }
 
         /* ── Stats strip ── */
@@ -588,19 +588,19 @@
     if (navSub) navSub.style.opacity = '0';
     if (navImg) navImg.style.opacity = '0';
 
-    // Step 1: Wait 750ms on pure black screen with the huge centered white text
+    // Step 1: Wait 700ms on pure black screen with the huge centered white text
     setTimeout(() => {
         // Step 2: Calculate FLIP coordinates
         const brandRect  = brand.getBoundingClientRect();
         const targetRect = navText.getBoundingClientRect();
 
-        // Calculate exact scale and translate deltas
-        const scale  = targetRect.height / brandRect.height;
-        const deltaX = targetRect.left - brandRect.left;
-        const deltaY = targetRect.top  - brandRect.top;
+        // Calculate exact scale and translate deltas from origin (window.innerWidth / 2, window.innerHeight / 2)
+        const targetX = targetRect.left - (window.innerWidth / 2);
+        const targetY = targetRect.top  - (window.innerHeight / 2);
+        const scale   = targetRect.height / brandRect.height;
 
         // Apply smooth GPU transform transition to both brand and curtain
-        brand.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scale})`;
+        brand.style.transform = `translate(${targetX}px, ${targetY}px) scale(${scale})`;
         curtain.classList.add('lift');
 
         // Fade in logo image and subtitle as it approaches
@@ -613,15 +613,15 @@
                 navSub.style.transition = 'opacity 0.4s ease';
                 navSub.style.opacity = '1';
             }
-        }, 550);
+        }, 700);
 
         // Step 3: When arrived, reveal real nav text and clean up intro elements
         setTimeout(() => {
             navText.style.opacity = '1';
             brand.remove();
             curtain.remove();
-        }, 980);
-    }, 750);
+        }, 1150);
+    }, 700);
 })();
 
 (function() {
