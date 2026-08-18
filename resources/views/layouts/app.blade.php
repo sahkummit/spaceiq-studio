@@ -383,15 +383,7 @@
                         </div>
                     </div>
 
-                    <span class="text-white/20">|</span>
 
-                    <!-- 2D Drafting Link -->
-                    <a href="{{ route('service.show', 'autocad-drafting') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">2D Drafting</a>
-
-                    <span class="text-white/20">|</span>
-
-                    <!-- Design Link -->
-                    <a href="{{ route('service.show', 'interior-design-consultation') }}" class="nav-link-underline hover:text-accent-400 transition-colors whitespace-nowrap">Design</a>
                 </div>
 
                 <!-- Contact Us (Extreme Right) -->
@@ -468,11 +460,7 @@
                 </div>
             </div>
 
-            <!-- 2D Drafting Link -->
-            <a href="{{ route('service.show', 'autocad-drafting') }}" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">2D Drafting</a>
-            
-            <!-- Design Link -->
-            <a href="{{ route('service.show', 'interior-design-consultation') }}" @click="mobileMenuOpen = false" class="text-xs font-medium uppercase tracking-widest text-gray-300 hover:text-white">Design</a>
+
             
             <hr class="border-white/10 my-2">
             

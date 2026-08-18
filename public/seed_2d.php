@@ -60,5 +60,11 @@ foreach ($files as $index => $file) {
     $count++;
 }
 
+// Disable 2D Drafting (AutoCAD) and Design services so they are hidden from listings
+\App\Models\Service::whereIn('slug', ['autocad-drafting', 'interior-design-consultation'])
+    ->update(['is_active' => false]);
+
+echo "<p>Disabled 2D Drafting and Design services from active services listings.</p>";
+
 echo "<h2>Success! {$count} PDF documents registered under AutoCAD Drafting.</h2>";
 echo "<p><a href='/services/autocad-drafting'>Go to AutoCAD Drafting Gallery</a></p>";
