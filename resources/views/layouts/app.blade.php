@@ -280,7 +280,7 @@
     <!-- BIG.dk Opening Curtain & Centered High-Res Exact Brand Lockup -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
     
-    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <div id="intro-brand" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
         <div class="flex items-center" style="gap: 36px;">
             <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" style="height: 144px; width: auto; filter: drop-shadow(0 10px 25px rgba(0,0,0,0.5));">
             <div class="flex flex-col" style="line-height: 1.25;">
@@ -299,33 +299,24 @@
 
             if (!navContainer || !curtain || !brand) return;
 
-            // Hide navbar logo initially
-            navContainer.style.opacity = '0';
-
             const introImg = brand.querySelector('img');
             function startSequence() {
-                // High-resolution unscaled base dimensions
-                const baseWidth  = brand.offsetWidth;
-                const baseHeight = brand.offsetHeight;
-
-                // Adjust starting scale for small mobile viewports if needed so it fits comfortably
-                const maxAllowedWidth = window.innerWidth * 0.88;
-                const fitScale = baseWidth > maxAllowedWidth ? (maxAllowedWidth / baseWidth) : 1.0;
-
-                const startX = (window.innerWidth - (baseWidth * fitScale)) / 2;
-                const startY = (window.innerHeight - (baseHeight * fitScale)) / 2;
-
-                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${fitScale})`;
+                // Measure rendered position in center
+                const startRect = brand.getBoundingClientRect();
+                
+                // Convert brand from translate(-50%,-50%) to direct pixel coordinates with origin 0 0
+                brand.style.top = startRect.top + 'px';
+                brand.style.left = startRect.left + 'px';
+                brand.style.transform = 'none';
+                brand.style.transformOrigin = '0 0';
 
                 // Hold for 750ms on pure black screen
                 setTimeout(() => {
-                    // Measure exact target coordinates and height of the navbar brand container
                     const targetRect = navContainer.getBoundingClientRect();
-                    const targetX = targetRect.left;
-                    const targetY = targetRect.top;
-
-                    // Uniform scale down to match navbar dimensions
-                    const targetScale = targetRect.height / baseHeight;
+                    const deltaX = targetRect.left - startRect.left;
+                    const deltaY = targetRect.top - startRect.top;
+                    const scaleX = targetRect.width / startRect.width;
+                    const scaleY = targetRect.height / startRect.height;
 
                     const brandDuration   = 1400; // 1.4s silky smooth
                     const curtainDuration = 1800; // 1.8s smooth architectural lift
@@ -336,8 +327,8 @@
                     curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
 
                     // Glide and downscale directly onto navbar coordinates
-                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(${targetScale})`;
-                    curtain.style.transform = 'translate3d(0, -100%, 0)';
+                    brand.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
+                    curtain.style.transform = 'translateY(-100%)';
 
                     // Exact 1:1 seamless handoff to navbar container
                     setTimeout(() => {
@@ -386,7 +377,7 @@
              :class="scrolled ? 'max-w-5xl mx-auto px-6 py-2 bg-brand-900/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl' : 'px-6 md:px-12 py-5 {{ request()->routeIs('home') ? 'bg-transparent border-transparent' : 'border-b border-white/5 bg-brand-950/20 backdrop-blur-sm' }}'">
             <div class="flex items-center justify-between gap-8 w-full">
                 <!-- Logo (Extreme Left) -->
-                <a href="{{ route('home') }}" id="nav-brand-container" class="flex-shrink-0 flex items-center gap-3 group">
+                <a href="{{ route('home') }}" id="nav-brand-container" class="flex-shrink-0 flex items-center gap-3 group" style="{{ request()->routeIs('home') ? 'opacity: 0;' : '' }}">
                     <img id="nav-brand-img" src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" 
                          class="w-auto drop-shadow-lg transition-all duration-300 group-hover:scale-105"
                          :class="scrolled ? 'h-9' : 'h-12'">
