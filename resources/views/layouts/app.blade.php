@@ -277,15 +277,15 @@
 </head>
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
     @if(request()->routeIs('home'))
-    <!-- BIG.dk Opening Curtain & Centered Exact Brand Lockup -->
+    <!-- BIG.dk Opening Curtain & Centered Full Brand Logo (High Resolution) -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
     
-    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased;">
-        <div class="flex items-center gap-3">
-            <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" class="h-12 w-auto drop-shadow-lg">
-            <div class="flex flex-col leading-tight">
-                <span class="font-display font-bold tracking-wider text-white text-lg">Space IQ</span>
-                <span class="font-display font-light tracking-widest text-white/70 uppercase text-[10px]">Design Studio</span>
+    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; image-rendering: -webkit-optimize-contrast;">
+        <div class="flex items-center gap-4 sm:gap-6">
+            <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" class="h-24 sm:h-32 md:h-40 w-auto drop-shadow-2xl brightness-100">
+            <div class="flex flex-col leading-none text-left">
+                <span class="font-display font-bold tracking-wider text-white text-3xl sm:text-5xl md:text-6xl">Space IQ</span>
+                <span class="font-display font-light tracking-[0.25em] text-white/75 uppercase text-xs sm:text-sm md:text-base mt-1.5 sm:mt-2.5">Design Studio</span>
             </div>
         </div>
     </div>
@@ -304,17 +304,15 @@
 
             const introImg = brand.querySelector('img');
             function startSequence() {
-                // Exact natural unscaled dimensions (matches navContainer 1:1)
-                const baseWidth  = brand.offsetWidth;
-                const baseHeight = brand.offsetHeight;
+                // High-resolution native dimensions
+                const heroWidth  = brand.offsetWidth;
+                const heroHeight = brand.offsetHeight;
 
-                // Pick prominent hero scale based on screen width
-                const initialScale = window.innerWidth < 640 ? 2.2 : (window.innerWidth < 1024 ? 3.0 : 3.8);
+                // Center dead in the viewport at 100% native resolution
+                const startX = (window.innerWidth - heroWidth) / 2;
+                const startY = (window.innerHeight - heroHeight) / 2;
 
-                const startX = (window.innerWidth - (baseWidth * initialScale)) / 2;
-                const startY = (window.innerHeight - (baseHeight * initialScale)) / 2;
-
-                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${initialScale})`;
+                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(1)`;
 
                 // Hold for 750ms on pure black screen
                 setTimeout(() => {
@@ -322,6 +320,10 @@
                     const targetRect = navContainer.getBoundingClientRect();
                     const targetX = targetRect.left;
                     const targetY = targetRect.top;
+
+                    // Downscale factor to match the navbar dimensions exactly
+                    const scaleX = targetRect.width / heroWidth;
+                    const scaleY = targetRect.height / heroHeight;
 
                     const brandDuration   = 1400; // 1.4s silky smooth
                     const curtainDuration = 1800; // 1.8s smooth architectural lift
@@ -331,11 +333,11 @@
                     brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 200ms ease ${brandDuration - 80}ms`;
                     curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
 
-                    // Glide directly to target coordinates with scale(1)
-                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(1)`;
+                    // Glide and downscale directly onto navbar coordinates
+                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(${scaleX}, ${scaleY})`;
                     curtain.style.transform = 'translate3d(0, -100%, 0)';
 
-                    // Exact 1:1 seamless handoff to navbar container
+                    // Seamless handoff to navbar container
                     setTimeout(() => {
                         navContainer.style.transition = 'opacity 200ms ease';
                         navContainer.style.opacity = '1';
