@@ -221,14 +221,14 @@
     pdfPageNum: 1,
     pdfTotalPages: 1,
     pdfTitle: '',
-    pdfScale: 1.2,
+    pdfScale: 2.0,
     pdfPageRendering: false,
     pdfPendingPageNum: null,
     openPdf(url, title) {
         this.pdfTitle = title;
         this.pdfOpen = true;
         this.pdfPageNum = 1;
-        this.pdfScale = 1.2;
+        this.pdfScale = 2.0;
         this.$nextTick(() => {
             pdfjsLib.getDocument(url).promise.then(pdf => {
                 this.pdfDoc = pdf;
@@ -696,9 +696,41 @@
             <template x-teleport="body">
                 <div x-show="pdfOpen" 
                      class="fixed inset-0 z-[100] flex flex-col bg-brand-950/98 backdrop-blur-md" 
+                     x-data="{ 
+                         scale: 1.0,
+                         translateX: 0,
+                         translateY: 0,
+                         isDragging: false,
+                         startX: 0,
+                         startY: 0,
+                         startDrag(e) {
+                             this.isDragging = true;
+                             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                             this.startX = clientX - this.translateX;
+                             this.startY = clientY - this.translateY;
+                         },
+                         drag(e) {
+                             if (!this.isDragging) return;
+                             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                             this.translateX = clientX - this.startX;
+                             this.translateY = clientY - this.startY;
+                         },
+                         stopDrag() {
+                             this.isDragging = false;
+                         },
+                         resetPan() {
+                             this.translateX = 0;
+                             this.translateY = 0;
+                             this.scale = 1.0;
+                         }
+                     }"
+                     @keydown.escape.window="closePdf()"
+                     @pdf-changed.window="resetPan()"
+                     x-init="$watch('pdfOpen', value => { if(value) resetPan() })"
                      x-transition.opacity 
-                     style="display: none;"
-                     @keydown.escape.window="closePdf()">
+                     style="display: none;">
                     
                     <!-- Top Navigation Bar -->
                     <div class="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-brand-950/80 z-[110]">
@@ -709,11 +741,11 @@
                         
                         <div class="flex items-center gap-3">
                             <!-- Zoom Buttons -->
-                            <button @click="zoomOut()" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors">
+                            <button @click="scale = Math.max(0.5, scale - 0.25)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/></svg>
                             </button>
-                            <span class="text-white text-xs font-bold w-12 text-center" x-text="Math.round(pdfScale * 100) + '%'"></span>
-                            <button @click="zoomIn()" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors">
+                            <span class="text-white text-xs font-bold w-12 text-center" x-text="Math.round(scale * 100) + '%'"></span>
+                            <button @click="scale = Math.min(3.0, scale + 0.25)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                             </button>
                             
@@ -726,10 +758,20 @@
                         </div>
                     </div>
                     
-                    <!-- Scrollable Canvas Area -->
-                    <div class="flex-1 overflow-auto flex justify-center items-start p-6 md:p-12 relative z-[105]" @click.self="closePdf()">
-                        <div class="relative bg-white shadow-2xl rounded-sm max-w-full overflow-hidden select-none border border-white/10">
-                            <canvas id="pdf-modal-canvas" class="max-w-full h-auto block"></canvas>
+                    <!-- Panning Canvas Area -->
+                    <div class="flex-1 overflow-hidden flex justify-center items-center p-4 relative z-[105] select-none" 
+                         @mousedown="startDrag($event)"
+                         @mousemove="drag($event)"
+                         @mouseup="stopDrag()"
+                         @mouseleave="stopDrag()"
+                         @touchstart="startDrag($event)"
+                         @touchmove="drag($event)"
+                         @touchend="stopDrag()"
+                         @wheel.prevent="scale = Math.max(0.5, Math.min(3.0, scale + (event.deltaY < 0 ? 0.1 : -0.1)))"
+                         @click.self="closePdf()">
+                        <div class="relative bg-white shadow-2xl rounded-sm transition-transform duration-75 ease-out border border-white/10 cursor-grab active:cursor-grabbing max-w-none max-h-none"
+                             :style="'transform: translate(' + translateX + 'px, ' + translateY + 'px) scale(' + scale + '); transform-origin: center;'">
+                            <canvas id="pdf-modal-canvas" class="max-w-none h-auto block" style="max-height: 80vh;"></canvas>
                             
                             <!-- Page loading overlay -->
                             <div x-show="pdfPageRendering" class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-xs">
@@ -740,7 +782,7 @@
                     
                     <!-- Bottom Controls Bar (Fixed Page Navigation) -->
                     <div class="py-4 border-t border-white/5 bg-brand-950/90 flex items-center justify-center gap-6 z-[110]">
-                        <button @click="prevPdfPage()" 
+                        <button @click="prevPdfPage(); resetPan()" 
                                 :disabled="pdfPageNum <= 1"
                                 :class="pdfPageNum <= 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-brand-600 hover:text-white'"
                                 class="px-5 py-2.5 bg-brand-900 border border-white/10 text-white font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 rounded">
@@ -750,7 +792,7 @@
                         
                         <span class="text-white font-display text-xs uppercase tracking-widest" x-text="'Page ' + pdfPageNum + ' of ' + pdfTotalPages"></span>
                         
-                        <button @click="nextPdfPage()" 
+                        <button @click="nextPdfPage(); resetPan()" 
                                 :disabled="pdfPageNum >= pdfTotalPages"
                                 :class="pdfPageNum >= pdfTotalPages ? 'opacity-30 cursor-not-allowed' : 'hover:bg-brand-600 hover:text-white'"
                                 class="px-5 py-2.5 bg-brand-900 border border-white/10 text-white font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 rounded">
