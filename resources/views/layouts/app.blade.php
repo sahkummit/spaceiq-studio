@@ -280,7 +280,7 @@
     <!-- BIG.dk Opening Curtain & Centered Exact Brand Lockup -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
     
-    <div id="intro-brand" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(3.2); transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
         <div class="flex items-center gap-3">
             <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" class="h-12 w-auto drop-shadow-lg" style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
             <div class="flex flex-col leading-tight">
@@ -301,21 +301,23 @@
 
             const introImg = brand.querySelector('img');
             function startSequence() {
-                // Measure initial rendered bounding box (already crystal sharp at scale 3.2 in center)
-                const startRect = brand.getBoundingClientRect();
-                
-                // Convert from translate(-50%,-50%) to direct pixel coordinates with origin 0 0
-                brand.style.top = startRect.top + 'px';
-                brand.style.left = startRect.left + 'px';
-                brand.style.transform = 'none';
-                brand.style.transformOrigin = '0 0';
+                const baseWidth  = brand.offsetWidth;
+                const baseHeight = brand.offsetHeight;
 
-                // Hold for 750ms on pure black screen
+                // Prominent large scale for the center screen presentation (3.6x desktop, 2.4x mobile)
+                const initialScale = window.innerWidth < 640 ? 2.4 : (window.innerWidth < 1024 ? 3.0 : 3.6);
+
+                const startX = (window.innerWidth - (baseWidth * initialScale)) / 2;
+                const startY = (window.innerHeight - (baseHeight * initialScale)) / 2;
+
+                // Show BIG logo in the center of the pitch-black screen
+                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${initialScale})`;
+
+                // Hold for 750ms on pure black screen showing the BIG logo
                 setTimeout(() => {
                     const targetRect = navContainer.getBoundingClientRect();
-                    const deltaX = targetRect.left - startRect.left;
-                    const deltaY = targetRect.top - startRect.top;
-                    const scaleFactor = targetRect.height / startRect.height;
+                    const targetX = targetRect.left;
+                    const targetY = targetRect.top;
 
                     const brandDuration   = 1400; // 1.4s silky smooth
                     const curtainDuration = 1800; // 1.8s smooth architectural lift
@@ -325,9 +327,9 @@
                     brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 250ms ease ${brandDuration - 100}ms`;
                     curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
 
-                    // Glide and downscale directly onto navbar coordinates
-                    brand.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleFactor})`;
-                    curtain.style.transform = 'translateY(-100%)';
+                    // Glides from big centered scale down to scale(1) at the navbar
+                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(1)`;
+                    curtain.style.transform = 'translate3d(0, -100%, 0)';
 
                     // Seamless overlapping handoff to navbar container
                     setTimeout(() => {
