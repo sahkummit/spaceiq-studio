@@ -133,130 +133,288 @@
     </div>
 </section>
 
-<!-- Value Proposition Section -->
-<section class="py-20 border-y border-white/5 bg-brand-900 border-t border-accent-400/10">
-    <div class="container mx-auto px-6 xl:px-12" style="max-width:1536px">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left text-white">
-            <div class="p-6 reveal">
-                <div class="w-12 h-12 rounded-lg bg-accent-500/15 border border-accent-400/25 flex items-center justify-center mb-5 md:mx-0 mx-auto">
+<!-- Value Proposition Section — Refined Architectural Glass Cards -->
+<section class="py-24 border-y border-white/5 bg-brand-900/60 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 20% 50%, #1A9E96 0%, transparent 60%), radial-gradient(circle at 80% 50%, #0E7C7B 0%, transparent 60%);"></div>
+    <div class="container mx-auto px-6 xl:px-12 relative z-10" style="max-width:1536px">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            <div class="p-8 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md hover:border-accent-400/40 hover:bg-white/[0.04] transition-all duration-500 group reveal">
+                <div class="w-12 h-12 rounded-xl bg-accent-500/10 border border-accent-400/20 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent-500/20 transition-all duration-300">
                     <svg class="w-6 h-6 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 </div>
-                <p class="text-xl font-display font-medium text-accent-400 mb-3 uppercase tracking-wider">Hyper-Realistic Precision</p>
-                <p class="text-gray-300 text-sm leading-relaxed font-light">We don't just create images; we simulate reality. From the way light reflects off a window to the tactile texture of a brick facade, every detail is engineered for authenticity.</p>
+                <p class="text-xs uppercase tracking-[0.25em] text-accent-400 font-bold mb-2">01 · Precision</p>
+                <h3 class="text-xl font-display font-medium text-white mb-3 tracking-wide group-hover:text-accent-300 transition-colors">Hyper-Realistic Fidelity</h3>
+                <p class="text-gray-400 text-sm leading-relaxed font-light">We simulate light physics, volumetric atmospheres, and genuine material honesty down to the sub-millimeter texture.</p>
             </div>
-            <div class="p-6 reveal" style="transition-delay:0.15s">
-                <div class="w-12 h-12 rounded-lg bg-accent-500/15 border border-accent-400/25 flex items-center justify-center mb-5 md:mx-0 mx-auto">
+            <div class="p-8 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md hover:border-accent-400/40 hover:bg-white/[0.04] transition-all duration-500 group reveal" style="transition-delay:0.15s">
+                <div class="w-12 h-12 rounded-xl bg-accent-500/10 border border-accent-400/20 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent-500/20 transition-all duration-300">
                     <svg class="w-6 h-6 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
-                <p class="text-xl font-display font-medium text-accent-400 mb-3 uppercase tracking-wider">Client-Centric Narrative</p>
-                <p class="text-gray-300 text-sm leading-relaxed font-light">We populate your designs with life—modern landscaping, realistic lighting, and curated environments that help potential buyers see themselves in the space.</p>
+                <p class="text-xs uppercase tracking-[0.25em] text-accent-400 font-bold mb-2">02 · Context</p>
+                <h3 class="text-xl font-display font-medium text-white mb-3 tracking-wide group-hover:text-accent-300 transition-colors">Emotional Narrative</h3>
+                <p class="text-gray-400 text-sm leading-relaxed font-light">Populated with authentic biophilic landscape, atmospheric twilight lighting, and human presence that helps clients envision life in the space.</p>
             </div>
-            <div class="p-6 reveal" style="transition-delay:0.3s">
-                <div class="w-12 h-12 rounded-lg bg-accent-500/15 border border-accent-400/25 flex items-center justify-center mb-5 md:mx-0 mx-auto">
+            <div class="p-8 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md hover:border-accent-400/40 hover:bg-white/[0.04] transition-all duration-500 group reveal" style="transition-delay:0.3s">
+                <div class="w-12 h-12 rounded-xl bg-accent-500/10 border border-accent-400/20 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent-500/20 transition-all duration-300">
                     <svg class="w-6 h-6 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                 </div>
-                <p class="text-xl font-display font-medium text-accent-400 mb-3 uppercase tracking-wider">Seamless Integration</p>
-                <p class="text-gray-300 text-sm leading-relaxed font-light">High-resolution visualizations designed to plug directly into your marketing decks, websites, and investor pitches flawlessly.</p>
+                <p class="text-xs uppercase tracking-[0.25em] text-accent-400 font-bold mb-2">03 · Impact</p>
+                <h3 class="text-xl font-display font-medium text-white mb-3 tracking-wide group-hover:text-accent-300 transition-colors">High-Impact Delivery</h3>
+                <p class="text-gray-400 text-sm leading-relaxed font-light">High-resolution 4K/8K imagery and 60FPS cinematics engineered for investor pitches, pre-sale campaigns, and architectural competitions.</p>
             </div>
         </div>
     </div>
 </section>
 
+<!-- Services — Creative Architectural Gallery Grid -->
+<section id="services" class="py-32 bg-brand-950 relative overflow-hidden">
+    <!-- Ambient Studio Lights -->
+    <div class="absolute top-1/4 -left-48 w-96 h-96 bg-accent-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 -right-48 w-96 h-96 bg-[#1A9E96]/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-
-
-<!-- Services — Editorial Full-Bleed Layout -->
-<section id="services" class="bg-brand-950 relative">
-    @php
-        $editorialServices = \App\Models\Service::where('is_active', true)
-            ->whereNotIn('slug', ['autocad-drafting', 'interior-design-consultation'])
-            ->orderBy('sort_order')
-            ->get();
-    @endphp
-
-    {{-- Section header --}}
-    <div class="pt-24 pb-12 container mx-auto px-6 xl:px-12 flex items-end justify-between" style="max-width:1536px">
-        <div>
-            <p class="text-[10px] uppercase tracking-[0.3em] text-accent-400 font-bold mb-3">Selected Works</p>
-            <h2 class="text-5xl md:text-7xl font-display font-light uppercase tracking-[0.1em] text-white leading-none">Our<br><span class="italic font-thin">Services</span></h2>
+    <div class="container mx-auto px-6 xl:px-12 relative z-10" style="max-width:1536px">
+        
+        {{-- Section Header --}}
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 pb-8 border-b border-white/10 gap-6 reveal">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="w-8 h-px bg-accent-400"></span>
+                    <p class="text-[11px] uppercase tracking-[0.35em] text-accent-400 font-semibold">Expertise & Capabilities</p>
+                </div>
+                <h2 class="text-4xl md:text-6xl font-display font-light uppercase tracking-tight text-white leading-[1.1]">
+                    Crafting Spatial <br class="hidden md:block"><span class="font-normal text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-accent-300">Atmospheres</span>
+                </h2>
+            </div>
+            <div class="max-w-md md:text-right">
+                <p class="text-sm text-gray-400 font-light leading-relaxed">
+                    From photorealistic still CGI to cinematic 4K animations and immersive 360° virtual reality, we transform blueprints into compelling visual narratives.
+                </p>
+            </div>
         </div>
-        <div class="hidden md:block text-right">
-            <div class="w-16 h-px bg-accent-400/30 mb-2 ml-auto"></div>
-            <p class="text-xs text-white/30 uppercase tracking-widest font-light">High-Fidelity<br>Architectural Visualization</p>
-        </div>
-    </div>
 
-    @forelse($editorialServices as $idx => $service)
-        @php
-            $isEven = $idx % 2 === 0;
-            if ($service->slug === 'walkthrough-animation') {
-                $videoMedia = $service->media->sortBy('sort_order')->first();
-                $isYt = $videoMedia && (str_contains($videoMedia->file_path, 'youtube.com') || str_contains($videoMedia->file_path, 'youtu.be'));
-                if ($isYt && preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $videoMedia->file_path, $ytm)) {
-                    $youtubeThumb = "https://img.youtube.com/vi/{$ytm[1]}/maxresdefault.jpg";
-                } else { $youtubeThumb = null; }
-                $featuredImage = null;
-            } else {
-                $videoMedia = null;
-                $youtubeThumb = null;
-                $mediaObj = $service->media->where('file_type', '!=', 'video')->sortBy('sort_order')->first();
-                $featuredImage = $mediaObj ? webp_asset(parse_url(Storage::url($mediaObj->file_path), PHP_URL_PATH)) : null;
-                if (!$featuredImage) {
-                    $featuredImage = $service->slug === 'interior-renders' ? webp_asset('/img/interior_render.png') : webp_asset('/img/exterior_render.png');
-                }
-            }
-            $numStr = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
-            $imgSrc = $youtubeThumb ?? $featuredImage;
-        @endphp
+        {{-- Services Grid (2x2 Asymmetric High-Impact Interactive Cards) --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
 
-        <a href="{{ route('service.show', $service->slug) }}"
-           class="service-editorial-item group block relative"
-           style="text-decoration:none;">
-            <div class="flex flex-col {{ $isEven ? 'md:flex-row' : 'md:flex-row-reverse' }} min-h-[80vh] md:min-h-[65vh]">
-
-                {{-- Image panel --}}
-                <div class="relative overflow-hidden w-full md:w-3/5 bg-black" style="min-height: 280px;">
-                    @if($imgSrc)
-                        <img src="{{ $imgSrc }}" alt="{{ $service->title }}"
-                             class="absolute inset-0 w-full h-full object-cover opacity-80 transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]">
-                    @endif
-                    <div class="absolute inset-0 pointer-events-none"
-                         style="background: linear-gradient(to {{ $isEven ? 'right' : 'left' }}, transparent 50%, rgba(4,16,15,0.75) 100%);"></div>
+            {{-- 01. Exterior Renders --}}
+            <a href="{{ route('service.show', 'exterior-renders') }}" 
+               class="group relative rounded-3xl overflow-hidden bg-brand-900/60 border border-white/10 hover:border-accent-400/50 transition-all duration-700 hover:shadow-[0_0_50px_rgba(14,124,123,0.25)] flex flex-col justify-between min-h-[520px] reveal">
+                <!-- Background Visual with Parallax Zoom -->
+                <div class="absolute inset-0 z-0 overflow-hidden">
+                    <img src="{{ webp_asset('/img/exterior_render.png') }}" 
+                         alt="Exterior Architectural Visualization" 
+                         class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-1000 ease-out">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/60 to-transparent"></div>
                 </div>
 
-                {{-- Text panel --}}
-                <div class="relative w-full md:w-2/5 bg-brand-950 flex flex-col justify-center px-10 md:px-16 py-14 md:py-24 overflow-hidden">
-                    <span class="service-number {{ $isEven ? '-right-2' : '-left-2' }} bottom-0">{{ $numStr }}</span>
+                <!-- Top Badges & Watermark -->
+                <div class="relative z-10 p-8 md:p-10 flex items-start justify-between">
+                    <span class="px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold bg-white/10 backdrop-blur-md text-white border border-white/15 group-hover:border-accent-400/40 group-hover:text-accent-300 transition-colors">
+                        Exterior CGI
+                    </span>
+                    <span class="font-display font-light text-5xl md:text-6xl text-white/20 group-hover:text-accent-400/40 transition-colors duration-500">
+                        01
+                    </span>
+                </div>
 
-                    <p class="text-[10px] uppercase tracking-[0.35em] text-accent-400/80 font-bold mb-5 relative z-10">{{ $service->category ?? 'Visualization' }}</p>
-
-                    <h3 class="font-display text-4xl md:text-5xl lg:text-[3.2rem] font-light text-white uppercase leading-[1.05] mb-5 relative z-10" style="letter-spacing:0.07em;">
-                        {{ $service->title }}
+                <!-- Bottom Content & Spec Tags -->
+                <div class="relative z-10 p-8 md:p-10">
+                    <h3 class="text-3xl md:text-4xl font-display font-light text-white uppercase tracking-wide mb-3 group-hover:translate-x-1 transition-transform duration-300">
+                        Exterior Visualization
                     </h3>
-
-                    <div class="w-10 h-px bg-accent-400/50 mb-6 relative z-10"></div>
-
-                    <p class="text-gray-400 font-light text-sm md:text-[0.95rem] leading-relaxed max-w-xs mb-10 relative z-10">
-                        {{ Str::limit($service->description ?? 'Precision-crafted architectural visuals that transform your ideas into reality.', 130) }}
+                    <p class="text-gray-300 text-sm font-light leading-relaxed mb-6 max-w-lg">
+                        High-impact architectural imagery with realistic lighting studies, environmental storytelling, and biophilic context.
                     </p>
 
-                    <div class="flex items-center gap-4 relative z-10">
-                        <span class="text-[10px] uppercase tracking-widest text-accent-400 font-bold group-hover:text-white transition-colors duration-300">View Work</span>
-                        <div class="w-8 h-8 rounded-full border border-accent-400/40 flex items-center justify-center group-hover:bg-accent-500 group-hover:border-accent-500 transition-all duration-300">
-                            <svg class="w-3.5 h-3.5 text-accent-400 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                            </svg>
+                    <!-- Tech Specs Pills -->
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">8K Resolution</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Lighting Studies</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Façade Physics</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Biophilic Context</span>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="flex items-center gap-3 text-xs uppercase tracking-widest font-semibold text-accent-400 group-hover:text-white transition-colors">
+                        <span>Explore Exterior Works</span>
+                        <div class="w-8 h-8 rounded-full border border-accent-400/40 flex items-center justify-center group-hover:bg-accent-500 group-hover:border-accent-500 group-hover:translate-x-1 transition-all duration-300">
+                            <svg class="w-3.5 h-3.5 text-accent-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </div>
                     </div>
                 </div>
+            </a>
+
+            {{-- 02. Interior Renders --}}
+            <a href="{{ route('service.show', 'interior-renders') }}" 
+               class="group relative rounded-3xl overflow-hidden bg-brand-900/60 border border-white/10 hover:border-accent-400/50 transition-all duration-700 hover:shadow-[0_0_50px_rgba(14,124,123,0.25)] flex flex-col justify-between min-h-[520px] reveal" style="transition-delay: 0.15s">
+                <!-- Background Visual with Parallax Zoom -->
+                <div class="absolute inset-0 z-0 overflow-hidden">
+                    <img src="{{ webp_asset('/img/interior_render.png') }}" 
+                         alt="Interior Architectural Visualization" 
+                         class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-1000 ease-out">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/60 to-transparent"></div>
+                </div>
+
+                <!-- Top Badges & Watermark -->
+                <div class="relative z-10 p-8 md:p-10 flex items-start justify-between">
+                    <span class="px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold bg-white/10 backdrop-blur-md text-white border border-white/15 group-hover:border-accent-400/40 group-hover:text-accent-300 transition-colors">
+                        Interior CGI
+                    </span>
+                    <span class="font-display font-light text-5xl md:text-6xl text-white/20 group-hover:text-accent-400/40 transition-colors duration-500">
+                        02
+                    </span>
+                </div>
+
+                <!-- Bottom Content & Spec Tags -->
+                <div class="relative z-10 p-8 md:p-10">
+                    <h3 class="text-3xl md:text-4xl font-display font-light text-white uppercase tracking-wide mb-3 group-hover:translate-x-1 transition-transform duration-300">
+                        Interior Visualization
+                    </h3>
+                    <p class="text-gray-300 text-sm font-light leading-relaxed mb-6 max-w-lg">
+                        Tactile texture mapping, photorealistic material honesty, and ray-traced shadows that evoke calm, warmth, and luxury.
+                    </p>
+
+                    <!-- Tech Specs Pills -->
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Ray-Traced Light</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Custom Textiles</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Material Honesty</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Photometric Accuracy</span>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="flex items-center gap-3 text-xs uppercase tracking-widest font-semibold text-accent-400 group-hover:text-white transition-colors">
+                        <span>Explore Interior Works</span>
+                        <div class="w-8 h-8 rounded-full border border-accent-400/40 flex items-center justify-center group-hover:bg-accent-500 group-hover:border-accent-500 group-hover:translate-x-1 transition-all duration-300">
+                            <svg class="w-3.5 h-3.5 text-accent-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            {{-- 03. 3D Animation & Cinematic Walkthroughs --}}
+            <a href="{{ route('service.show', 'walkthrough-animation') }}" 
+               class="group relative rounded-3xl overflow-hidden bg-brand-900/60 border border-white/10 hover:border-accent-400/50 transition-all duration-700 hover:shadow-[0_0_50px_rgba(14,124,123,0.25)] flex flex-col justify-between min-h-[520px] reveal">
+                <!-- Background Visual with Parallax Zoom -->
+                <div class="absolute inset-0 z-0 overflow-hidden">
+                    <img src="https://img.youtube.com/vi/71NTGV8dpI8/maxresdefault.jpg" 
+                         alt="3D Architectural Animation and Walkthroughs" 
+                         class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-1000 ease-out">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/60 to-transparent"></div>
+                </div>
+
+                <!-- Top Badges & Watermark -->
+                <div class="relative z-10 p-8 md:p-10 flex items-start justify-between">
+                    <span class="px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold bg-white/10 backdrop-blur-md text-white border border-white/15 group-hover:border-accent-400/40 group-hover:text-accent-300 transition-colors">
+                        Cinematic 4K Motion
+                    </span>
+                    <span class="font-display font-light text-5xl md:text-6xl text-white/20 group-hover:text-accent-400/40 transition-colors duration-500">
+                        03
+                    </span>
+                </div>
+
+                <!-- Bottom Content & Spec Tags -->
+                <div class="relative z-10 p-8 md:p-10">
+                    <div class="inline-flex items-center gap-2 mb-3">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent-400"></span>
+                        </span>
+                        <span class="text-[10px] uppercase tracking-widest text-accent-300 font-semibold">Cinematic Reels</span>
+                    </div>
+
+                    <h3 class="text-3xl md:text-4xl font-display font-light text-white uppercase tracking-wide mb-3 group-hover:translate-x-1 transition-transform duration-300">
+                        3D Animation & Films
+                    </h3>
+                    <p class="text-gray-300 text-sm font-light leading-relaxed mb-6 max-w-lg">
+                        Fluid 60FPS camera trajectories, aerial drone simulations, dynamic weather cycles, and evocative soundscapes.
+                    </p>
+
+                    <!-- Tech Specs Pills -->
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">60 FPS 4K Motion</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Drone Paths</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Sound Atmosphere</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Color Grading</span>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="flex items-center gap-3 text-xs uppercase tracking-widest font-semibold text-accent-400 group-hover:text-white transition-colors">
+                        <span>Watch Animation Reels</span>
+                        <div class="w-8 h-8 rounded-full border border-accent-400/40 flex items-center justify-center group-hover:bg-accent-500 group-hover:border-accent-500 group-hover:translate-x-1 transition-all duration-300">
+                            <svg class="w-3.5 h-3.5 text-accent-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            {{-- 04. 360° Virtual Panoramic Tours --}}
+            <a href="{{ route('service.show', '360-views') }}" 
+               class="group relative rounded-3xl overflow-hidden bg-brand-900/60 border border-white/10 hover:border-accent-400/50 transition-all duration-700 hover:shadow-[0_0_50px_rgba(14,124,123,0.25)] flex flex-col justify-between min-h-[520px] reveal" style="transition-delay: 0.15s">
+                <!-- Background Visual with Parallax Zoom -->
+                <div class="absolute inset-0 z-0 overflow-hidden">
+                    <img src="{{ asset('storage/services/DN1u6OJr8VHjgH5dn5PjCi6p30kr9BN5uV2XvYGt.jpg') }}" 
+                         alt="360 Virtual Reality Panoramic Tours" 
+                         class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-1000 ease-out"
+                         onerror="this.src='{{ webp_asset('/img/interior_render.png') }}'">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/60 to-transparent"></div>
+                </div>
+
+                <!-- Top Badges & Watermark -->
+                <div class="relative z-10 p-8 md:p-10 flex items-start justify-between">
+                    <span class="px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold bg-white/10 backdrop-blur-md text-white border border-white/15 group-hover:border-accent-400/40 group-hover:text-accent-300 transition-colors">
+                        Spatial VR Immersion
+                    </span>
+                    <span class="font-display font-light text-5xl md:text-6xl text-white/20 group-hover:text-accent-400/40 transition-colors duration-500">
+                        04
+                    </span>
+                </div>
+
+                <!-- Bottom Content & Spec Tags -->
+                <div class="relative z-10 p-8 md:p-10">
+                    <h3 class="text-3xl md:text-4xl font-display font-light text-white uppercase tracking-wide mb-3 group-hover:translate-x-1 transition-transform duration-300">
+                        360° Virtual Tours
+                    </h3>
+                    <p class="text-gray-300 text-sm font-light leading-relaxed mb-6 max-w-lg">
+                        Interactive spherical panoramas and VR tours that allow buyers and stakeholders to freely navigate and experience every angle.
+                    </p>
+
+                    <!-- Tech Specs Pills -->
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">VR Headset Ready</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Interactive Hotspots</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Web & Mobile Embed</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] tracking-wider uppercase bg-brand-950/80 text-gray-300 border border-white/5">Pre-Sale Tours</span>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="flex items-center gap-3 text-xs uppercase tracking-widest font-semibold text-accent-400 group-hover:text-white transition-colors">
+                        <span>Experience 360° Views</span>
+                        <div class="w-8 h-8 rounded-full border border-accent-400/40 flex items-center justify-center group-hover:bg-accent-500 group-hover:border-accent-500 group-hover:translate-x-1 transition-all duration-300">
+                            <svg class="w-3.5 h-3.5 text-accent-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+
+        {{-- Bottom Architectural CTA Banner --}}
+        <div class="mt-16 p-8 md:p-12 rounded-3xl bg-gradient-to-r from-brand-900/80 via-brand-900/40 to-brand-900/80 border border-white/10 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-8 reveal">
+            <div>
+                <p class="text-[10px] uppercase tracking-[0.3em] text-accent-400 font-bold mb-2">Have a custom architectural project?</p>
+                <h4 class="text-2xl md:text-3xl font-display font-light text-white uppercase tracking-wide">Bring your drawings and blueprints to life</h4>
             </div>
-            @if(!$loop->last)
-                <div class="w-full h-px bg-white/5"></div>
-            @endif
-        </a>
-    @empty
-        <div class="text-center py-12 text-gray-500">More selected works coming soon.</div>
-    @endforelse
+            <div class="flex items-center gap-4 flex-shrink-0">
+                <a href="{{ route('contact') }}" class="btn-gold px-8 py-4 text-xs tracking-widest uppercase font-semibold rounded-full shadow-xl">
+                    Request a Proposal
+                </a>
+                <a href="{{ route('service.show', 'exterior-renders') }}" class="px-6 py-4 text-xs tracking-widest uppercase font-semibold text-white/80 hover:text-white border border-white/15 rounded-full hover:border-white/40 transition-colors">
+                    Explore All Works
+                </a>
+            </div>
+        </div>
+
+    </div>
 </section>
 
 <!-- Testimonials Section -->
