@@ -303,12 +303,14 @@
                 const targetRect  = navText.getBoundingClientRect();
                 const targetStyle = window.getComputedStyle(navText);
 
-                const duration = 1200; // 1.2s
-                const ease = 'cubic-bezier(0.77, 0, 0.175, 1)';
+                const brandDuration   = 1300; // 1.3s for brand text flight
+                const curtainDuration = 1800; // 1.8s for smooth cinematic curtain lift
+                const brandEase   = 'cubic-bezier(0.77, 0, 0.175, 1)';
+                const curtainEase = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
                 // Apply transition directly to position, transform, font-size and spacing
-                brand.style.transition = `top ${duration}ms ${ease}, left ${duration}ms ${ease}, transform ${duration}ms ${ease}, font-size ${duration}ms ${ease}, letter-spacing ${duration}ms ${ease}`;
-                curtain.style.transition = `transform ${duration}ms ${ease}`;
+                brand.style.transition = `top ${brandDuration}ms ${brandEase}, left ${brandDuration}ms ${brandEase}, transform ${brandDuration}ms ${brandEase}, font-size ${brandDuration}ms ${brandEase}, letter-spacing ${brandDuration}ms ${brandEase}`;
+                curtain.style.transition = `transform ${curtainDuration}ms ${curtainEase}`;
 
                 // Fly directly to exact navbar coordinates and typography
                 brand.style.top = targetRect.top + 'px';
@@ -318,7 +320,7 @@
                 brand.style.letterSpacing = targetStyle.letterSpacing;
                 brand.style.lineHeight = targetStyle.lineHeight;
 
-                // Lift the curtain
+                // Lift the curtain smoothly
                 curtain.style.transform = 'translateY(-100%)';
 
                 // Reveal logo icon and subtitle as text arrives
@@ -331,14 +333,18 @@
                         navSub.style.transition = 'opacity 400ms ease';
                         navSub.style.opacity = '1';
                     }
-                }, duration * 0.6);
+                }, brandDuration * 0.6);
 
                 // Seamless handoff to permanent navbar text
                 setTimeout(() => {
                     navText.style.opacity = '1';
                     brand.remove();
+                }, brandDuration + 40);
+
+                // Remove curtain after it finishes gliding off screen
+                setTimeout(() => {
                     curtain.remove();
-                }, duration + 60);
+                }, curtainDuration + 50);
 
             }, 750);
         }
