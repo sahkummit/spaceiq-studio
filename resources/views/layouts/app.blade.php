@@ -277,80 +277,68 @@
 </head>
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
     @if(request()->routeIs('home'))
-    <!-- BIG.dk Opening Curtain & Centered High-Res Exact Brand Lockup -->
+    <!-- BIG.dk Opening Black Curtain -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
-    
-    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
-        <div class="flex items-center" style="gap: 36px;">
-            <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" style="height: 144px; width: auto; filter: drop-shadow(0 10px 25px rgba(0,0,0,0.5));">
-            <div class="flex flex-col" style="line-height: 1.25;">
-                <span class="font-display font-bold text-white" style="font-size: 54px; letter-spacing: 0.05em;">Space IQ</span>
-                <span class="font-display font-light uppercase text-white/70" style="font-size: 30px; letter-spacing: 0.1em;">Design Studio</span>
-            </div>
-        </div>
-    </div>
 
     <script>
     (function() {
         function runIntro() {
             const navContainer = document.getElementById('nav-brand-container');
             const curtain      = document.getElementById('intro-curtain');
-            const brand        = document.getElementById('intro-brand');
 
-            if (!navContainer || !curtain || !brand) return;
+            if (!navContainer || !curtain) return;
 
-            // Hide navbar logo initially
-            navContainer.style.opacity = '0';
-
-            const introImg = brand.querySelector('img');
+            const introImg = navContainer.querySelector('img');
             function startSequence() {
-                // High-resolution unscaled base dimensions
-                const baseWidth  = brand.offsetWidth;
-                const baseHeight = brand.offsetHeight;
+                // Measure initial navbar logo natural dimensions
+                const rect = navContainer.getBoundingClientRect();
+                const targetX = rect.left;
+                const targetY = rect.top;
+                const baseWidth  = navContainer.offsetWidth;
+                const baseHeight = navContainer.offsetHeight;
 
-                // Adjust starting scale for small mobile viewports if needed so it fits comfortably
-                const maxAllowedWidth = window.innerWidth * 0.88;
-                const fitScale = baseWidth > maxAllowedWidth ? (maxAllowedWidth / baseWidth) : 1.0;
+                // Pick prominent hero scale for the center screen presentation
+                const initialScale = window.innerWidth < 640 ? 2.2 : (window.innerWidth < 1024 ? 2.8 : 3.4);
 
-                const startX = (window.innerWidth - (baseWidth * fitScale)) / 2;
-                const startY = (window.innerHeight - (baseHeight * fitScale)) / 2;
+                const startX = (window.innerWidth - (baseWidth * initialScale)) / 2;
+                const startY = (window.innerHeight - (baseHeight * initialScale)) / 2;
 
-                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${fitScale})`;
+                // Set fixed positioning on the one and only logo element in center of screen
+                navContainer.style.position = 'fixed';
+                navContainer.style.top = '0px';
+                navContainer.style.left = '0px';
+                navContainer.style.transformOrigin = '0 0';
+                navContainer.style.zIndex = '99999';
+                navContainer.style.willChange = 'transform';
+                navContainer.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${initialScale})`;
 
                 // Hold for 750ms on pure black screen
                 setTimeout(() => {
-                    // Measure exact target coordinates and height of the navbar brand container
-                    const targetRect = navContainer.getBoundingClientRect();
-                    const targetX = targetRect.left;
-                    const targetY = targetRect.top;
-
-                    // Uniform scale down to match navbar dimensions
-                    const targetScale = targetRect.height / baseHeight;
-
-                    const brandDuration   = 1400; // 1.4s silky smooth
+                    const brandDuration   = 1400; // 1.4s silky smooth flight
                     const curtainDuration = 1800; // 1.8s smooth architectural lift
                     const ease = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
-                    // GPU-only hardware-accelerated transitions
-                    brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 200ms ease ${brandDuration - 80}ms`;
+                    // Set GPU-only transitions
+                    navContainer.style.transition = `transform ${brandDuration}ms ${ease}`;
                     curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
 
-                    // Glide and downscale directly onto navbar coordinates
-                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(${targetScale})`;
+                    // Glide the logo directly into top-left navbar position at scale(1)
+                    navContainer.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(1)`;
                     curtain.style.transform = 'translate3d(0, -100%, 0)';
 
-                    // Exact 1:1 seamless handoff to navbar container
+                    // When flight finishes, cleanly dock into navbar flow
                     setTimeout(() => {
-                        navContainer.style.transition = 'opacity 200ms ease';
-                        navContainer.style.opacity = '1';
-                        brand.style.opacity = '0';
-                    }, brandDuration - 80);
+                        navContainer.style.position = '';
+                        navContainer.style.top = '';
+                        navContainer.style.left = '';
+                        navContainer.style.transform = '';
+                        navContainer.style.transformOrigin = '';
+                        navContainer.style.transition = '';
+                        navContainer.style.zIndex = '';
+                        navContainer.style.willChange = '';
+                    }, brandDuration + 50);
 
-                    // Clean up elements from DOM
-                    setTimeout(() => {
-                        brand.remove();
-                    }, brandDuration + 200);
-
+                    // Remove curtain after it clears screen
                     setTimeout(() => {
                         curtain.remove();
                     }, curtainDuration + 100);
