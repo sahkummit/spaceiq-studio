@@ -277,15 +277,15 @@
 </head>
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
     @if(request()->routeIs('home'))
-    <!-- BIG.dk Opening Curtain & Centered Exact Brand Lockup -->
+    <!-- BIG.dk Opening Curtain & Centered High-Res Exact Brand Lockup -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
     
-    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased;">
-        <div class="flex items-center gap-3">
-            <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" class="h-12 w-auto drop-shadow-lg" style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
-            <div class="flex flex-col leading-tight">
-                <span class="font-display font-bold tracking-wider text-white text-lg">Space IQ</span>
-                <span class="font-display font-light tracking-widest text-white/70 uppercase text-[10px]">Design Studio</span>
+    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+        <div class="flex items-center" style="gap: 36px;">
+            <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" style="height: 144px; width: auto; filter: drop-shadow(0 10px 25px rgba(0,0,0,0.5));">
+            <div class="flex flex-col" style="line-height: 1.25;">
+                <span class="font-display font-bold text-white" style="font-size: 54px; letter-spacing: 0.05em;">Space IQ</span>
+                <span class="font-display font-light uppercase text-white/70" style="font-size: 30px; letter-spacing: 0.1em;">Design Studio</span>
             </div>
         </div>
     </div>
@@ -304,24 +304,28 @@
 
             const introImg = brand.querySelector('img');
             function startSequence() {
-                // Exact natural unscaled dimensions (matches navContainer 1:1)
+                // High-resolution unscaled base dimensions
                 const baseWidth  = brand.offsetWidth;
                 const baseHeight = brand.offsetHeight;
 
-                // Pick prominent hero scale based on screen width
-                const initialScale = window.innerWidth < 640 ? 2.2 : (window.innerWidth < 1024 ? 2.8 : 3.4);
+                // Adjust starting scale for small mobile viewports if needed so it fits comfortably
+                const maxAllowedWidth = window.innerWidth * 0.88;
+                const fitScale = baseWidth > maxAllowedWidth ? (maxAllowedWidth / baseWidth) : 1.0;
 
-                const startX = (window.innerWidth - (baseWidth * initialScale)) / 2;
-                const startY = (window.innerHeight - (baseHeight * initialScale)) / 2;
+                const startX = (window.innerWidth - (baseWidth * fitScale)) / 2;
+                const startY = (window.innerHeight - (baseHeight * fitScale)) / 2;
 
-                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${initialScale})`;
+                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${fitScale})`;
 
                 // Hold for 750ms on pure black screen
                 setTimeout(() => {
-                    // Measure exact target coordinates of the navbar brand container
+                    // Measure exact target coordinates and height of the navbar brand container
                     const targetRect = navContainer.getBoundingClientRect();
                     const targetX = targetRect.left;
                     const targetY = targetRect.top;
+
+                    // Uniform scale down to match navbar dimensions
+                    const targetScale = targetRect.height / baseHeight;
 
                     const brandDuration   = 1400; // 1.4s silky smooth
                     const curtainDuration = 1800; // 1.8s smooth architectural lift
@@ -331,8 +335,8 @@
                     brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 200ms ease ${brandDuration - 80}ms`;
                     curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
 
-                    // Glide directly to target coordinates with exact scale(1)
-                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(1)`;
+                    // Glide and downscale directly onto navbar coordinates
+                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(${targetScale})`;
                     curtain.style.transform = 'translate3d(0, -100%, 0)';
 
                     // Exact 1:1 seamless handoff to navbar container
