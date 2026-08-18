@@ -279,76 +279,75 @@
     @if(request()->routeIs('home'))
     <!-- BIG.dk Opening Curtain & Centered Logo -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
-    <div id="intro-brand" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); transform-origin: 0 0; z-index: 99999; pointer-events: none; color: #ffffff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 10vw, 7rem); letter-spacing: 0.05em; white-space: nowrap; line-height: 1; will-change: transform;">Space IQ</div>
+    <div id="intro-brand" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; pointer-events: none; color: #ffffff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 10vw, 7rem); letter-spacing: 0.05em; white-space: nowrap; line-height: 1; will-change: top, left, transform, font-size, letter-spacing;">Space IQ</div>
 
     <script>
     (function() {
-        const navText = document.getElementById('nav-brand-text');
-        const navSub  = document.getElementById('nav-brand-sub');
-        const navImg  = document.getElementById('nav-brand-img');
-        const curtain = document.getElementById('intro-curtain');
-        const brand   = document.getElementById('intro-brand');
+        function runIntro() {
+            const navText = document.getElementById('nav-brand-text');
+            const navSub  = document.getElementById('nav-brand-sub');
+            const navImg  = document.getElementById('nav-brand-img');
+            const curtain = document.getElementById('intro-curtain');
+            const brand   = document.getElementById('intro-brand');
 
-        if (!navText || !curtain || !brand) return;
+            if (!navText || !curtain || !brand) return;
 
-        // Hide nav elements initially so they reveal at the perfect moment
-        navText.style.opacity = '0';
-        if (navSub) navSub.style.opacity = '0';
-        if (navImg) navImg.style.opacity = '0';
+            // Hide nav elements initially so they reveal at the perfect moment
+            navText.style.opacity = '0';
+            if (navSub) navSub.style.opacity = '0';
+            if (navImg) navImg.style.opacity = '0';
 
-        // Measure start coordinates
-        const startRect = brand.getBoundingClientRect();
-        brand.style.top = startRect.top + 'px';
-        brand.style.left = startRect.left + 'px';
-        brand.style.transform = 'none';
-        brand.style.transformOrigin = '0 0';
-
-        // Hold for 700ms on pure black screen
-        setTimeout(() => {
-            // Measure exact target coordinates of the navbar Space IQ text
-            const targetRect = navText.getBoundingClientRect();
-            const deltaX = targetRect.left - startRect.left;
-            const deltaY = targetRect.top  - startRect.top;
-            const scaleX = targetRect.width / startRect.width;
-            const scaleY = targetRect.height / startRect.height;
-
-            const duration = 1200; // 1.2s
-            const ease = 'cubic-bezier(0.77, 0, 0.175, 1)';
-
-            // Apply smooth 60fps GPU transition with overlapping crossfade
-            brand.style.transition = `transform ${duration}ms ${ease}, opacity 300ms ease ${duration - 150}ms`;
-            curtain.style.transition = `transform ${duration}ms ${ease}`;
-
-            // Trigger flight directly to navbar text coordinates and curtain lift
-            brand.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
-            curtain.style.transform = 'translateY(-100%)';
-
-            // Reveal logo icon and subtitle as text approaches
+            // Hold for 750ms on pure black screen
             setTimeout(() => {
-                if (navImg) {
-                    navImg.style.transition = 'opacity 500ms ease';
-                    navImg.style.opacity = '1';
-                }
-                if (navSub) {
-                    navSub.style.transition = 'opacity 500ms ease';
-                    navSub.style.opacity = '1';
-                }
-            }, duration * 0.55);
+                // Measure exact target coordinates and computed style of the navbar Space IQ text
+                const targetRect  = navText.getBoundingClientRect();
+                const targetStyle = window.getComputedStyle(navText);
 
-            // Smooth crossfade handoff so there is ZERO snapping or jumping
-            setTimeout(() => {
-                navText.style.transition = 'opacity 300ms ease';
-                navText.style.opacity = '1';
-                brand.style.opacity = '0';
-            }, duration - 150);
+                const duration = 1200; // 1.2s
+                const ease = 'cubic-bezier(0.77, 0, 0.175, 1)';
 
-            // Clean up DOM elements after full completion
-            setTimeout(() => {
-                brand.remove();
-                curtain.remove();
-            }, duration + 400);
+                // Apply transition directly to position, transform, font-size and spacing
+                brand.style.transition = `top ${duration}ms ${ease}, left ${duration}ms ${ease}, transform ${duration}ms ${ease}, font-size ${duration}ms ${ease}, letter-spacing ${duration}ms ${ease}`;
+                curtain.style.transition = `transform ${duration}ms ${ease}`;
 
-        }, 700);
+                // Fly directly to exact navbar coordinates and typography
+                brand.style.top = targetRect.top + 'px';
+                brand.style.left = targetRect.left + 'px';
+                brand.style.transform = 'translate(0, 0)';
+                brand.style.fontSize = targetStyle.fontSize;
+                brand.style.letterSpacing = targetStyle.letterSpacing;
+                brand.style.lineHeight = targetStyle.lineHeight;
+
+                // Lift the curtain
+                curtain.style.transform = 'translateY(-100%)';
+
+                // Reveal logo icon and subtitle as text arrives
+                setTimeout(() => {
+                    if (navImg) {
+                        navImg.style.transition = 'opacity 400ms ease';
+                        navImg.style.opacity = '1';
+                    }
+                    if (navSub) {
+                        navSub.style.transition = 'opacity 400ms ease';
+                        navSub.style.opacity = '1';
+                    }
+                }, duration * 0.6);
+
+                // Seamless handoff to permanent navbar text
+                setTimeout(() => {
+                    navText.style.opacity = '1';
+                    brand.remove();
+                    curtain.remove();
+                }, duration + 60);
+
+            }, 750);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runIntro);
+        } else {
+            runIntro();
+        }
     })();
     </script>
     @endif
