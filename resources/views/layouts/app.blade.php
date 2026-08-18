@@ -358,7 +358,7 @@
         }
         @endif
     </style>
-    @if(!app()->environment('local'))
+    @else
         <!-- Vite Compiled Production Assets (Production environment) -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
