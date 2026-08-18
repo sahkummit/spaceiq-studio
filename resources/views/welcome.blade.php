@@ -95,37 +95,38 @@
 <section class="relative overflow-hidden bg-brand-950" style="height: 100svh; min-height: 600px;">
     <!-- Background Video Wrapper -->
     <div class="absolute inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
-        <!-- Ambient Background Image shown while video loads -->
-        <div class="absolute inset-0 bg-cover bg-center opacity-55 scale-[1.02]"
-             style="background-image: url('{{ asset('img/hero_bg.webp') }}');" id="hero-video-fallback"></div>
+        <!-- Direct YouTube Autoplay Video (no image fallback) -->
+        <iframe class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] pointer-events-none opacity-85 select-none scale-[1.35]"
+                src="https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&showinfo=0&rel=0&modestbranding=1&start=26&iv_load_policy=3&disablekb=1&fs=0"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen></iframe>
         <!-- Transparent click shield -->
         <div class="absolute inset-0 bg-transparent z-10 pointer-events-auto"></div>
     </div>
-    <!-- Subtle bottom gradient blending into stats bar -->
-    <div class="absolute inset-0 z-0 bg-gradient-to-b from-brand-950/20 via-transparent to-brand-950/90 pointer-events-none"></div>
 
-    <!-- Stats Banner — the ONLY element over the video -->
-    <div class="absolute bottom-0 left-0 w-full z-20 py-7" style="background: linear-gradient(to top, rgba(4,16,15,0.97) 0%, rgba(4,16,15,0.55) 65%, transparent 100%);">
+    <!-- Stats Banner — Completely transparent, floating directly over video -->
+    <div class="absolute bottom-0 left-0 w-full z-20 py-8 bg-transparent">
         <div class="container mx-auto px-6 max-w-5xl">
             <div class="flex items-center justify-center gap-8 md:gap-16 text-center flex-wrap" id="stats-section">
                 <div>
-                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5" data-count="12000" data-suffix="+">0</p>
-                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold">Successful Projects</p>
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" data-count="12000" data-suffix="+">0</p>
+                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Successful Projects</p>
                 </div>
                 <div class="stats-strip-sep hidden md:block"></div>
                 <div>
-                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5" data-count="500" data-suffix="+">0</p>
-                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold">Happy Clients</p>
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" data-count="500" data-suffix="+">0</p>
+                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Happy Clients</p>
                 </div>
                 <div class="stats-strip-sep hidden md:block"></div>
                 <div>
-                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5" data-count="15" data-suffix="+">0</p>
-                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold">Countries</p>
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" data-count="15" data-suffix="+">0</p>
+                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Countries</p>
                 </div>
                 <div class="stats-strip-sep hidden md:block"></div>
                 <div>
-                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5" data-count="10" data-suffix="+">0</p>
-                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold">Years of Experience</p>
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" data-count="10" data-suffix="+">0</p>
+                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Years of Experience</p>
                 </div>
             </div>
         </div>
@@ -574,36 +575,5 @@
     steps.forEach(step => observer.observe(step));
 })();
 
-// ── Lazy Load YouTube Background Video ──
-(function() {
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            const container = document.getElementById('hero-video-container');
-            const fallback = document.getElementById('hero-video-fallback');
-            if (!container) return;
-            
-            const iframe = document.createElement('iframe');
-            iframe.className = "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] pointer-events-none opacity-75 select-none scale-[1.35]";
-            iframe.src = "https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&showinfo=0&rel=0&modestbranding=1&start=26&iv_load_policy=3&disablekb=1&fs=0";
-            iframe.frameBorder = "0";
-            iframe.allow = "autoplay; encrypted-media";
-            iframe.allowFullscreen = true;
-            
-            // Insert before the click shield
-            container.insertBefore(iframe, container.lastElementChild);
-            
-            // Fade out fallback once loaded (approx 1.5s after injection to allow smooth transition)
-            iframe.addEventListener('load', () => {
-                setTimeout(() => {
-                    if (fallback) {
-                        fallback.style.transition = 'opacity 1.2s ease';
-                        fallback.style.opacity = '0';
-                        setTimeout(() => fallback.remove(), 1200);
-                    }
-                }, 1000);
-            });
-        }, 800);
-    });
-})();
 </script>
 @endpush
