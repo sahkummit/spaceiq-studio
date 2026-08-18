@@ -79,52 +79,38 @@
             color: #ffffff !important;
         }
 
-        /* ── BIG.dk-style Intro Animation ── */
+        /* ── BIG.dk-style Intro Animation (60fps GPU Accelerated) ── */
         #intro-curtain {
             position: fixed;
             inset: 0;
-            z-index: 9999;
-            background: #000;
+            z-index: 99998;
+            background: #000000;
             pointer-events: none;
-            /* curtain starts fully covering the screen */
+            will-change: transform;
             transform: translateY(0%);
+            transition: transform 0.95s cubic-bezier(0.77, 0, 0.175, 1);
         }
         #intro-curtain.lift {
             transform: translateY(-100%);
-            transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1) 0s;
-        }
-        #intro-curtain.done {
-            display: none;
         }
 
         #intro-brand {
             position: fixed;
-            z-index: 10000;
+            z-index: 99999;
             pointer-events: none;
-            /* start: centered on screen */
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            transform-origin: top left;
             font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
-            font-weight: 700;
-            font-size: clamp(3rem, 10vw, 7rem);
-            color: #fff;
-            letter-spacing: 0.05em;
+            font-weight: 800;
+            font-size: clamp(3.5rem, 12vw, 8.5rem);
+            color: #ffffff;
+            letter-spacing: 0.04em;
             white-space: nowrap;
             line-height: 1;
-            /* will animate via JS using FLIP technique */
-            transition: none;
-        }
-        #intro-brand.fly {
-            /* JS will compute exact target rect and set inline style */
-            transition: top 0.85s cubic-bezier(0.76, 0, 0.24, 1),
-                        left 0.85s cubic-bezier(0.76, 0, 0.24, 1),
-                        font-size 0.85s cubic-bezier(0.76, 0, 0.24, 1),
-                        transform 0.85s cubic-bezier(0.76, 0, 0.24, 1),
-                        letter-spacing 0.85s cubic-bezier(0.76, 0, 0.24, 1);
-        }
-        #intro-brand.done {
-            display: none;
+            will-change: transform;
+            transition: transform 0.95s cubic-bezier(0.77, 0, 0.175, 1);
         }
 
         /* ── Stats strip ── */
@@ -587,62 +573,55 @@
 
 @push('scripts')
 <script>
-// ── BIG.dk-style Intro Animation ──
+// ── BIG.dk-style Intro Animation (GPU Accelerated FLIP) ──
 (function() {
     const curtain = document.getElementById('intro-curtain');
     const brand   = document.getElementById('intro-brand');
-    if (!curtain || !brand) return;
+    const navText = document.getElementById('nav-brand-text');
+    const navSub  = document.getElementById('nav-brand-sub');
+    const navImg  = document.getElementById('nav-brand-img');
 
-    // If already shown this session, skip instantly
-    if (sessionStorage.getItem('introShown')) {
-        curtain.classList.add('done');
-        brand.classList.add('done');
-        return;
-    }
+    if (!curtain || !brand || !navText) return;
 
-    // ── STEP 1: Show centered text on black for 1.4s ──
-    // (brand is already centered via CSS fixed + translate(-50%,-50%))
+    // Initially hide the header brand elements so the flying brand merges seamlessly
+    navText.style.opacity = '0';
+    if (navSub) navSub.style.opacity = '0';
+    if (navImg) navImg.style.opacity = '0';
 
+    // Step 1: Wait 750ms on pure black screen with the huge centered white text
     setTimeout(() => {
-        // ── STEP 2: Find the nav "Space IQ" text element ──
-        // It's a <span> inside the logo anchor in the header
-        const navSpan = document.querySelector('header a .font-display.font-bold');
+        // Step 2: Calculate FLIP coordinates
+        const brandRect  = brand.getBoundingClientRect();
+        const targetRect = navText.getBoundingClientRect();
 
-        if (navSpan) {
-            // FLIP: measure current center position of brand
-            const brandRect = brand.getBoundingClientRect();
+        // Calculate exact scale and translate deltas
+        const scale  = targetRect.height / brandRect.height;
+        const deltaX = targetRect.left - brandRect.left;
+        const deltaY = targetRect.top  - brandRect.top;
 
-            // Measure target: nav text rect
-            const targetRect = navSpan.getBoundingClientRect();
-
-            // Compute target font-size from navSpan computed style
-            const targetFontSize = parseFloat(window.getComputedStyle(navSpan).fontSize);
-            const targetLetterSpacing = window.getComputedStyle(navSpan).letterSpacing;
-
-            // Enable transitions
-            brand.classList.add('fly');
-
-            // Set target position — align top-left of brand with nav text top-left
-            brand.style.top       = targetRect.top + 'px';
-            brand.style.left      = targetRect.left + 'px';
-            brand.style.transform = 'translate(0, 0)';
-            brand.style.fontSize  = targetFontSize + 'px';
-            brand.style.letterSpacing = targetLetterSpacing;
-            brand.style.fontWeight = '700';
-        }
-
-        // ── STEP 3: Simultaneously lift the black curtain upward ──
+        // Apply smooth GPU transform transition to both brand and curtain
+        brand.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scale})`;
         curtain.classList.add('lift');
 
-        // ── STEP 4: After animation completes, remove both elements ──
+        // Fade in logo image and subtitle as it approaches
         setTimeout(() => {
-            brand.classList.add('done');
-            curtain.classList.add('done');
-            sessionStorage.setItem('introShown', '1');
-        }, 950);
+            if (navImg) {
+                navImg.style.transition = 'opacity 0.4s ease';
+                navImg.style.opacity = '1';
+            }
+            if (navSub) {
+                navSub.style.transition = 'opacity 0.4s ease';
+                navSub.style.opacity = '1';
+            }
+        }, 550);
 
-    }, 1400); // hold big text for 1.4 seconds
-
+        // Step 3: When arrived, reveal real nav text and clean up intro elements
+        setTimeout(() => {
+            navText.style.opacity = '1';
+            brand.remove();
+            curtain.remove();
+        }, 980);
+    }, 750);
 })();
 
 (function() {

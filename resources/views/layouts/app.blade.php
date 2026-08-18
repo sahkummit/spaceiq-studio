@@ -288,14 +288,14 @@
              :class="scrolled ? 'max-w-5xl mx-auto px-6 py-2 bg-brand-900/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl' : 'px-6 md:px-12 py-5 {{ request()->routeIs('home') ? 'bg-transparent border-transparent' : 'border-b border-white/5 bg-brand-950/20 backdrop-blur-sm' }}'">
             <div class="flex items-center justify-between gap-8 w-full">
                 <!-- Logo (Extreme Left) -->
-                <a href="{{ route('home') }}" class="flex-shrink-0 flex items-center gap-3 group">
-                    <img src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" 
+                <a href="{{ route('home') }}" id="nav-brand-container" class="flex-shrink-0 flex items-center gap-3 group">
+                    <img id="nav-brand-img" src="{{ asset('img/logo.png') }}" alt="Space IQ Design Studio" 
                          class="w-auto drop-shadow-lg transition-all duration-300 group-hover:scale-105"
                          :class="scrolled ? 'h-9' : 'h-12'">
                     <div class="flex flex-col leading-tight">
-                        <span class="font-display font-bold tracking-wider text-white transition-all duration-300"
+                        <span id="nav-brand-text" class="font-display font-bold tracking-wider text-white transition-all duration-300"
                               :class="scrolled ? 'text-sm' : 'text-lg'">Space IQ</span>
-                        <span class="font-display font-light tracking-widest text-white/70 uppercase transition-all duration-300"
+                        <span id="nav-brand-sub" class="font-display font-light tracking-widest text-white/70 uppercase transition-all duration-300"
                               :class="scrolled ? 'text-[8px]' : 'text-[10px]'">Design Studio</span>
                     </div>
                 </a>
