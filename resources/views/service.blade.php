@@ -9,40 +9,43 @@
 @section('meta_description', $service->short_description)
 @section('og_image', $service->og_image ?? ($firstImagePath ? asset(ltrim($firstImagePath, '/')) : asset('img/social-share.png')))
 
-@if($service->slug === '360-views')
 @section('head')
-    <link rel="stylesheet" href="{{ asset('css/pannellum.css') }}"/>
-    <script src="{{ asset('js/pannellum.js') }}"></script>
-    <style>
-        .pnlm-container {
-            background: #080e0e !important;
-        }
-        .pnlm-load-box {
-            background-color: rgba(12, 24, 24, 0.85) !important;
-            border: 1px solid rgba(26, 158, 150, 0.3) !important;
-            border-radius: 6px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-        .pnlm-lbox {
-            border: 4px solid #1A9E96 !important;
-            border-left-color: transparent !important;
-        }
-        .pnlm-ltext {
-            color: #7EC8C0 !important;
-            font-family: 'Montserrat', sans-serif !important;
-            font-weight: 600 !important;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-        .pnlm-control-button {
-            background-color: rgba(12, 24, 24, 0.8) !important;
-            fill: #7EC8C0 !important;
-        }
-        .pnlm-control-button:hover {
-            background-color: #1A9E96 !important;
-            fill: #080e0e !important;
-        }
+    @if($service->slug === '360-views')
+        <link rel="stylesheet" href="{{ asset('css/pannellum.css') }}"/>
+        <script src="{{ asset('js/pannellum.js') }}"></script>
+        <style>
+            .pnlm-container {
+                background: #080e0e !important;
+            }
+            .pnlm-load-box {
+                background-color: rgba(12, 24, 24, 0.85) !important;
+                border: 1px solid rgba(26, 158, 150, 0.3) !important;
+                border-radius: 6px;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            }
+            .pnlm-lbox {
+                border: 4px solid #1A9E96 !important;
+                border-left-color: transparent !important;
+            }
+            .pnlm-ltext {
+                color: #7EC8C0 !important;
+                font-family: 'Montserrat', sans-serif !important;
+                font-weight: 600 !important;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+            .pnlm-control-button {
+                background-color: rgba(12, 24, 24, 0.8) !important;
+                fill: #7EC8C0 !important;
+            }
+            .pnlm-control-button:hover {
+                background-color: #1A9E96 !important;
+                fill: #080e0e !important;
+            }
+        </style>
+    @endif
 
+    <style>
         /* ── Shimmer Skeleton ── */
         @keyframes skeleton-shimmer {
             0%   { background-position: -800px 0; }
@@ -67,8 +70,51 @@
             opacity: 1;
         }
     </style>
+
+    @php
+        $isPdf = $service->media->where('file_type', 'pdf')->count() > 0;
+    @endphp
+    @if($isPdf)
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+        <script>
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('pdfCard', (url, title) => ({
+                    url: url,
+                    title: title,
+                    loading: true,
+                    pages: 1,
+                    init() {
+                        pdfjsLib.getDocument(this.url).promise.then(pdf => {
+                            this.pages = pdf.numPages;
+                            pdf.getPage(1).then(page => {
+                                const canvas = this.$refs.canvas;
+                                const context = canvas.getContext('2d');
+                                
+                                // Render thumbnail at suitable scale
+                                const viewport = page.getViewport({ scale: 1.0 });
+                                canvas.width = viewport.width;
+                                canvas.height = viewport.height;
+                                
+                                const renderContext = {
+                                    canvasContext: context,
+                                    viewport: viewport
+                                };
+                                page.render(renderContext).promise.then(() => {
+                                    this.loading = false;
+                                });
+                            });
+                        }).catch(err => {
+                            console.error('Error rendering PDF thumbnail:', err);
+                            this.loading = false;
+                        });
+                    }
+                }));
+            });
+        </script>
+    @endif
 @endsection
-@endif
 
 @section('content')
 
@@ -169,8 +215,83 @@
             try { this.pannellumViewer.destroy(); } catch(e) {}
             this.pannellumViewer = null;
         }
+    },
+    pdfOpen: false,
+    pdfDoc: null,
+    pdfPageNum: 1,
+    pdfTotalPages: 1,
+    pdfTitle: '',
+    pdfScale: 1.2,
+    pdfPageRendering: false,
+    pdfPendingPageNum: null,
+    openPdf(url, title) {
+        this.pdfTitle = title;
+        this.pdfOpen = true;
+        this.pdfPageNum = 1;
+        this.pdfScale = 1.2;
+        this.$nextTick(() => {
+            pdfjsLib.getDocument(url).promise.then(pdf => {
+                this.pdfDoc = pdf;
+                this.pdfTotalPages = pdf.numPages;
+                this.renderPdfPage(this.pdfPageNum);
+            });
+        });
+    },
+    renderPdfPage(num) {
+        this.pdfPageRendering = true;
+        this.pdfDoc.getPage(num).then(page => {
+            const canvas = document.getElementById('pdf-modal-canvas');
+            if (!canvas) return;
+            const context = canvas.getContext('2d');
+            
+            const viewport = page.getViewport({ scale: this.pdfScale });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            
+            page.render(renderContext).promise.then(() => {
+                this.pdfPageRendering = false;
+                if (this.pdfPendingPageNum !== null) {
+                    this.renderPdfPage(this.pdfPendingPageNum);
+                    this.pdfPendingPageNum = null;
+                }
+            });
+        });
+    },
+    queueRenderPage(num) {
+        if (this.pdfPageRendering) {
+            this.pdfPendingPageNum = num;
+        } else {
+            this.renderPdfPage(num);
+        }
+    },
+    prevPdfPage() {
+        if (this.pdfPageNum <= 1) return;
+        this.pdfPageNum--;
+        this.queueRenderPage(this.pdfPageNum);
+    },
+    nextPdfPage() {
+        if (this.pdfPageNum >= this.pdfTotalPages) return;
+        this.pdfPageNum++;
+        this.queueRenderPage(this.pdfPageNum);
+    },
+    zoomIn() {
+        this.pdfScale = Math.min(this.pdfScale + 0.2, 2.5);
+        this.renderPdfPage(this.pdfPageNum);
+    },
+    zoomOut() {
+        this.pdfScale = Math.max(this.pdfScale - 0.2, 0.6);
+        this.renderPdfPage(this.pdfPageNum);
+    },
+    closePdf() {
+        this.pdfOpen = false;
+        this.pdfDoc = null;
     }
-}">
+}">">
 
 <!-- ── HERO ── -->
 <section class="relative flex flex-col justify-start overflow-hidden bg-brand-950 pb-0">
@@ -396,26 +517,35 @@
                                     </div>
                                 @elseif($media->file_type === 'pdf')
                                     <!-- PDF Document Card -->
-                                    <div class="glass-card rounded-xl border border-white/8 bg-brand-900/60 p-6 shadow-2xl relative overflow-hidden flex flex-col h-full group">
-                                        <!-- PDF Header -->
-                                        <div class="flex items-center justify-between mb-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2zM9 9h1.5m-1.5 3h4m-4 3h4"/></svg>
-                                                </div>
-                                                <div class="max-w-[70%]">
-                                                    <h4 class="text-white font-bold text-sm tracking-wide group-hover:text-accent-300 transition-colors truncate" title="{{ $media->title }}">{{ $media->title }}</h4>
-                                                    <p class="text-gray-400 text-[10px] uppercase tracking-widest font-semibold mt-0.5">PDF Document</p>
+                                    <div class="relative group/pdf rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-brand-900/40 hover:border-accent-400/30 transition-all duration-300 flex flex-col cursor-pointer"
+                                         x-data="pdfCard('{{ Storage::url($media->file_path) }}', '{{ $media->title }}')"
+                                         @click="openPdf(url, title)">
+                                        
+                                        <!-- Canvas/Thumbnail Area -->
+                                        <div class="w-full aspect-[4/3] bg-black/50 relative overflow-hidden flex items-center justify-center">
+                                            <canvas x-ref="canvas" class="w-full h-full object-cover transition-transform duration-700 group-hover/pdf:scale-105 opacity-80 group-hover/pdf:opacity-100"></canvas>
+                                            
+                                            <!-- Loading Indicator -->
+                                            <div x-show="loading" class="absolute inset-0 flex items-center justify-center bg-brand-950/80">
+                                                <div class="w-8 h-8 rounded-full border-2 border-accent-400 border-t-transparent animate-spin"></div>
+                                            </div>
+                                            
+                                            <!-- Zoom/Open Overlay -->
+                                            <div class="absolute inset-0 bg-black/35 opacity-0 group-hover/pdf:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                                                <div class="bg-brand-900/90 backdrop-blur-sm px-4 py-2 rounded-full border border-accent-400/30 text-xs font-bold text-accent-300 uppercase tracking-widest flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    View Plan
                                                 </div>
                                             </div>
-                                            <a href="{{ Storage::url($media->file_path) }}" target="_blank" class="w-8 h-8 rounded-md bg-brand-950/60 border border-white/10 hover:border-accent-400/50 flex items-center justify-center text-white/45 hover:text-white transition-colors" title="Open PDF">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                            </a>
                                         </div>
                                         
-                                        <!-- Embedded PDF Viewer -->
-                                        <div class="w-full aspect-[4/3] min-h-[350px] md:min-h-[400px] overflow-hidden rounded-md bg-black/40 border border-white/5 relative">
-                                            <iframe src="{{ Storage::url($media->file_path) }}#toolbar=0" class="w-full h-full absolute inset-0" frameborder="0"></iframe>
+                                        <!-- Info Footer -->
+                                        <div class="p-5 border-t border-white/5 bg-brand-950/40">
+                                            <h4 class="text-white font-bold text-sm tracking-wide group-hover/pdf:text-accent-300 transition-colors truncate">{{ $media->title }}</h4>
+                                            <p class="text-accent-400/70 text-[10px] uppercase tracking-widest font-black mt-1 flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                PDF Blueprint · <span x-text="pages">1</span> Page(s)
+                                            </p>
                                         </div>
                                     </div>
                                 @else
@@ -560,6 +690,77 @@
                         <h3 class="text-white text-xs font-semibold tracking-widest uppercase bg-brand-900/60 border border-white/5 px-4 py-2 rounded shadow-sm inline-block" x-text="lightboxTitle"></h3>
                     </div>
                 </div>
+            </template>
+
+            <!-- PDF Viewer Modal -->
+            <template x-teleport="body">
+                <div x-show="pdfOpen" 
+                     class="fixed inset-0 z-[100] flex flex-col bg-brand-950/98 backdrop-blur-md" 
+                     x-transition.opacity 
+                     style="display: none;"
+                     @keydown.escape.window="closePdf()">
+                    
+                    <!-- Top Navigation Bar -->
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-brand-950/80 z-[110]">
+                        <div>
+                            <h3 class="text-white text-sm md:text-base font-bold tracking-wide" x-text="pdfTitle"></h3>
+                            <p class="text-gray-400 text-[10px] md:text-xs mt-0.5" x-text="'Page ' + pdfPageNum + ' of ' + pdfTotalPages"></p>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <!-- Zoom Buttons -->
+                            <button @click="zoomOut()" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/></svg>
+                            </button>
+                            <span class="text-white text-xs font-bold w-12 text-center" x-text="Math.round(pdfScale * 100) + '%'"></span>
+                            <button @click="zoomIn()" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                            </button>
+                            
+                            <div class="w-px h-6 bg-white/10 mx-2"></div>
+                            
+                            <!-- Close Button -->
+                            <button @click="closePdf()" class="text-white/70 hover:text-white transition-colors bg-white/5 rounded-full p-2 border border-white/10">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Scrollable Canvas Area -->
+                    <div class="flex-1 overflow-auto flex justify-center items-start p-6 md:p-12 relative z-[105]" @click.self="closePdf()">
+                        <div class="relative bg-white shadow-2xl rounded-sm max-w-full overflow-hidden select-none border border-white/10">
+                            <canvas id="pdf-modal-canvas" class="max-w-full h-auto block"></canvas>
+                            
+                            <!-- Page loading overlay -->
+                            <div x-show="pdfPageRendering" class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-xs">
+                                <div class="w-10 h-10 rounded-full border-2 border-brand-600 border-t-transparent animate-spin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bottom Controls Bar (Fixed Page Navigation) -->
+                    <div class="py-4 border-t border-white/5 bg-brand-950/90 flex items-center justify-center gap-6 z-[110]">
+                        <button @click="prevPdfPage()" 
+                                :disabled="pdfPageNum <= 1"
+                                :class="pdfPageNum <= 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-brand-600 hover:text-white'"
+                                class="px-5 py-2.5 bg-brand-900 border border-white/10 text-white font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 rounded">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            Prev
+                        </button>
+                        
+                        <span class="text-white font-display text-xs uppercase tracking-widest" x-text="'Page ' + pdfPageNum + ' of ' + pdfTotalPages"></span>
+                        
+                        <button @click="nextPdfPage()" 
+                                :disabled="pdfPageNum >= pdfTotalPages"
+                                :class="pdfPageNum >= pdfTotalPages ? 'opacity-30 cursor-not-allowed' : 'hover:bg-brand-600 hover:text-white'"
+                                class="px-5 py-2.5 bg-brand-900 border border-white/10 text-white font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 rounded">
+                            Next
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                    
+                </div>
+            </template>
             </template>
         </div>
     @else
