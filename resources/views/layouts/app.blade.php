@@ -44,8 +44,231 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Vite Compiled Production Assets -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if(app()->environment('local'))
+        <!-- Tailwind CSS (CDN for local development) -->
+        <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+        <style type="text/tailwindcss">
+            @theme {
+                --color-brand-950: #080e0e;
+                --color-brand-900: #0c1818;
+                --color-brand-800: #122828;
+                --color-brand-700: #1a3a3a;
+                --color-brand-600: #0E7C7B;
+                --color-brand-500: #1A9E96;
+                --color-brand-400: #3AADAA;
+                --color-brand-300: #7EC8C0;
+                --color-accent-500: #0E7C7B;
+                --color-accent-400: #1A9E96;
+                --color-accent-300: #3AADAA;
+                --font-display: 'Montserrat', sans-serif;
+                --font-sans: 'Montserrat', sans-serif;
+            }
+            
+            body { 
+                font-family: var(--font-sans); 
+                background-color: var(--color-brand-950);
+                color: #f8fafc;
+            }
+            
+            h1, h2, h3, h4, h5, h6, .font-display {
+                font-family: var(--font-display);
+            }
+            
+            .glass-nav {
+                background: rgba(8, 14, 14, 0.88);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border-bottom: 1px solid rgba(14, 124, 123, 0.1);
+            }
+            
+            .glass-card {
+                background: rgba(255, 255, 255, 0.02);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+            }
+            .glass-card:hover {
+                border-color: rgba(14, 124, 123, 0.35);
+                background: rgba(14, 124, 123, 0.04);
+            }
+            
+            .text-gradient {
+                background: linear-gradient(135deg, #ffffff 0%, #7EC8C0 50%, #1A9E96 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            
+            /* Custom Rich Text Parser for Quill/HTML Output */
+            .rich-text h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 1rem; margin-top: 2rem; font-family: var(--font-display); color: #ffffff; }
+            .rich-text h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; margin-top: 2rem; font-family: var(--font-display); color: #ffffff; }
+            .rich-text h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; margin-top: 1.5rem; font-family: var(--font-display); color: #3AADAA; }
+            .rich-text p { margin-bottom: 1.25rem; line-height: 1.8; color: #d1d5db; font-weight: 300; }
+            .rich-text ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; color: #d1d5db; }
+            .rich-text ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1.25rem; color: #d1d5db; }
+            .rich-text li { margin-bottom: 0.5rem; padding-left: 0.25rem; }
+            .rich-text li::marker { color: #1A9E96; }
+            .rich-text a { color: #1A9E96; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+            .rich-text a:hover { color: #3AADAA; text-decoration: underline; }
+            .rich-text strong, .rich-text b { color: #ffffff; font-weight: 600; }
+            .rich-text blockquote { border-left: 4px solid #0E7C7B; padding-left: 1rem; font-style: italic; color: #9ca3af; margin-bottom: 1.25rem; background: rgba(14, 124, 123, 0.05); padding: 1rem; border-radius: 0 4px 4px 0; }
+            .rich-text pre { background: #0c1818; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1.25rem; border: 1px solid rgba(14, 124, 123, 0.1); }
+            .rich-text code { font-family: monospace; background: rgba(14, 124, 123, 0.15); padding: 0.1rem 0.3rem; border-radius: 0.25rem; font-size: 0.875em; }
+            
+            .btn-glow {
+                box-shadow: 0 0 20px rgba(14, 124, 123, 0.25);
+                transition: box-shadow 0.3s ease, transform 0.3s ease;
+            }
+            .btn-glow:hover {
+                box-shadow: 0 0 30px rgba(26, 158, 150, 0.45);
+                transform: translateY(-2px);
+            }
+     
+            /* ── Page Loading Bar ── */
+            #page-loader {
+                position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+                background: linear-gradient(90deg, #0E7C7B, #3AADAA, #0E7C7B);
+                background-size: 200% 100%;
+                animation: loader-shimmer 1.2s linear infinite;
+                z-index: 9999;
+                transition: width 0.3s ease;
+            }
+            @keyframes loader-shimmer {
+                0%   { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+            }
+     
+            /* ── Scroll Reveal ── */
+            .reveal {
+                opacity: 0;
+                transform: translateY(32px);
+                transition: opacity 0.65s ease, transform 0.65s ease;
+            }
+            .reveal.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .reveal-left {
+                opacity: 0;
+                transform: translateX(-40px);
+                transition: opacity 0.65s ease, transform 0.65s ease;
+            }
+            .reveal-left.visible {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            .reveal-right {
+                opacity: 0;
+                transform: translateX(40px);
+                transition: opacity 0.65s ease, transform 0.65s ease;
+            }
+            .reveal-right.visible {
+                opacity: 1;
+                transform: translateX(0);
+            }
+     
+            /* ── Back To Top ── */
+            #back-to-top {
+                position: fixed; bottom: 100px; right: 24px;
+                width: 44px; height: 44px;
+                background: rgba(12,24,24,0.9);
+                border: 1px solid rgba(26,158,150,0.4);
+                border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer; z-index: 1000;
+                opacity: 0; pointer-events: none;
+                transition: opacity 0.3s, transform 0.3s, border-color 0.3s;
+                backdrop-filter: blur(8px);
+            }
+            #back-to-top.show {
+                opacity: 1; pointer-events: auto;
+            }
+            #back-to-top:hover {
+                border-color: rgba(26,158,150,0.9);
+                transform: translateY(-3px);
+            }
+     
+            /* ── WhatsApp Button ── */
+            #whatsapp-btn {
+                position: fixed; bottom: 24px; right: 24px;
+                width: 52px; height: 52px;
+                background: #25D366;
+                border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer; z-index: 1000;
+                box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+                transition: transform 0.3s, box-shadow 0.3s;
+                text-decoration: none;
+            }
+            #whatsapp-btn:hover {
+                transform: scale(1.1) translateY(-2px);
+                box-shadow: 0 6px 28px rgba(37,211,102,0.55);
+            }
+            #whatsapp-btn svg { width: 28px; height: 28px; }
+     
+            /* ── Active Nav ── */
+            .nav-active {
+                color: #1A9E96 !important;
+                position: relative;
+            }
+            .nav-active::after {
+                content: '';
+                position: absolute;
+                bottom: -4px; left: 0; right: 0;
+                height: 2px;
+                background: #1A9E96;
+                border-radius: 1px;
+            }
+     
+            /* ── Form Input Focus Glow ── */
+            input:focus, select:focus, textarea:focus {
+                outline: none;
+                border-color: rgba(26, 158, 150, 0.7) !important;
+                box-shadow: 0 0 0 3px rgba(26, 158, 150, 0.18), 0 0 12px rgba(26, 158, 150, 0.12);
+                transition: box-shadow 0.2s ease, border-color 0.2s ease;
+            }
+     
+            /* ── Nav Link Underline hover ── */
+            .nav-link-underline {
+                position: relative;
+            }
+            .nav-link-underline::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 1.5px;
+                bottom: -4px;
+                left: 50%;
+                background-color: #1A9E96;
+                transition: width 0.3s ease, left 0.3s ease;
+            }
+            .nav-link-underline:hover::after {
+                width: 100%;
+                left: 0;
+            }
+     
+            /* ── Page Entrance Transition ── */
+            .page-entrance {
+                opacity: 0;
+                transform: translateY(12px);
+                transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .page-entrance.loaded {
+                opacity: 1;
+                transform: translateY(0);
+            }
+     
+            /* ── 3D Perspective Card Tilt ── */
+            .tilt-card {
+                transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+                transform-style: preserve-3d;
+                will-change: transform;
+            }
+        </style>
+    @else
+        <!-- Vite Compiled Production Assets (Production environment) -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
