@@ -107,7 +107,7 @@
         $lightboxImagesCollect = collect();
         foreach($groupedMedia as $category => $categoryMedia) {
             foreach($categoryMedia->sortBy('sort_order') as $media) {
-                if ($media->file_type !== 'video' && $service->slug !== '360-views') {
+                if ($media->file_type !== 'video' && $media->file_type !== 'pdf' && $service->slug !== '360-views') {
                     $lightboxImagesCollect->push([
                         'url' => webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH)),
                         'title' => $media->title ?? ''
@@ -300,8 +300,9 @@
                 <div>
                     @php
                         $is360 = $service->slug === '360-views';
+                        $isPdf = $service->media->where('file_type', 'pdf')->count() > 0;
                         $numCols = 3;
-                        $gridColsClass = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+                        $gridColsClass = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
                     @endphp
                     <div class="grid {{ $gridColsClass }} items-start w-full mb-16 pt-8">
                     @php
@@ -316,11 +317,11 @@
                     @foreach($columns as $colIndex => $columnMedia)
                         @php
                             $staggerClass = match($colIndex) {
-                                1 => 'md:mt-12',
-                                2 => 'lg:mt-24',
+                                1 => $isPdf ? '' : 'md:mt-12',
+                                2 => $isPdf ? '' : 'lg:mt-24',
                                 default => ''
                             };
-                            $spaceClass = $is360 ? 'space-y-6' : 'space-y-4';
+                            $spaceClass = ($is360 || $isPdf) ? 'space-y-6' : 'space-y-4';
                         @endphp
                         <div class="{{ $spaceClass }} w-full {{ $staggerClass }}">
                             @foreach($columnMedia as $media)
@@ -393,10 +394,30 @@
                                         </div>
 
                                     </div>
-
-
-
-
+                                @elseif($media->file_type === 'pdf')
+                                    <!-- PDF Document Card -->
+                                    <div class="glass-card rounded-xl border border-white/8 bg-brand-900/60 p-6 shadow-2xl relative overflow-hidden flex flex-col h-full group">
+                                        <!-- PDF Header -->
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2zM9 9h1.5m-1.5 3h4m-4 3h4"/></svg>
+                                                </div>
+                                                <div class="max-w-[70%]">
+                                                    <h4 class="text-white font-bold text-sm tracking-wide group-hover:text-accent-300 transition-colors truncate" title="{{ $media->title }}">{{ $media->title }}</h4>
+                                                    <p class="text-gray-400 text-[10px] uppercase tracking-widest font-semibold mt-0.5">PDF Document</p>
+                                                </div>
+                                            </div>
+                                            <a href="{{ Storage::url($media->file_path) }}" target="_blank" class="w-8 h-8 rounded-md bg-brand-950/60 border border-white/10 hover:border-accent-400/50 flex items-center justify-center text-white/45 hover:text-white transition-colors" title="Open PDF">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
+                                        </div>
+                                        
+                                        <!-- Embedded PDF Viewer -->
+                                        <div class="w-full aspect-[4/3] min-h-[350px] md:min-h-[400px] overflow-hidden rounded-md bg-black/40 border border-white/5 relative">
+                                            <iframe src="{{ Storage::url($media->file_path) }}#toolbar=0" class="w-full h-full absolute inset-0" frameborder="0"></iframe>
+                                        </div>
+                                    </div>
                                 @else
                                     @php
                                         $isTallImage = false;
