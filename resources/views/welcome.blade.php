@@ -78,66 +78,134 @@
             box-shadow: 0 0 20px rgba(26, 158, 150, 0.6);
             color: #ffffff !important;
         }
+
+        /* ── Intro Splash Animation ── */
+        #intro-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #04100f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        #intro-splash.gone {
+            display: none;
+        }
+        #intro-logo-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        #intro-name {
+            font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 300;
+            letter-spacing: 0.22em;
+            color: #ffffff;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.95s cubic-bezier(0.22,1,0.36,1), transform 0.95s cubic-bezier(0.22,1,0.36,1);
+            white-space: nowrap;
+        }
+        #intro-tagline {
+            font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+            letter-spacing: 0.48em;
+            color: #1A9E96;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.7s ease 0.55s;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+        }
+        #intro-line {
+            width: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #1A9E96, transparent);
+            margin: 0 auto;
+            transition: width 0.85s cubic-bezier(0.22,1,0.36,1) 0.25s;
+        }
+        #intro-splash.phase-in #intro-name   { opacity: 1; transform: translateY(0); }
+        #intro-splash.phase-in #intro-tagline { opacity: 1; }
+        #intro-splash.phase-in #intro-line   { width: clamp(60px, 18vw, 180px); }
+        #intro-splash.phase-out {
+            opacity: 0;
+            transition: opacity 0.65s ease;
+        }
+
+        /* ── Stats strip ── */
+        .stats-strip-sep {
+            width: 1px;
+            background: rgba(255,255,255,0.12);
+            height: 40px;
+            align-self: center;
+        }
+
+        /* ── Services editorial layout ── */
+        .service-number {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: clamp(6rem, 16vw, 13rem);
+            font-weight: 300;
+            line-height: 1;
+            color: rgba(255,255,255,0.04);
+            position: absolute;
+            bottom: -0.1em;
+            pointer-events: none;
+            user-select: none;
+            letter-spacing: -0.02em;
+        }
     </style>
 @endsection
 
 @section('content')
 
-<!-- Hero Section -->
-<section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-screen flex items-center">
-    <!-- Background Video Wrapper (Solid Dark Backdrop) -->
+{{-- ── INTRO SPLASH ── --}}
+<div id="intro-splash">
+    <div id="intro-logo-wrap">
+        <div id="intro-line"></div>
+        <div id="intro-name">Space IQ</div>
+        <div id="intro-tagline">Design Studio</div>
+    </div>
+</div>
+
+<!-- Hero Section — full screen video, no text overlay except stats bar -->
+<section class="relative overflow-hidden bg-brand-950" style="height: 100svh; min-height: 600px;">
+    <!-- Background Video Wrapper -->
     <div class="absolute inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
-        <!-- High-Quality Ambient Background Image shown while video loads -->
-        <div class="absolute inset-0 bg-cover bg-center opacity-45 filter blur-[2px] scale-[1.02]" 
+        <!-- Ambient Background Image shown while video loads -->
+        <div class="absolute inset-0 bg-cover bg-center opacity-55 scale-[1.02]"
              style="background-image: url('{{ asset('img/hero_bg.webp') }}');" id="hero-video-fallback"></div>
-        <!-- Transparent click shield to intercept all touches/clicks and prevent YouTube controls from showing -->
+        <!-- Transparent click shield -->
         <div class="absolute inset-0 bg-transparent z-10 pointer-events-auto"></div>
     </div>
-    <!-- Dark overlay for text readability -->
-    <div class="absolute inset-0 z-0 bg-gradient-to-b from-brand-950/60 via-brand-950/30 to-brand-950/85"></div>
-    
-    <div class="container mx-auto px-6 relative z-10 text-center">
-        <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-4 font-display text-white">
-            Space IQ <span class="text-gradient">Design Studio</span>
-        </h1>
-        
-        <p class="text-lg md:text-2xl text-white font-medium tracking-widest uppercase mb-10 font-display">
-            Where Vision Meets Reality
-        </p>
-        
-        <p class="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-            We bridge the gap between architectural vision and reality with hyper-realistic 4K renders that captivate clients and accelerate project approvals.
-        </p>
-        
-        <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="{{ route('contact') }}" class="btn-glow px-10 py-5 bg-brand-600 hover:bg-brand-500 rounded-sm font-semibold text-white transition-all flex items-center justify-center gap-2 uppercase tracking-wide text-sm">
-                Book a Consultation
-            </a>
-            <a href="#services" class="px-10 py-5 border border-white/20 hover:border-white/50 rounded-sm font-semibold text-white transition-all text-center uppercase tracking-wide text-sm bg-black/20 backdrop-blur-sm">
-                View Project Gallery
-            </a>
-        </div>
-    </div>
+    <!-- Subtle bottom gradient blending into stats bar -->
+    <div class="absolute inset-0 z-0 bg-gradient-to-b from-brand-950/20 via-transparent to-brand-950/90 pointer-events-none"></div>
 
-    <!-- Stats Banner inside Hero -->
-    <div class="absolute bottom-0 left-0 w-full py-8 z-20">
+    <!-- Stats Banner — the ONLY element over the video -->
+    <div class="absolute bottom-0 left-0 w-full z-20 py-7" style="background: linear-gradient(to top, rgba(4,16,15,0.97) 0%, rgba(4,16,15,0.55) 65%, transparent 100%);">
         <div class="container mx-auto px-6 max-w-5xl">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center" id="stats-section">
+            <div class="flex items-center justify-center gap-8 md:gap-16 text-center flex-wrap" id="stats-section">
                 <div>
-                    <p class="text-3xl font-display font-bold text-white mb-1" data-count="12000" data-suffix="+">0</p>
-                    <p class="text-[10px] uppercase tracking-widest text-accent-400 font-bold">Successful Projects</p>
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5" data-count="12000" data-suffix="+">0</p>
+                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold">Successful Projects</p>
                 </div>
+                <div class="stats-strip-sep hidden md:block"></div>
                 <div>
-                    <p class="text-3xl font-display font-bold text-white mb-1" data-count="500" data-suffix="+">0</p>
-                    <p class="text-[10px] uppercase tracking-widest text-accent-400 font-bold">Happy Clients</p>
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5" data-count="500" data-suffix="+">0</p>
+                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold">Happy Clients</p>
                 </div>
+                <div class="stats-strip-sep hidden md:block"></div>
                 <div>
-                    <p class="text-3xl font-display font-bold text-white mb-1" data-count="15" data-suffix="+">0</p>
-                    <p class="text-[10px] uppercase tracking-widest text-accent-400 font-bold">Countries</p>
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5" data-count="15" data-suffix="+">0</p>
+                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold">Countries</p>
                 </div>
+                <div class="stats-strip-sep hidden md:block"></div>
                 <div>
-                    <p class="text-3xl font-display font-bold text-white mb-1" data-count="10" data-suffix="+">0</p>
-                    <p class="text-[10px] uppercase tracking-widest text-accent-400 font-bold">Years of Experience</p>
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5" data-count="10" data-suffix="+">0</p>
+                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold">Years of Experience</p>
                 </div>
             </div>
         </div>
@@ -173,90 +241,101 @@
     </div>
 </section>
 
-<!-- Services Grid -->
-<section id="services" class="py-24 relative bg-brand-950">
-    <div class="container mx-auto px-6 xl:px-12" style="max-width:1536px">
-        <div class="text-center mb-20">
-            <h2 class="text-4xl md:text-6xl font-display font-light uppercase tracking-[0.2em] text-white">Selected Works.</h2>
-            <p class="text-xs uppercase tracking-widest text-accent-400 font-bold mt-4">High-Fidelity Architectural Visualizations</p>
-            <div class="w-12 h-px bg-accent-500/40 mx-auto mt-8"></div>
+
+
+
+<!-- Services — Editorial Full-Bleed Layout -->
+<section id="services" class="bg-brand-950 relative">
+    @php
+        $editorialServices = \App\Models\Service::where('is_active', true)
+            ->whereNotIn('slug', ['autocad-drafting', 'interior-design-consultation'])
+            ->orderBy('sort_order')
+            ->get();
+    @endphp
+
+    {{-- Section header --}}
+    <div class="pt-24 pb-12 container mx-auto px-6 xl:px-12 flex items-end justify-between" style="max-width:1536px">
+        <div>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-accent-400 font-bold mb-3">Selected Works</p>
+            <h2 class="text-5xl md:text-7xl font-display font-light uppercase tracking-[0.1em] text-white leading-none">Our<br><span class="italic font-thin">Services</span></h2>
         </div>
-        
-        <div class="space-y-24">
-            @php
-                $groupedServicesHome = \App\Models\Service::where('is_active', true)
-                    ->whereNotIn('slug', ['autocad-drafting', 'interior-design-consultation'])
-                    ->orderBy('sort_order')
-                    ->get()
-                    ->groupBy('category');
-            @endphp
-            
-            @forelse($groupedServicesHome as $category => $services)
-                <div>
-                    <!-- Subtle category title -->
-                    <div class="flex items-center gap-4 mb-8">
-                        <span class="text-xs uppercase tracking-[0.25em] font-black text-accent-400/90">{{ $category }}</span>
-                        <div class="flex-1 h-px bg-white/5"></div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 {{ $services->count() > 1 ? 'md:grid-cols-2' : 'md:grid-cols-1' }} gap-6">
-                        @foreach($services as $index => $service)
-                            @php
-                                $featuredImage = null;
-                                if ($service->slug === 'walkthrough-animation') {
-                                    $videoMedia = $service->media->sortBy('sort_order')->first();
-                                } else {
-                                    $mediaObj = $service->media->where('file_type', '!=', 'video')->sortBy('sort_order')->first();
-                                    $featuredImage = $mediaObj ? webp_asset(parse_url(Storage::url($mediaObj->file_path), PHP_URL_PATH)) : null;
-                                }
-                                
-                                if (!$featuredImage && $service->slug !== 'walkthrough-animation') {
-                                    $featuredImage = $service->slug === 'interior-renders' ? webp_asset('/img/interior_render.png') : webp_asset('/img/exterior_render.png');
-                                }
-                            @endphp
-                            
-                            <a href="{{ route('service.show', $service->slug) }}" class="group relative overflow-hidden aspect-[16/10] bg-black border border-white/5 block">
-                                @if($service->slug === 'walkthrough-animation' && isset($videoMedia))
-                                    @php
-                                        $isYoutube = str_contains($videoMedia->file_path, 'youtube.com') || str_contains($videoMedia->file_path, 'youtu.be');
-                                    @endphp
-                                    @if($isYoutube)
-                                        <!-- Embed youtube container with autoplay static cover -->
-                                        <div class="w-full h-full relative">
-                                            <div class="absolute inset-0 bg-cover bg-center opacity-85 transition-opacity duration-500 group-hover:opacity-60" style="background-image: url('https://img.youtube.com/vi/{{ preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $videoMedia->file_path, $match) ? $match[1] : '' }}/hqdefault.jpg')"></div>
-                                        </div>
-                                    @else
-                                        <video src="{{ Storage::url($videoMedia->file_path) }}" autoplay muted loop playsinline class="w-full h-full object-cover opacity-80 group-hover:opacity-55 transition-opacity duration-700"></video>
-                                    @endif
-                                @else
-                                    <img src="{{ $featuredImage }}" alt="{{ $service->title }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-55 transition-all duration-700 ease-out group-hover:scale-105">
-                                @endif
-                                
-                                <!-- Sleek overlay gradient -->
-                                <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-transparent to-transparent opacity-60 group-hover:opacity-85 transition-opacity duration-300"></div>
-                                
-                                <!-- Info and arrow slide transition -->
-                                <div class="absolute bottom-6 left-6 right-6 md:bottom-8 md:left-8 md:right-8 flex justify-between items-end">
-                                    <div class="max-w-[80%]">
-                                        <span class="text-[9px] uppercase tracking-[0.2em] text-accent-400 font-bold mb-1.5 block">Exhibition / {{ $service->title }}</span>
-                                        <h4 class="text-2xl md:text-3xl font-display font-medium text-white uppercase tracking-wide group-hover:text-accent-300 transition-colors" style="font-weight: 300;">{{ $service->title }}</h4>
-                                    </div>
-                                    
-                                    <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/50 group-hover:border-accent-400 group-hover:text-white transition-all duration-300 transform group-hover:translate-x-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                    </div>
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @empty
-                <div class="text-center py-12">
-                    <p class="text-gray-500">More selected works coming soon.</p>
-                </div>
-            @endforelse
+        <div class="hidden md:block text-right">
+            <div class="w-16 h-px bg-accent-400/30 mb-2 ml-auto"></div>
+            <p class="text-xs text-white/30 uppercase tracking-widest font-light">High-Fidelity<br>Architectural Visualization</p>
         </div>
     </div>
+
+    @forelse($editorialServices as $idx => $service)
+        @php
+            $isEven = $idx % 2 === 0;
+            if ($service->slug === 'walkthrough-animation') {
+                $videoMedia = $service->media->sortBy('sort_order')->first();
+                $isYt = $videoMedia && (str_contains($videoMedia->file_path, 'youtube.com') || str_contains($videoMedia->file_path, 'youtu.be'));
+                if ($isYt && preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $videoMedia->file_path, $ytm)) {
+                    $youtubeThumb = "https://img.youtube.com/vi/{$ytm[1]}/maxresdefault.jpg";
+                } else { $youtubeThumb = null; }
+                $featuredImage = null;
+            } else {
+                $videoMedia = null;
+                $youtubeThumb = null;
+                $mediaObj = $service->media->where('file_type', '!=', 'video')->sortBy('sort_order')->first();
+                $featuredImage = $mediaObj ? webp_asset(parse_url(Storage::url($mediaObj->file_path), PHP_URL_PATH)) : null;
+                if (!$featuredImage) {
+                    $featuredImage = $service->slug === 'interior-renders' ? webp_asset('/img/interior_render.png') : webp_asset('/img/exterior_render.png');
+                }
+            }
+            $numStr = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
+            $imgSrc = $youtubeThumb ?? $featuredImage;
+        @endphp
+
+        <a href="{{ route('service.show', $service->slug) }}"
+           class="service-editorial-item group block relative"
+           style="text-decoration:none;">
+            <div class="flex flex-col {{ $isEven ? 'md:flex-row' : 'md:flex-row-reverse' }} min-h-[80vh] md:min-h-[65vh]">
+
+                {{-- Image panel --}}
+                <div class="relative overflow-hidden w-full md:w-3/5 bg-black" style="min-height: 280px;">
+                    @if($imgSrc)
+                        <img src="{{ $imgSrc }}" alt="{{ $service->title }}"
+                             class="absolute inset-0 w-full h-full object-cover opacity-80 transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]">
+                    @endif
+                    <div class="absolute inset-0 pointer-events-none"
+                         style="background: linear-gradient(to {{ $isEven ? 'right' : 'left' }}, transparent 50%, rgba(4,16,15,0.75) 100%);"></div>
+                </div>
+
+                {{-- Text panel --}}
+                <div class="relative w-full md:w-2/5 bg-brand-950 flex flex-col justify-center px-10 md:px-16 py-14 md:py-24 overflow-hidden">
+                    <span class="service-number {{ $isEven ? '-right-2' : '-left-2' }} bottom-0">{{ $numStr }}</span>
+
+                    <p class="text-[10px] uppercase tracking-[0.35em] text-accent-400/80 font-bold mb-5 relative z-10">{{ $service->category ?? 'Visualization' }}</p>
+
+                    <h3 class="font-display text-4xl md:text-5xl lg:text-[3.2rem] font-light text-white uppercase leading-[1.05] mb-5 relative z-10" style="letter-spacing:0.07em;">
+                        {{ $service->title }}
+                    </h3>
+
+                    <div class="w-10 h-px bg-accent-400/50 mb-6 relative z-10"></div>
+
+                    <p class="text-gray-400 font-light text-sm md:text-[0.95rem] leading-relaxed max-w-xs mb-10 relative z-10">
+                        {{ Str::limit($service->description ?? 'Precision-crafted architectural visuals that transform your ideas into reality.', 130) }}
+                    </p>
+
+                    <div class="flex items-center gap-4 relative z-10">
+                        <span class="text-[10px] uppercase tracking-widest text-accent-400 font-bold group-hover:text-white transition-colors duration-300">View Work</span>
+                        <div class="w-8 h-8 rounded-full border border-accent-400/40 flex items-center justify-center group-hover:bg-accent-500 group-hover:border-accent-500 transition-all duration-300">
+                            <svg class="w-3.5 h-3.5 text-accent-400 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if(!$loop->last)
+                <div class="w-full h-px bg-white/5"></div>
+            @endif
+        </a>
+    @empty
+        <div class="text-center py-12 text-gray-500">More selected works coming soon.</div>
+    @endforelse
 </section>
 
 <!-- Testimonials Section -->
@@ -522,7 +601,37 @@
 
 @push('scripts')
 <script>
+// ── Intro Splash Animation ──
+(function() {
+    const splash = document.getElementById('intro-splash');
+    if (!splash) return;
+
+    // Check if already shown this session
+    if (sessionStorage.getItem('introShown')) {
+        splash.classList.add('phase-out');
+        setTimeout(() => splash.classList.add('gone'), 700);
+        return;
+    }
+
+    // Phase in: fade up text + expand line
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            splash.classList.add('phase-in');
+        }, 120);
+    });
+
+    // Hold visible for ~2.2 seconds then fade out
+    setTimeout(() => {
+        splash.classList.add('phase-out');
+        setTimeout(() => {
+            splash.classList.add('gone');
+            sessionStorage.setItem('introShown', '1');
+        }, 700);
+    }, 2200);
+})();
+
 // ── Animated Stat Counters ──
+
 (function() {
     const section = document.getElementById('stats-section');
     if (!section) return;
