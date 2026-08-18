@@ -94,6 +94,8 @@
                 allow="autoplay; encrypted-media" 
                 allowfullscreen>
         </iframe>
+        <!-- Transparent click shield to intercept all touches/clicks and prevent YouTube controls from showing -->
+        <div class="absolute inset-0 bg-transparent z-10 pointer-events-auto"></div>
     </div>
     <!-- Dark overlay for text readability -->
     <div class="absolute inset-0 z-0 bg-gradient-to-b from-brand-950/60 via-brand-950/30 to-brand-950/85"></div>
