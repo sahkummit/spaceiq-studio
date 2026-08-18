@@ -111,22 +111,22 @@
             <div class="flex items-center justify-center gap-8 md:gap-16 text-center flex-wrap" id="stats-section">
                 <div>
                     <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" data-count="12000" data-suffix="+">0</p>
-                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Successful Projects</p>
+                    <p class="text-[9px] uppercase tracking-widest text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Successful Projects</p>
                 </div>
                 <div class="stats-strip-sep hidden md:block"></div>
                 <div>
                     <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" data-count="500" data-suffix="+">0</p>
-                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Happy Clients</p>
+                    <p class="text-[9px] uppercase tracking-widest text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Happy Clients</p>
                 </div>
                 <div class="stats-strip-sep hidden md:block"></div>
                 <div>
                     <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" data-count="15" data-suffix="+">0</p>
-                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Countries</p>
+                    <p class="text-[9px] uppercase tracking-widest text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Countries</p>
                 </div>
                 <div class="stats-strip-sep hidden md:block"></div>
                 <div>
                     <p class="text-3xl md:text-4xl font-display font-bold text-white mb-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" data-count="10" data-suffix="+">0</p>
-                    <p class="text-[9px] uppercase tracking-widest text-accent-400 font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Years of Experience</p>
+                    <p class="text-[9px] uppercase tracking-widest text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Years of Experience</p>
                 </div>
             </div>
         </div>
