@@ -86,14 +86,10 @@
 <!-- Hero Section -->
 <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-screen flex items-center">
     <!-- Background Video Wrapper (Solid Dark Backdrop) -->
-    <div class="absolute inset-0 z-0 bg-brand-950 overflow-hidden">
-        <!-- Background Video (YouTube Walkthrough Showreel - Interior Animation) -->
-        <iframe class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] pointer-events-none opacity-75 select-none scale-[1.35]" 
-                src="https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&showinfo=0&rel=0&modestbranding=1&start=26&iv_load_policy=3&disablekb=1&fs=0" 
-                frameborder="0" 
-                allow="autoplay; encrypted-media" 
-                allowfullscreen>
-        </iframe>
+    <div class="absolute inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
+        <!-- High-Quality Ambient Background Image shown while video loads -->
+        <div class="absolute inset-0 bg-cover bg-center opacity-45 filter blur-[2px] scale-[1.02]" 
+             style="background-image: url('{{ asset('img/hero_bg.webp') }}');" id="hero-video-fallback"></div>
         <!-- Transparent click shield to intercept all touches/clicks and prevent YouTube controls from showing -->
         <div class="absolute inset-0 bg-transparent z-10 pointer-events-auto"></div>
     </div>
@@ -799,6 +795,38 @@
     });
     
     steps.forEach(step => observer.observe(step));
+})();
+
+// ── Lazy Load YouTube Background Video ──
+(function() {
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const container = document.getElementById('hero-video-container');
+            const fallback = document.getElementById('hero-video-fallback');
+            if (!container) return;
+            
+            const iframe = document.createElement('iframe');
+            iframe.className = "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] pointer-events-none opacity-75 select-none scale-[1.35]";
+            iframe.src = "https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&showinfo=0&rel=0&modestbranding=1&start=26&iv_load_policy=3&disablekb=1&fs=0";
+            iframe.frameBorder = "0";
+            iframe.allow = "autoplay; encrypted-media";
+            iframe.allowFullscreen = true;
+            
+            // Insert before the click shield
+            container.insertBefore(iframe, container.lastElementChild);
+            
+            // Fade out fallback once loaded (approx 1.5s after injection to allow smooth transition)
+            iframe.addEventListener('load', () => {
+                setTimeout(() => {
+                    if (fallback) {
+                        fallback.style.transition = 'opacity 1.2s ease';
+                        fallback.style.opacity = '0';
+                        setTimeout(() => fallback.remove(), 1200);
+                    }
+                }, 1000);
+            });
+        }, 800);
+    });
 })();
 </script>
 @endpush
