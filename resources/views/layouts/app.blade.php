@@ -277,84 +277,86 @@
 </head>
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
     @if(request()->routeIs('home'))
-    <!-- BIG.dk Opening Curtain & Centered Logo -->
+    <!-- BIG.dk Opening Curtain & Centered Full Brand Logo -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
-    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; color: #ffffff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 10vw, 7rem); letter-spacing: 0.05em; white-space: nowrap; line-height: 1; will-change: transform, opacity; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;">Space IQ</div>
+    
+    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; will-change: transform, opacity; -webkit-font-smoothing: antialiased;">
+        <div class="flex items-center gap-4 sm:gap-6">
+            <img src="{{ asset('img/logo.png') }}" alt="Space IQ" class="h-20 sm:h-28 md:h-36 w-auto drop-shadow-2xl">
+            <div class="flex flex-col leading-none text-left">
+                <span class="font-display font-bold tracking-wider text-white text-3xl sm:text-5xl md:text-6xl">Space IQ</span>
+                <span class="font-display font-light tracking-[0.25em] text-white/75 uppercase text-xs sm:text-sm md:text-base mt-1 sm:mt-2">Design Studio</span>
+            </div>
+        </div>
+    </div>
 
     <script>
     (function() {
         function runIntro() {
-            const navText = document.getElementById('nav-brand-text');
-            const navSub  = document.getElementById('nav-brand-sub');
-            const navImg  = document.getElementById('nav-brand-img');
-            const curtain = document.getElementById('intro-curtain');
-            const brand   = document.getElementById('intro-brand');
+            const navContainer = document.getElementById('nav-brand-container');
+            const curtain      = document.getElementById('intro-curtain');
+            const brand        = document.getElementById('intro-brand');
 
-            if (!navText || !curtain || !brand) return;
+            if (!navContainer || !curtain || !brand) return;
 
-            // Hide nav elements initially
-            navText.style.opacity = '0';
-            if (navSub) navSub.style.opacity = '0';
-            if (navImg) navImg.style.opacity = '0';
+            // Hide navbar logo initially
+            navContainer.style.opacity = '0';
 
-            // Measure initial dimensions and place dead-center using GPU translate3d
-            const startWidth  = brand.offsetWidth;
-            const startHeight = brand.offsetHeight;
-            const startX = (window.innerWidth - startWidth) / 2;
-            const startY = (window.innerHeight - startHeight) / 2;
+            const introImg = brand.querySelector('img');
+            function startSequence() {
+                // Measure initial dimensions and place dead-center using GPU translate3d
+                const startWidth  = brand.offsetWidth;
+                const startHeight = brand.offsetHeight;
+                const startX = (window.innerWidth - startWidth) / 2;
+                const startY = (window.innerHeight - startHeight) / 2;
 
-            brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(1)`;
+                brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(1)`;
 
-            // Hold for 750ms on pure black screen
-            setTimeout(() => {
-                // Measure exact target coordinates of the navbar text
-                const targetRect = navText.getBoundingClientRect();
-                const targetX = targetRect.left;
-                const targetY = targetRect.top;
-                const scaleX  = targetRect.width / startWidth;
-                const scaleY  = targetRect.height / startHeight;
-
-                const brandDuration   = 1400; // 1.4s silky smooth
-                const curtainDuration = 1800; // 1.8s smooth architectural lift
-                const ease = 'cubic-bezier(0.65, 0, 0.35, 1)';
-
-                // Set GPU-only hardware-accelerated transitions
-                brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 250ms ease ${brandDuration - 100}ms`;
-                curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
-
-                // Trigger smooth GPU translation and scale
-                brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(${scaleX}, ${scaleY})`;
-                curtain.style.transform = 'translate3d(0, -100%, 0)';
-
-                // Reveal logo icon and subtitle as text glides in
+                // Hold for 750ms on pure black screen
                 setTimeout(() => {
-                    if (navImg) {
-                        navImg.style.transition = 'opacity 500ms ease';
-                        navImg.style.opacity = '1';
-                    }
-                    if (navSub) {
-                        navSub.style.transition = 'opacity 500ms ease';
-                        navSub.style.opacity = '1';
-                    }
-                }, brandDuration * 0.55);
+                    // Measure exact target coordinates of the navbar brand container
+                    const targetRect = navContainer.getBoundingClientRect();
+                    const targetX = targetRect.left;
+                    const targetY = targetRect.top;
+                    const scaleX  = targetRect.width / startWidth;
+                    const scaleY  = targetRect.height / startHeight;
 
-                // Seamless handoff to navbar text
-                setTimeout(() => {
-                    navText.style.transition = 'opacity 250ms ease';
-                    navText.style.opacity = '1';
-                    brand.style.opacity = '0';
-                }, brandDuration - 100);
+                    const brandDuration   = 1400; // 1.4s silky smooth
+                    const curtainDuration = 1800; // 1.8s smooth architectural lift
+                    const ease = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
-                // Clean up elements from DOM
-                setTimeout(() => {
-                    brand.remove();
-                }, brandDuration + 200);
+                    // GPU-only hardware-accelerated transitions
+                    brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 250ms ease ${brandDuration - 100}ms`;
+                    curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
 
-                setTimeout(() => {
-                    curtain.remove();
-                }, curtainDuration + 100);
+                    // Trigger smooth GPU translation and scale
+                    brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(${scaleX}, ${scaleY})`;
+                    curtain.style.transform = 'translate3d(0, -100%, 0)';
 
-            }, 750);
+                    // Seamless handoff to the actual navbar logo container
+                    setTimeout(() => {
+                        navContainer.style.transition = 'opacity 250ms ease';
+                        navContainer.style.opacity = '1';
+                        brand.style.opacity = '0';
+                    }, brandDuration - 100);
+
+                    // Clean up elements from DOM
+                    setTimeout(() => {
+                        brand.remove();
+                    }, brandDuration + 200);
+
+                    setTimeout(() => {
+                        curtain.remove();
+                    }, curtainDuration + 100);
+
+                }, 750);
+            }
+
+            if (introImg && !introImg.complete) {
+                introImg.onload = startSequence;
+            } else {
+                startSequence();
+            }
         }
 
         if (document.readyState === 'loading') {
