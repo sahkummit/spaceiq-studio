@@ -568,7 +568,7 @@
                                          $mediaUrl = webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
                                          $mediaIndex = $lightboxImagesCollect->values()->filter(fn($x) => $x['url'] === $mediaUrl)->keys()->first() ?? 0;
                                      @endphp
-                                     <div class="relative group overflow-hidden rounded-md shadow-xl tilt-card {{ $isTallImage ? 'max-w-[60%] md:max-w-[50%] mx-auto' : 'w-full' }}" 
+                                     <div class="relative group overflow-hidden border border-white/5 bg-black {{ $isTallImage ? 'max-w-[60%] md:max-w-[50%] mx-auto' : 'w-full' }}" 
                                           @if($media->file_type !== 'video') 
                                              @click="lightboxOpen = true; lightboxIndex = {{ $mediaIndex }}; lightboxUrl = '{{ $mediaUrl }}'; lightboxTitle = '{{ $media->title }}'; initPannellum('{{ $mediaUrl }}')" 
                                           @endif>
@@ -584,7 +584,7 @@
                                                 }
                                             @endphp
                                             @if($isYoutube)
-                                                <div class="relative w-full aspect-video overflow-hidden rounded-md shadow-xl bg-brand-900/50">
+                                                <div class="relative w-full aspect-video overflow-hidden border border-white/5 bg-brand-900/50">
                                                     <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=0&controls=1&rel=0" 
                                                             class="absolute inset-0 w-full h-full" 
                                                             frameborder="0" 
@@ -593,7 +593,7 @@
                                                     </iframe>
                                                 </div>
                                             @else
-                                                <video src="{{ Storage::url($media->file_path) }}" controls class="w-full h-auto block rounded-md shadow-xl"></video>
+                                                <video src="{{ Storage::url($media->file_path) }}" controls class="w-full h-auto block border border-white/5"></video>
                                             @endif
                                         @else
                                             <div class="cursor-pointer overflow-hidden bg-brand-900/50 relative"

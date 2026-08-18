@@ -176,11 +176,13 @@
 <!-- Services Grid -->
 <section id="services" class="py-24 relative bg-brand-950">
     <div class="container mx-auto px-6 xl:px-12" style="max-width:1536px">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl md:text-5xl font-display mb-4 font-light"><span class="font-bold">Our</span> Masterpieces</h2>
+        <div class="text-center mb-20">
+            <h2 class="text-4xl md:text-6xl font-display font-light uppercase tracking-[0.2em] text-white">Selected Works.</h2>
+            <p class="text-xs uppercase tracking-widest text-accent-400 font-bold mt-4">High-Fidelity Architectural Visualizations</p>
+            <div class="w-12 h-px bg-accent-500/40 mx-auto mt-8"></div>
         </div>
         
-        <div class="grid grid-cols-1 gap-20">
+        <div class="space-y-24">
             @php
                 $groupedServicesHome = \App\Models\Service::where('is_active', true)
                     ->whereNotIn('slug', ['autocad-drafting', 'interior-design-consultation'])
@@ -190,305 +192,72 @@
             @endphp
             
             @forelse($groupedServicesHome as $category => $services)
-                <div class="mb-4">
-                    <h3 class="text-2xl text-accent-400 uppercase tracking-widest font-bold mb-10 border-b border-white/10 pb-4 inline-block">{{ $category }}</h3>
-                    <div class="grid grid-cols-1 gap-12">
+                <div>
+                    <!-- Subtle category title -->
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="text-xs uppercase tracking-[0.25em] font-black text-accent-400/90">{{ $category }}</span>
+                        <div class="flex-1 h-px bg-white/5"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 {{ $services->count() > 1 ? 'md:grid-cols-2' : 'md:grid-cols-1' }} gap-6">
                         @foreach($services as $index => $service)
                             @php
-                                $imageUrls = collect();
-                                if ($service->slug !== 'walkthrough-animation' && $service->slug !== '360-views') {
-                                    $selected = [];
-                                    $seenGenres = [];
-                                    
-                                    foreach ($service->media->where('file_type', '!=', 'video')->sortBy('sort_order') as $media) {
-                                        $path = public_path(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
-                                        
-                                        // Ensure width > height (landscape) to fit the frame perfectly
-                                        $isLandscape = true;
-                                        if (file_exists($path)) {
-                                            $size = @getimagesize($path);
-                                            if ($size && ($size[1] > $size[0])) {
-                                                $isLandscape = false;
-                                            }
-                                        }
-                                        
-                                        if (!$isLandscape) {
-                                            continue;
-                                        }
-                                        
-                                        $genre = 'other';
-                                        $title = strtolower($media->title);
-                                        $cat = strtolower($media->category ?? '');
-                                        
-                                        if (str_contains($title, 'bedroom')) {
-                                            $genre = 'bedroom';
-                                        } elseif (str_contains($title, 'living')) {
-                                            $genre = 'living';
-                                        } elseif (str_contains($title, 'bath')) {
-                                            $genre = 'bathroom';
-                                        } elseif (str_contains($title, 'dining') || str_contains($title, 'kitchen') || str_contains($title, 'cafe') || str_contains($title, 'bar')) {
-                                            $genre = 'dining_kitchen_bar';
-                                        } elseif (str_contains($title, 'office') || str_contains($title, 'conference') || str_contains($title, 'reception') || str_contains($title, 'study') || str_contains($title, 'library')) {
-                                            $genre = 'workspace';
-                                        } elseif (str_contains($title, 'gym')) {
-                                            $genre = 'gym';
-                                        } elseif (str_contains($title, 'mansion') || str_contains($title, 'house') || str_contains($title, 'home') || str_contains($title, 'townhouse') || str_contains($title, 'residence') || str_contains($title, 'suburban')) {
-                                            $genre = 'residential_elevation';
-                                        } elseif (str_contains($title, 'commercial') || str_contains($title, 'building') || str_contains($title, 'retail') || str_contains($title, 'theatre') || str_contains($title, 'office complex')) {
-                                            $genre = 'commercial_elevation';
-                                        } elseif (str_contains($title, 'landscape') || str_contains($title, 'pool') || str_contains($title, 'garden') || str_contains($title, 'backyard') || str_contains($title, 'lawn')) {
-                                            $genre = 'landscape_design';
-                                        } elseif (str_contains($title, 'black & white') || str_contains($title, 'b&w') || $cat === 'b&w' || $cat === 'b-w' || $cat === 'bw') {
-                                            $genre = 'floorplan_bw';
-                                        } elseif (str_contains($title, 'colour') || str_contains($title, 'color') || $cat === 'color') {
-                                            $genre = 'floorplan_color';
-                                        } elseif (str_contains($title, 'site plan') || $cat === 'site plan' || $cat === 'site-plan') {
-                                            $genre = 'floorplan_site';
-                                        } elseif ($cat === 'residential') {
-                                            $genre = 'floorplan_residential';
-                                        }
-                                        
-                                        if ($genre === 'other' || !in_array($genre, $seenGenres)) {
-                                            if ($genre !== 'other') {
-                                                $seenGenres[] = $genre;
-                                            }
-                                            $imageUrls->push([
-                                                'url' => webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH)),
-                                                'title' => $media->title ?? $service->title . ' - Project ' . ($imageUrls->count() + 1)
-                                            ]);
-                                            if ($imageUrls->count() >= 5) {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    
-                                    if ($imageUrls->count() < 5) {
-                                        foreach ($service->media->where('file_type', '!=', 'video')->sortBy('sort_order') as $media) {
-                                            $url = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
-                                            if (!$imageUrls->pluck('url')->contains(webp_asset($url))) {
-                                                $path = public_path($url);
-                                                $isLandscape = true;
-                                                if (file_exists($path)) {
-                                                    $size = @getimagesize($path);
-                                                    if ($size && ($size[1] > $size[0])) {
-                                                        $isLandscape = false;
-                                                    }
-                                                }
-                                                if ($isLandscape) {
-                                                    $imageUrls->push([
-                                                        'url' => webp_asset($url),
-                                                        'title' => $media->title ?? $service->title . ' - Project ' . ($imageUrls->count() + 1)
-                                                    ]);
-                                                    if ($imageUrls->count() >= 5) {
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    
-                                    if ($imageUrls->isEmpty()) {
-                                        $imageUrls->push([
-                                            'url' => $index % 2 == 0 ? webp_asset('/img/exterior_render.png') : webp_asset('/img/interior_render.png'),
-                                            'title' => $service->title . ' - Project Placeholder'
-                                        ]);
-                                    }
+                                $featuredImage = null;
+                                if ($service->slug === 'walkthrough-animation') {
+                                    $videoMedia = $service->media->sortBy('sort_order')->first();
+                                } else {
+                                    $mediaObj = $service->media->where('file_type', '!=', 'video')->sortBy('sort_order')->first();
+                                    $featuredImage = $mediaObj ? webp_asset(parse_url(Storage::url($mediaObj->file_path), PHP_URL_PATH)) : null;
+                                }
+                                
+                                if (!$featuredImage && $service->slug !== 'walkthrough-animation') {
+                                    $featuredImage = $service->slug === 'interior-renders' ? webp_asset('/img/interior_render.png') : webp_asset('/img/exterior_render.png');
                                 }
                             @endphp
-                        <div class="relative group/card w-full"
-                             @if($service->slug !== 'walkthrough-animation' && $service->slug !== '360-views')
-                             x-data="{ 
-                                 currentIndex: 0, 
-                                 images: {{ json_encode($imageUrls->values()->toArray()) }},
-                                 total: {{ $imageUrls->count() }},
-                                 touchStartX: 0,
-                                 touchEndX: 0,
-                                 next() {
-                                     this.currentIndex = (this.currentIndex + 1) % this.total;
-                                 },
-                                 prev() {
-                                     this.currentIndex = (this.currentIndex - 1 + this.total) % this.total;
-                                 },
-                                 handleTouchStart(e) {
-                                     this.touchStartX = e.touches[0].clientX;
-                                 },
-                                 handleTouchEnd(e) {
-                                     this.touchEndX = e.changedTouches[0].clientX;
-                                     this.handleSwipe();
-                                 },
-                                 handleSwipe() {
-                                     const diff = this.touchStartX - this.touchEndX;
-                                     if (Math.abs(diff) > 40) {
-                                         if (diff > 0) {
-                                             this.next();
-                                         } else {
-                                             this.prev();
-                                         }
-                                     }
-                                 },
-                                 init() {
-                                     if (this.total > 1) {
-                                         setInterval(() => this.next(), 10000);
-                                     }
-                                 }
-                             }"
-                             @touchstart="handleTouchStart($event)"
-                             @touchend="handleTouchEnd($event)"
-                             style="touch-action: pan-y;"
-                             @endif
-                        >
-                            <!-- Tilting Card Container -->
-                            <div class="flex flex-col {{ $index % 2 == 0 ? 'md:flex-row' : 'md:flex-row-reverse' }} items-center group bg-brand-900/30 border border-white/5 hover:border-accent-400/20 rounded-xl overflow-hidden transition-colors duration-500 tilt-card {{ $index % 2 == 0 ? 'reveal-left' : 'reveal-right' }}">
-                                <div class="w-full md:w-1/2 p-8 md:p-10 xl:p-12 z-10 relative">
-                                    <h4 class="text-3xl font-display font-bold text-white mb-4 uppercase">{{ $service->title }}</h4>
-                                    <p class="text-gray-400 mb-8 font-light text-lg leading-relaxed">{{ $service->short_description ?? Str::limit(strip_tags($service->description), 100) }}</p>
-                                    <a href="{{ route('service.show', $service->slug) }}" class="text-accent-400 hover:text-white font-medium flex items-center gap-2 group-hover:gap-4 transition-all w-max uppercase tracking-wider text-sm border-b border-accent-400 hover:border-white pb-1">
-                                        View Gallery <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                    </a>
-                                </div>
-                                @if($service->slug === 'walkthrough-animation')
+                            
+                            <a href="{{ route('service.show', $service->slug) }}" class="group relative overflow-hidden aspect-[16/10] bg-black border border-white/5 block">
+                                @if($service->slug === 'walkthrough-animation' && isset($videoMedia))
                                     @php
-                                        $videoMedia = $service->media->sortBy('sort_order')->first();
-                                        $isYoutube = false;
-                                        $youtubeId = '';
-                                        if ($videoMedia) {
-                                            if (str_contains($videoMedia->file_path, 'youtube.com') || str_contains($videoMedia->file_path, 'youtu.be')) {
-                                                $isYoutube = true;
-                                                if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $videoMedia->file_path, $match)) {
-                                                    $youtubeId = $match[1];
-                                                }
-                                            }
-                                        }
+                                        $isYoutube = str_contains($videoMedia->file_path, 'youtube.com') || str_contains($videoMedia->file_path, 'youtu.be');
                                     @endphp
-                                    <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
-                                        @if($videoMedia)
-                                            @if($isYoutube)
-                                                <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&mute=1&controls=1&rel=0" 
-                                                        class="w-full h-full" 
-                                                        frameborder="0" 
-                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                                        allowfullscreen>
-                                                </iframe>
-                                            @else
-                                                <video src="{{ Storage::url($videoMedia->file_path) }}" autoplay muted loop playsinline controls class="w-full h-full object-cover"></video>
-                                            @endif
-                                        @else
-                                            <div class="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                                                Video Showcase Coming Soon
-                                            </div>
-                                        @endif
-                                    </div>
-                                @elseif($service->slug === '360-views')
-                                    @php
-                                        $panoramaMedia = $service->media->where('id', 105)->first() ?? $service->media->first();
-                                        $panoPath = $panoramaMedia ? webp_asset(parse_url(Storage::url($panoramaMedia->file_path), PHP_URL_PATH)) : null;
-                                    @endphp
-                                    <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
-                                        @if($panoPath)
-                                            <div id="home-panorama-{{ $panoramaMedia->id }}" 
-                                                 class="w-full h-full"
-                                                 x-data="{ viewer: null }"
-                                                 x-init="$nextTick(() => {
-                                                     viewer = pannellum.viewer('home-panorama-{{ $panoramaMedia->id }}', {
-                                                         type: 'equirectangular',
-                                                         panorama: '{{ $panoPath }}',
-                                                         autoLoad: true,
-                                                         compass: false,
-                                                         autoRotate: -2,
-                                                         autoRotateInactivityDelay: -1,
-                                                         mouseZoom: false,
-                                                         showZoomCtrl: false,
-                                                         showFullscreenCtrl: true
-                                                     });
-                                                     const stopRotate = () => {
-                                                         if (viewer) viewer.stopAutoRotate();
-                                                     };
-                                                     $el.addEventListener('mousedown', stopRotate, { once: true });
-                                                     $el.addEventListener('touchstart', stopRotate, { once: true });
-                                                     $el.addEventListener('pointerdown', stopRotate, { once: true });
-                                                 })">
-                                            </div>
-                                        @else
-                                            <div class="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                                                360 View Showcase Coming Soon
-                                            </div>
-                                        @endif
-                                    </div>
-                                @else
-                                    <div class="w-full md:w-1/2 relative overflow-hidden h-[300px] sm:h-[350px] md:h-[400px] bg-brand-950">
+                                    @if($isYoutube)
+                                        <!-- Embed youtube container with autoplay static cover -->
                                         <div class="w-full h-full relative">
-                                            <template x-for="(item, idx) in images" :key="idx">
-                                                <div x-show="currentIndex === idx" 
-                                                     x-transition:enter="transition ease-out duration-700"
-                                                     x-transition:enter-start="opacity-0 scale-105"
-                                                     x-transition:enter-end="opacity-100 scale-100"
-                                                     x-transition:leave="transition ease-in duration-500"
-                                                     x-transition:leave-start="opacity-100"
-                                                     x-transition:leave-end="opacity-0"
-                                                     class="absolute inset-0 w-full h-full flex items-center justify-center bg-brand-950 overflow-hidden"
-                                                     x-data="{ bgLoaded: false, fgLoaded: false }">
-                                                     <!-- Skeleton shimmer shown until both images load -->
-                                                     <div class="absolute inset-0 skeleton-shimmer z-0" x-show="!fgLoaded"></div>
-                                                     <!-- Blurred Ambient Background Image -->
-                                                     <img :src="item.url"
-                                                          loading="lazy"
-                                                          decoding="async"
-                                                          @load="bgLoaded = true"
-                                                          class="absolute inset-0 w-full h-full object-cover blur-xl opacity-30 scale-110 pointer-events-none lazy-img animate-kenburns"
-                                                          :class="bgLoaded ? 'loaded' : ''">
-                                                     <!-- Main Foreground Image (Fully Visible) -->
-                                                     <img :src="item.url"
-                                                          loading="lazy"
-                                                          decoding="async"
-                                                          @load="fgLoaded = true"
-                                                          class="relative z-10 max-w-full max-h-full object-contain grayscale-[15%] hover:grayscale-0 transition-all duration-700 lazy-img animate-kenburns"
-                                                          :class="fgLoaded ? 'loaded' : ''"
-                                                          :alt="item.title || 'Space IQ Portfolio Project'">
-                                                </div>
-                                            </template>
-                                            <div class="absolute inset-0 bg-black/10 pointer-events-none z-10"></div>
+                                            <div class="absolute inset-0 bg-cover bg-center opacity-85 transition-opacity duration-500 group-hover:opacity-60" style="background-image: url('https://img.youtube.com/vi/{{ preg_match(\'%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i\', $videoMedia->file_path, $match) ? $match[1] : \'\' }}/hqdefault.jpg')"></div>
                                         </div>
-
-                                        <template x-if="total > 1">
-                                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20 bg-brand-950/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/5">
-                                                <template x-for="(item, idx) in images" :key="idx">
-                                                    <button @click="currentIndex = idx" 
-                                                             class="w-1.5 h-1.5 rounded-full transition-all focus:outline-none cursor-pointer"
-                                                             :class="currentIndex === idx ? 'bg-accent-400 w-3' : 'bg-white/40 hover:bg-white/70'"></button>
-                                                </template>
-                                            </div>
-                                        </template>
-                                    </div>
+                                    @else
+                                        <video src="{{ Storage::url($videoMedia->file_path) }}" autoplay muted loop playsinline class="w-full h-full object-cover opacity-80 group-hover:opacity-55 transition-opacity duration-700"></video>
+                                    @endif
+                                @else
+                                    <img src="{{ $featuredImage }}" alt="{{ $service->title }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-55 transition-all duration-700 ease-out group-hover:scale-105">
                                 @endif
-                            </div>
-
-                            <!-- Fixed Navigation Arrows (Outside tilt-card) -->
-                            @if($service->slug !== 'walkthrough-animation' && $service->slug !== '360-views')
-                            <template x-if="total > 1">
-                                <div class="absolute bottom-0 md:top-0 md:bottom-0 {{ $index % 2 == 0 ? 'right-0' : 'left-0 md:right-auto' }} w-full md:w-1/2 h-[300px] sm:h-[350px] md:h-auto flex items-center justify-between px-4 z-30 pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
-                                    <button @click="prev()" class="p-2 rounded-full bg-brand-950/80 border border-white/10 text-white hover:text-accent-400 hover:scale-110 transition-all focus:outline-none pointer-events-auto cursor-pointer">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-                                    </button>
-                                    <button @click="next()" class="p-2 rounded-full bg-brand-950/80 border border-white/10 text-white hover:text-accent-400 hover:scale-110 transition-all focus:outline-none pointer-events-auto cursor-pointer">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                                    </button>
+                                
+                                <!-- Sleek overlay gradient -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-transparent to-transparent opacity-60 group-hover:opacity-85 transition-opacity duration-300"></div>
+                                
+                                <!-- Info and arrow slide transition -->
+                                <div class="absolute bottom-6 left-6 right-6 md:bottom-8 md:left-8 md:right-8 flex justify-between items-end">
+                                    <div class="max-w-[80%]">
+                                        <span class="text-[9px] uppercase tracking-[0.2em] text-accent-400 font-bold mb-1.5 block">Exhibition / {{ $service->title }}</span>
+                                        <h4 class="text-2xl md:text-3xl font-display font-medium text-white uppercase tracking-wide group-hover:text-accent-300 transition-colors" style="font-weight: 300;">{{ $service->title }}</h4>
+                                    </div>
+                                    
+                                    <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/50 group-hover:border-accent-400 group-hover:text-white transition-all duration-300 transform group-hover:translate-x-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </div>
                                 </div>
-                            </template>
-                            @endif
-                        </div>
+                            </a>
                         @endforeach
                     </div>
                 </div>
             @empty
                 <div class="text-center py-12">
-                    <p class="text-gray-500">More services coming soon!</p>
+                    <p class="text-gray-500">More selected works coming soon.</p>
                 </div>
             @endforelse
         </div>
     </div>
 </section>
-
-
 
 <!-- Testimonials Section -->
 <section class="py-24 bg-brand-900 relative overflow-hidden">
