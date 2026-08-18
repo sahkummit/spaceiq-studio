@@ -296,10 +296,8 @@
         if (navSub) navSub.style.opacity = '0';
         if (navImg) navImg.style.opacity = '0';
 
-        // Measure exact initial rendered bounding box
+        // Measure start coordinates
         const startRect = brand.getBoundingClientRect();
-        
-        // Convert brand from translate(-50%,-50%) to direct pixel coordinates with origin 0 0
         brand.style.top = startRect.top + 'px';
         brand.style.left = startRect.left + 'px';
         brand.style.transform = 'none';
@@ -310,36 +308,46 @@
             // Measure exact target coordinates of the navbar Space IQ text
             const targetRect = navText.getBoundingClientRect();
             const deltaX = targetRect.left - startRect.left;
-            const deltaY = targetRect.top - startRect.top;
-            const scale  = targetRect.height / startRect.height;
+            const deltaY = targetRect.top  - startRect.top;
+            const scaleX = targetRect.width / startRect.width;
+            const scaleY = targetRect.height / startRect.height;
 
-            // Apply smooth 60fps GPU cubic-bezier transition
-            const timing = '1.3s cubic-bezier(0.77, 0, 0.175, 1)';
-            brand.style.transition = 'transform ' + timing;
-            curtain.style.transition = 'transform ' + timing;
+            const duration = 1200; // 1.2s
+            const ease = 'cubic-bezier(0.77, 0, 0.175, 1)';
+
+            // Apply smooth 60fps GPU transition with overlapping crossfade
+            brand.style.transition = `transform ${duration}ms ${ease}, opacity 300ms ease ${duration - 150}ms`;
+            curtain.style.transition = `transform ${duration}ms ${ease}`;
 
             // Trigger flight directly to navbar text coordinates and curtain lift
-            brand.style.transform = 'translate(' + deltaX + 'px, ' + deltaY + 'px) scale(' + scale + ')';
+            brand.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
             curtain.style.transform = 'translateY(-100%)';
 
             // Reveal logo icon and subtitle as text approaches
             setTimeout(() => {
                 if (navImg) {
-                    navImg.style.transition = 'opacity 0.4s ease';
+                    navImg.style.transition = 'opacity 500ms ease';
                     navImg.style.opacity = '1';
                 }
                 if (navSub) {
-                    navSub.style.transition = 'opacity 0.4s ease';
+                    navSub.style.transition = 'opacity 500ms ease';
                     navSub.style.opacity = '1';
                 }
-            }, 850);
+            }, duration * 0.55);
 
-            // Pixel-perfect handoff to permanent navbar text
+            // Smooth crossfade handoff so there is ZERO snapping or jumping
             setTimeout(() => {
+                navText.style.transition = 'opacity 300ms ease';
                 navText.style.opacity = '1';
+                brand.style.opacity = '0';
+            }, duration - 150);
+
+            // Clean up DOM elements after full completion
+            setTimeout(() => {
                 brand.remove();
                 curtain.remove();
-            }, 1350);
+            }, duration + 400);
+
         }, 700);
     })();
     </script>
