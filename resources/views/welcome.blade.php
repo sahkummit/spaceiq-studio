@@ -223,7 +223,7 @@
                                     @if($isYoutube)
                                         <!-- Embed youtube container with autoplay static cover -->
                                         <div class="w-full h-full relative">
-                                            <div class="absolute inset-0 bg-cover bg-center opacity-85 transition-opacity duration-500 group-hover:opacity-60" style="background-image: url('https://img.youtube.com/vi/{{ preg_match(\'%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i\', $videoMedia->file_path, $match) ? $match[1] : \'\' }}/hqdefault.jpg')"></div>
+                                            <div class="absolute inset-0 bg-cover bg-center opacity-85 transition-opacity duration-500 group-hover:opacity-60" style="background-image: url('https://img.youtube.com/vi/{{ preg_match(\'%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^\"&?/ ]{11})%i\', $videoMedia->file_path, $match) ? $match[1] : \'\' }}/hqdefault.jpg')"></div>
                                         </div>
                                     @else
                                         <video src="{{ Storage::url($videoMedia->file_path) }}" autoplay muted loop playsinline class="w-full h-full object-cover opacity-80 group-hover:opacity-55 transition-opacity duration-700"></video>
