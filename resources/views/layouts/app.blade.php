@@ -272,60 +272,60 @@
 
     @if(request()->routeIs('home'))
     <style>
-        /* ── BIG.dk Style Intro Animation (Universal for all environments) ── */
+        /* ── Exact BIG.dk Intro Animation (Extracted from big.dk source) ── */
         #intro-curtain {
             position: fixed;
             inset: 0;
-            z-index: 99998;
+            z-index: 999998;
             background: #000000;
             pointer-events: none;
             will-change: transform;
-            animation: bigCurtainLift 1.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+            animation: bigCurtain 3.05s cubic-bezier(0.33, 1, 0.68, 1) forwards;
         }
 
         #intro-brand {
             position: fixed;
-            z-index: 99999;
+            z-index: 999999;
             pointer-events: none;
             color: #ffffff;
             font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-weight: 800;
             white-space: nowrap;
             line-height: 1;
-            letter-spacing: -0.01em;
             will-change: top, left, transform, font-size, opacity;
-            animation: bigBrandFlyMobile 1.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+            animation: bigLogoMobile 3.05s cubic-bezier(0.65, 0, 0.35, 1) forwards;
         }
 
-        @keyframes bigCurtainLift {
-            0%, 38% {
+        @keyframes bigCurtain {
+            0%, 60% {
                 transform: translateY(0%);
+                visibility: visible;
             }
-            82%, 100% {
+            100% {
                 transform: translateY(-100%);
                 visibility: hidden;
             }
         }
 
-        @keyframes bigBrandFlyMobile {
-            0%, 38% {
-                top: 50%;
-                left: 50%;
+        @keyframes bigLogoMobile {
+            0%, 32% {
+                left: 50vw;
+                top: 50vh;
                 transform: translate(-50%, -50%);
                 font-size: clamp(3.2rem, 11vw, 7.5rem);
                 opacity: 1;
             }
-            82% {
-                top: 24px;
+            90% {
                 left: 72px;
+                top: 24px;
                 transform: translate(0, 0);
                 font-size: 1.125rem;
                 letter-spacing: 0.05em;
                 opacity: 1;
             }
-            92%, 100% {
-                top: 24px;
+            98%, 100% {
                 left: 72px;
+                top: 24px;
                 transform: translate(0, 0);
                 font-size: 1.125rem;
                 opacity: 0;
@@ -335,27 +335,27 @@
 
         @media (min-width: 768px) {
             #intro-brand {
-                animation-name: bigBrandFlyDesktop;
+                animation-name: bigLogoDesktop;
             }
-            @keyframes bigBrandFlyDesktop {
-                0%, 38% {
-                    top: 50%;
-                    left: 50%;
+            @keyframes bigLogoDesktop {
+                0%, 32% {
+                    left: 50vw;
+                    top: 50vh;
                     transform: translate(-50%, -50%);
                     font-size: clamp(3.5rem, 11vw, 8rem);
                     opacity: 1;
                 }
-                82% {
-                    top: 31px;
+                90% {
                     left: 108px;
+                    top: 31px;
                     transform: translate(0, 0);
                     font-size: 1.125rem;
                     letter-spacing: 0.05em;
                     opacity: 1;
                 }
-                92%, 100% {
-                    top: 31px;
+                98%, 100% {
                     left: 108px;
+                    top: 31px;
                     transform: translate(0, 0);
                     font-size: 1.125rem;
                     opacity: 0;

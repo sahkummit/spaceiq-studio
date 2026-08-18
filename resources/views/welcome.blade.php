@@ -524,7 +524,7 @@
         const brand   = document.getElementById('intro-brand');
         if (curtain) curtain.remove();
         if (brand) brand.remove();
-    }, 1800);
+    }, 3200);
 })();
 
 (function() {
