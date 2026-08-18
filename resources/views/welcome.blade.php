@@ -79,61 +79,52 @@
             color: #ffffff !important;
         }
 
-        /* ── Intro Splash Animation ── */
-        #intro-splash {
+        /* ── BIG.dk-style Intro Animation ── */
+        #intro-curtain {
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: #04100f;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #000;
             pointer-events: none;
+            /* curtain starts fully covering the screen */
+            transform: translateY(0%);
         }
-        #intro-splash.gone {
+        #intro-curtain.lift {
+            transform: translateY(-100%);
+            transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1) 0s;
+        }
+        #intro-curtain.done {
             display: none;
         }
-        #intro-logo-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        #intro-name {
-            font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+
+        #intro-brand {
+            position: fixed;
+            z-index: 10000;
+            pointer-events: none;
+            /* start: centered on screen */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 700;
             font-size: clamp(3rem, 10vw, 7rem);
-            font-weight: 300;
-            letter-spacing: 0.22em;
-            color: #ffffff;
-            text-transform: uppercase;
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 0.95s cubic-bezier(0.22,1,0.36,1), transform 0.95s cubic-bezier(0.22,1,0.36,1);
+            color: #fff;
+            letter-spacing: 0.05em;
             white-space: nowrap;
+            line-height: 1;
+            /* will animate via JS using FLIP technique */
+            transition: none;
         }
-        #intro-tagline {
-            font-size: clamp(0.6rem, 1.4vw, 0.78rem);
-            letter-spacing: 0.48em;
-            color: #1A9E96;
-            text-transform: uppercase;
-            opacity: 0;
-            transition: opacity 0.7s ease 0.55s;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
+        #intro-brand.fly {
+            /* JS will compute exact target rect and set inline style */
+            transition: top 0.85s cubic-bezier(0.76, 0, 0.24, 1),
+                        left 0.85s cubic-bezier(0.76, 0, 0.24, 1),
+                        font-size 0.85s cubic-bezier(0.76, 0, 0.24, 1),
+                        transform 0.85s cubic-bezier(0.76, 0, 0.24, 1),
+                        letter-spacing 0.85s cubic-bezier(0.76, 0, 0.24, 1);
         }
-        #intro-line {
-            width: 0;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #1A9E96, transparent);
-            margin: 0 auto;
-            transition: width 0.85s cubic-bezier(0.22,1,0.36,1) 0.25s;
-        }
-        #intro-splash.phase-in #intro-name   { opacity: 1; transform: translateY(0); }
-        #intro-splash.phase-in #intro-tagline { opacity: 1; }
-        #intro-splash.phase-in #intro-line   { width: clamp(60px, 18vw, 180px); }
-        #intro-splash.phase-out {
-            opacity: 0;
-            transition: opacity 0.65s ease;
+        #intro-brand.done {
+            display: none;
         }
 
         /* ── Stats strip ── */
@@ -162,14 +153,9 @@
 
 @section('content')
 
-{{-- ── INTRO SPLASH ── --}}
-<div id="intro-splash">
-    <div id="intro-logo-wrap">
-        <div id="intro-line"></div>
-        <div id="intro-name">Space IQ</div>
-        <div id="intro-tagline">Design Studio</div>
-    </div>
-</div>
+{{-- ── BIG.dk-style Intro: black curtain + big centered brand that flies to nav ── --}}
+<div id="intro-curtain"></div>
+<div id="intro-brand">Space IQ</div>
 
 <!-- Hero Section — full screen video, no text overlay except stats bar -->
 <section class="relative overflow-hidden bg-brand-950" style="height: 100svh; min-height: 600px;">
@@ -601,36 +587,63 @@
 
 @push('scripts')
 <script>
-// ── Intro Splash Animation ──
+// ── BIG.dk-style Intro Animation ──
 (function() {
-    const splash = document.getElementById('intro-splash');
-    if (!splash) return;
+    const curtain = document.getElementById('intro-curtain');
+    const brand   = document.getElementById('intro-brand');
+    if (!curtain || !brand) return;
 
-    // Check if already shown this session
+    // If already shown this session, skip instantly
     if (sessionStorage.getItem('introShown')) {
-        splash.classList.add('phase-out');
-        setTimeout(() => splash.classList.add('gone'), 700);
+        curtain.classList.add('done');
+        brand.classList.add('done');
         return;
     }
 
-    // Phase in: fade up text + expand line
-    requestAnimationFrame(() => {
-        setTimeout(() => {
-            splash.classList.add('phase-in');
-        }, 120);
-    });
+    // ── STEP 1: Show centered text on black for 1.4s ──
+    // (brand is already centered via CSS fixed + translate(-50%,-50%))
 
-    // Hold visible for ~2.2 seconds then fade out
     setTimeout(() => {
-        splash.classList.add('phase-out');
-        setTimeout(() => {
-            splash.classList.add('gone');
-            sessionStorage.setItem('introShown', '1');
-        }, 700);
-    }, 2200);
-})();
+        // ── STEP 2: Find the nav "Space IQ" text element ──
+        // It's a <span> inside the logo anchor in the header
+        const navSpan = document.querySelector('header a .font-display.font-bold');
 
-// ── Animated Stat Counters ──
+        if (navSpan) {
+            // FLIP: measure current center position of brand
+            const brandRect = brand.getBoundingClientRect();
+
+            // Measure target: nav text rect
+            const targetRect = navSpan.getBoundingClientRect();
+
+            // Compute target font-size from navSpan computed style
+            const targetFontSize = parseFloat(window.getComputedStyle(navSpan).fontSize);
+            const targetLetterSpacing = window.getComputedStyle(navSpan).letterSpacing;
+
+            // Enable transitions
+            brand.classList.add('fly');
+
+            // Set target position — align top-left of brand with nav text top-left
+            brand.style.top       = targetRect.top + 'px';
+            brand.style.left      = targetRect.left + 'px';
+            brand.style.transform = 'translate(0, 0)';
+            brand.style.fontSize  = targetFontSize + 'px';
+            brand.style.letterSpacing = targetLetterSpacing;
+            brand.style.fontWeight = '700';
+        }
+
+        // ── STEP 3: Simultaneously lift the black curtain upward ──
+        curtain.classList.add('lift');
+
+        // ── STEP 4: After animation completes, remove both elements ──
+        setTimeout(() => {
+            brand.classList.add('done');
+            curtain.classList.add('done');
+            sessionStorage.setItem('introShown', '1');
+        }, 950);
+
+    }, 1400); // hold big text for 1.4 seconds
+
+})();
 
 (function() {
     const section = document.getElementById('stats-section');
