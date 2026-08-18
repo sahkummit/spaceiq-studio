@@ -270,86 +270,6 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 
-    @if(request()->routeIs('home'))
-    <style>
-        /* ── BIG.dk Style Intro Animation (100% GPU Accelerated Transform) ── */
-        #intro-curtain {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 99998;
-            background: #000000;
-            pointer-events: none;
-            will-change: transform;
-            animation: bigCurtain 2.4s cubic-bezier(0.77, 0, 0.175, 1) forwards;
-        }
-
-        #intro-brand {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            z-index: 99999;
-            pointer-events: none;
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 800;
-            font-size: 4.2rem;
-            white-space: nowrap;
-            line-height: 1;
-            letter-spacing: -0.01em;
-            will-change: transform, opacity;
-            animation: bigLogoDesktop 2.4s cubic-bezier(0.77, 0, 0.175, 1) forwards;
-        }
-
-        @keyframes bigCurtain {
-            0%, 40% {
-                transform: translateY(0%);
-            }
-            85%, 100% {
-                transform: translateY(-100%);
-            }
-        }
-
-        @keyframes bigLogoDesktop {
-            0%, 35% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-            85% {
-                transform: translate(calc(-50vw + 115px), calc(-50vh + 32px)) scale(0.24);
-                opacity: 1;
-            }
-            95%, 100% {
-                transform: translate(calc(-50vw + 115px), calc(-50vh + 32px)) scale(0.24);
-                opacity: 0;
-            }
-        }
-
-        @media (max-width: 767px) {
-            #intro-brand {
-                font-size: 3rem;
-                animation-name: bigLogoMobile;
-            }
-            @keyframes bigLogoMobile {
-                0%, 35% {
-                    transform: translate(-50%, -50%) scale(1);
-                    opacity: 1;
-                }
-                85% {
-                    transform: translate(calc(-50vw + 76px), calc(-50vh + 26px)) scale(0.28);
-                    opacity: 1;
-                }
-                95%, 100% {
-                    transform: translate(calc(-50vw + 76px), calc(-50vh + 26px)) scale(0.28);
-                    opacity: 0;
-                }
-            }
-        }
-    </style>
-    @endif
-
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
@@ -358,8 +278,71 @@
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
     @if(request()->routeIs('home'))
     <!-- BIG.dk Opening Curtain & Centered Logo -->
-    <div id="intro-curtain"></div>
-    <div id="intro-brand">Space IQ</div>
+    <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
+    <div id="intro-brand" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); transform-origin: 0 0; z-index: 99999; pointer-events: none; color: #ffffff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 10vw, 7rem); letter-spacing: 0.05em; white-space: nowrap; line-height: 1; will-change: transform;">Space IQ</div>
+
+    <script>
+    (function() {
+        const navText = document.getElementById('nav-brand-text');
+        const navSub  = document.getElementById('nav-brand-sub');
+        const navImg  = document.getElementById('nav-brand-img');
+        const curtain = document.getElementById('intro-curtain');
+        const brand   = document.getElementById('intro-brand');
+
+        if (!navText || !curtain || !brand) return;
+
+        // Hide nav elements initially so they reveal at the perfect moment
+        navText.style.opacity = '0';
+        if (navSub) navSub.style.opacity = '0';
+        if (navImg) navImg.style.opacity = '0';
+
+        // Measure exact initial rendered bounding box
+        const startRect = brand.getBoundingClientRect();
+        
+        // Convert brand from translate(-50%,-50%) to direct pixel coordinates with origin 0 0
+        brand.style.top = startRect.top + 'px';
+        brand.style.left = startRect.left + 'px';
+        brand.style.transform = 'none';
+        brand.style.transformOrigin = '0 0';
+
+        // Hold for 700ms on pure black screen
+        setTimeout(() => {
+            // Measure exact target coordinates of the navbar Space IQ text
+            const targetRect = navText.getBoundingClientRect();
+            const deltaX = targetRect.left - startRect.left;
+            const deltaY = targetRect.top - startRect.top;
+            const scale  = targetRect.height / startRect.height;
+
+            // Apply smooth 60fps GPU cubic-bezier transition
+            const timing = '1.3s cubic-bezier(0.77, 0, 0.175, 1)';
+            brand.style.transition = 'transform ' + timing;
+            curtain.style.transition = 'transform ' + timing;
+
+            // Trigger flight directly to navbar text coordinates and curtain lift
+            brand.style.transform = 'translate(' + deltaX + 'px, ' + deltaY + 'px) scale(' + scale + ')';
+            curtain.style.transform = 'translateY(-100%)';
+
+            // Reveal logo icon and subtitle as text approaches
+            setTimeout(() => {
+                if (navImg) {
+                    navImg.style.transition = 'opacity 0.4s ease';
+                    navImg.style.opacity = '1';
+                }
+                if (navSub) {
+                    navSub.style.transition = 'opacity 0.4s ease';
+                    navSub.style.opacity = '1';
+                }
+            }, 850);
+
+            // Pixel-perfect handoff to permanent navbar text
+            setTimeout(() => {
+                navText.style.opacity = '1';
+                brand.remove();
+                curtain.remove();
+            }, 1350);
+        }, 700);
+    })();
+    </script>
     @endif
 
     <!-- Page Loading Bar -->
