@@ -264,8 +264,101 @@
                 transform-style: preserve-3d;
                 will-change: transform;
             }
-        </style>
-    @else
+        @if(request()->routeIs('home'))
+        /* ── BIG.dk Style Intro Animation ── */
+        #intro-curtain {
+            position: fixed;
+            inset: 0;
+            z-index: 99998;
+            background: #000000;
+            pointer-events: none;
+            will-change: transform;
+            animation: bigCurtainLift 1.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+        }
+
+        #intro-brand {
+            position: fixed;
+            z-index: 99999;
+            pointer-events: none;
+            color: #ffffff;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 800;
+            white-space: nowrap;
+            line-height: 1;
+            letter-spacing: -0.01em;
+            will-change: top, left, transform, font-size, opacity;
+            animation: bigBrandFlyMobile 1.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+        }
+
+        @keyframes bigCurtainLift {
+            0%, 38% {
+                transform: translateY(0%);
+            }
+            82%, 100% {
+                transform: translateY(-100%);
+                visibility: hidden;
+            }
+        }
+
+        @keyframes bigBrandFlyMobile {
+            0%, 38% {
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: clamp(3.2rem, 11vw, 7.5rem);
+                opacity: 1;
+            }
+            82% {
+                top: 24px;
+                left: 72px;
+                transform: translate(0, 0);
+                font-size: 1.125rem;
+                letter-spacing: 0.05em;
+                opacity: 1;
+            }
+            92%, 100% {
+                top: 24px;
+                left: 72px;
+                transform: translate(0, 0);
+                font-size: 1.125rem;
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #intro-brand {
+                animation-name: bigBrandFlyDesktop;
+            }
+            @keyframes bigBrandFlyDesktop {
+                0%, 38% {
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: clamp(3.5rem, 11vw, 8rem);
+                    opacity: 1;
+                }
+                82% {
+                    top: 31px;
+                    left: 108px;
+                    transform: translate(0, 0);
+                    font-size: 1.125rem;
+                    letter-spacing: 0.05em;
+                    opacity: 1;
+                }
+                92%, 100% {
+                    top: 31px;
+                    left: 108px;
+                    transform: translate(0, 0);
+                    font-size: 1.125rem;
+                    opacity: 0;
+                    visibility: hidden;
+                }
+            }
+        }
+        @endif
+    </style>
+    @if(!app()->environment('local'))
         <!-- Vite Compiled Production Assets (Production environment) -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
@@ -278,8 +371,8 @@
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
     @if(request()->routeIs('home'))
     <!-- BIG.dk Opening Curtain & Centered Logo -->
-    <div id="intro-curtain" style="position: fixed; inset: 0; z-index: 999998; background: #000000; pointer-events: none; will-change: transform; transform: translateY(0); transition: transform 1.1s cubic-bezier(0.77, 0, 0.175, 1);"></div>
-    <div id="intro-brand" style="position: fixed; z-index: 999999; top: 50%; left: 50%; transform: translate(-50%, -50%); will-change: top, left, transform, font-size, letter-spacing; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 11vw, 8rem); color: #ffffff; letter-spacing: 0.04em; white-space: nowrap; line-height: 1; pointer-events: none; transition: top 1.1s cubic-bezier(0.77, 0, 0.175, 1), left 1.1s cubic-bezier(0.77, 0, 0.175, 1), transform 1.1s cubic-bezier(0.77, 0, 0.175, 1), font-size 1.1s cubic-bezier(0.77, 0, 0.175, 1), letter-spacing 1.1s cubic-bezier(0.77, 0, 0.175, 1);">Space IQ</div>
+    <div id="intro-curtain"></div>
+    <div id="intro-brand">Space IQ</div>
     @endif
 
     <!-- Page Loading Bar -->

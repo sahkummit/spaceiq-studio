@@ -517,56 +517,14 @@
 
 @push('scripts')
 <script>
-// ── BIG.dk-style Intro Animation ──
+// ── Clean up BIG.dk intro elements after animation ──
 (function() {
-    const curtain = document.getElementById('intro-curtain');
-    const brand   = document.getElementById('intro-brand');
-    const navText = document.getElementById('nav-brand-text');
-    const navSub  = document.getElementById('nav-brand-sub');
-    const navImg  = document.getElementById('nav-brand-img');
-
-    if (!curtain || !brand || !navText) return;
-
-    // Immediately hide the nav elements so only the big intro text is active
-    navText.style.opacity = '0';
-    if (navSub) navSub.style.opacity = '0';
-    if (navImg) navImg.style.opacity = '0';
-
-    // Hold for 750ms on pure black screen
     setTimeout(() => {
-        const targetRect  = navText.getBoundingClientRect();
-        const targetStyle = window.getComputedStyle(navText);
-
-        // Move directly to navbar text coordinates
-        brand.style.top = targetRect.top + 'px';
-        brand.style.left = targetRect.left + 'px';
-        brand.style.transform = 'translate(0, 0)';
-        brand.style.fontSize = targetStyle.fontSize;
-        brand.style.letterSpacing = targetStyle.letterSpacing;
-        brand.style.fontWeight = targetStyle.fontWeight;
-
-        // Simultaneously lift the curtain
-        curtain.style.transform = 'translateY(-100%)';
-
-        // Fade in the logo icon and tagline as it arrives
-        setTimeout(() => {
-            if (navImg) {
-                navImg.style.transition = 'opacity 0.35s ease';
-                navImg.style.opacity = '1';
-            }
-            if (navSub) {
-                navSub.style.transition = 'opacity 0.35s ease';
-                navSub.style.opacity = '1';
-            }
-        }, 750);
-
-        // Merge and cleanup
-        setTimeout(() => {
-            navText.style.opacity = '1';
-            brand.remove();
-            curtain.remove();
-        }, 1150);
-    }, 750);
+        const curtain = document.getElementById('intro-curtain');
+        const brand   = document.getElementById('intro-brand');
+        if (curtain) curtain.remove();
+        if (brand) brand.remove();
+    }, 1800);
 })();
 
 (function() {
