@@ -272,94 +272,78 @@
 
     @if(request()->routeIs('home'))
     <style>
-        /* ── Exact BIG.dk Intro Animation (Extracted from big.dk source) ── */
+        /* ── BIG.dk Style Intro Animation (100% GPU Accelerated Transform) ── */
         #intro-curtain {
             position: fixed;
-            inset: 0;
-            z-index: 999998;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99998;
             background: #000000;
             pointer-events: none;
             will-change: transform;
-            animation: bigCurtain 3.05s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+            animation: bigCurtain 2.4s cubic-bezier(0.77, 0, 0.175, 1) forwards;
         }
 
         #intro-brand {
             position: fixed;
-            z-index: 999999;
+            top: 50%;
+            left: 50%;
+            z-index: 99999;
             pointer-events: none;
             color: #ffffff;
-            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-weight: 800;
+            font-size: 4.2rem;
             white-space: nowrap;
             line-height: 1;
-            will-change: top, left, transform, font-size, opacity;
-            animation: bigLogoMobile 3.05s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+            letter-spacing: -0.01em;
+            will-change: transform, opacity;
+            animation: bigLogoDesktop 2.4s cubic-bezier(0.77, 0, 0.175, 1) forwards;
         }
 
         @keyframes bigCurtain {
-            0%, 60% {
+            0%, 40% {
                 transform: translateY(0%);
-                visibility: visible;
             }
-            100% {
+            85%, 100% {
                 transform: translateY(-100%);
-                visibility: hidden;
             }
         }
 
-        @keyframes bigLogoMobile {
-            0%, 32% {
-                left: 50vw;
-                top: 50vh;
-                transform: translate(-50%, -50%);
-                font-size: clamp(3.2rem, 11vw, 7.5rem);
+        @keyframes bigLogoDesktop {
+            0%, 35% {
+                transform: translate(-50%, -50%) scale(1);
                 opacity: 1;
             }
-            90% {
-                left: 72px;
-                top: 24px;
-                transform: translate(0, 0);
-                font-size: 1.125rem;
-                letter-spacing: 0.05em;
+            85% {
+                transform: translate(calc(-50vw + 115px), calc(-50vh + 32px)) scale(0.24);
                 opacity: 1;
             }
-            98%, 100% {
-                left: 72px;
-                top: 24px;
-                transform: translate(0, 0);
-                font-size: 1.125rem;
+            95%, 100% {
+                transform: translate(calc(-50vw + 115px), calc(-50vh + 32px)) scale(0.24);
                 opacity: 0;
-                visibility: hidden;
             }
         }
 
-        @media (min-width: 768px) {
+        @media (max-width: 767px) {
             #intro-brand {
-                animation-name: bigLogoDesktop;
+                font-size: 3rem;
+                animation-name: bigLogoMobile;
             }
-            @keyframes bigLogoDesktop {
-                0%, 32% {
-                    left: 50vw;
-                    top: 50vh;
-                    transform: translate(-50%, -50%);
-                    font-size: clamp(3.5rem, 11vw, 8rem);
+            @keyframes bigLogoMobile {
+                0%, 35% {
+                    transform: translate(-50%, -50%) scale(1);
                     opacity: 1;
                 }
-                90% {
-                    left: 108px;
-                    top: 31px;
-                    transform: translate(0, 0);
-                    font-size: 1.125rem;
-                    letter-spacing: 0.05em;
+                85% {
+                    transform: translate(calc(-50vw + 76px), calc(-50vh + 26px)) scale(0.28);
                     opacity: 1;
                 }
-                98%, 100% {
-                    left: 108px;
-                    top: 31px;
-                    transform: translate(0, 0);
-                    font-size: 1.125rem;
+                95%, 100% {
+                    transform: translate(calc(-50vw + 76px), calc(-50vh + 26px)) scale(0.28);
                     opacity: 0;
-                    visibility: hidden;
                 }
             }
         }
