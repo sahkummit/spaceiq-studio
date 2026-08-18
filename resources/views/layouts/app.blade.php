@@ -313,41 +313,44 @@
                 // Show BIG logo in the center of the pitch-black screen
                 brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(${initialScale})`;
 
-                // Hold for 750ms on pure black screen showing the BIG logo
+                // Hold on pure black screen, then glide logo to top-left
                 setTimeout(() => {
                     const targetRect = navContainer.getBoundingClientRect();
                     const targetX = targetRect.left;
                     const targetY = targetRect.top;
 
-                    const brandDuration   = 1400; // 1.4s silky smooth
-                    const curtainDuration = 1800; // 1.8s smooth architectural lift
-                    const ease = 'cubic-bezier(0.76, 0, 0.24, 1)';
+                    const brandDuration = 1500; // 1.5s flight
+                    const brandEase     = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
-                    // GPU-only hardware-accelerated transitions
-                    brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 250ms ease ${brandDuration - 100}ms`;
-                    curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
-
-                    // Glides from big centered scale down to scale(1) at the navbar
+                    brand.style.transition = `transform ${brandDuration}ms ${brandEase}, opacity 250ms ease ${brandDuration - 100}ms`;
                     brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(1)`;
-                    curtain.style.transform = 'translate3d(0, -100%, 0)';
 
-                    // Seamless overlapping handoff to navbar container
+                    // Black curtain lifts straight UPWARDS (like big.dk)
+                    setTimeout(() => {
+                        const curtainDuration = 1400; // 1.4s smooth curtain lift
+                        const curtainEase     = 'cubic-bezier(0.33, 1, 0.68, 1)';
+
+                        curtain.style.transition = `transform ${curtainDuration}ms ${curtainEase}`;
+                        curtain.style.transform = 'translateY(-100%)';
+
+                        setTimeout(() => {
+                            curtain.remove();
+                        }, curtainDuration + 100);
+                    }, 500);
+
+                    // Seamless handoff to navbar container
                     setTimeout(() => {
                         navContainer.style.transition = 'opacity 250ms ease';
                         navContainer.style.opacity = '1';
                         brand.style.opacity = '0';
                     }, brandDuration - 100);
 
-                    // Clean up elements from DOM after full completion
+                    // Clean up brand from DOM after completion
                     setTimeout(() => {
                         brand.remove();
                     }, brandDuration + 200);
 
-                    setTimeout(() => {
-                        curtain.remove();
-                    }, curtainDuration + 100);
-
-                }, 750);
+                }, 900);
             }
 
             if (introImg && !introImg.complete) {
