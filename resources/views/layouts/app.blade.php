@@ -279,7 +279,7 @@
     @if(request()->routeIs('home'))
     <!-- BIG.dk Opening Curtain & Centered Logo -->
     <div id="intro-curtain" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99998; background: #000000; pointer-events: none; will-change: transform;"></div>
-    <div id="intro-brand" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; pointer-events: none; color: #ffffff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 10vw, 7rem); letter-spacing: 0.05em; white-space: nowrap; line-height: 1; will-change: top, left, transform, font-size, letter-spacing;">Space IQ</div>
+    <div id="intro-brand" style="position: fixed; top: 0; left: 0; transform-origin: 0 0; z-index: 99999; pointer-events: none; color: #ffffff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 10vw, 7rem); letter-spacing: 0.05em; white-space: nowrap; line-height: 1; will-change: transform, opacity; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;">Space IQ</div>
 
     <script>
     (function() {
@@ -292,59 +292,67 @@
 
             if (!navText || !curtain || !brand) return;
 
-            // Hide nav elements initially so they reveal at the perfect moment
+            // Hide nav elements initially
             navText.style.opacity = '0';
             if (navSub) navSub.style.opacity = '0';
             if (navImg) navImg.style.opacity = '0';
 
+            // Measure initial dimensions and place dead-center using GPU translate3d
+            const startWidth  = brand.offsetWidth;
+            const startHeight = brand.offsetHeight;
+            const startX = (window.innerWidth - startWidth) / 2;
+            const startY = (window.innerHeight - startHeight) / 2;
+
+            brand.style.transform = `translate3d(${startX}px, ${startY}px, 0px) scale(1)`;
+
             // Hold for 750ms on pure black screen
             setTimeout(() => {
-                // Measure exact target coordinates and computed style of the navbar Space IQ text
-                const targetRect  = navText.getBoundingClientRect();
-                const targetStyle = window.getComputedStyle(navText);
+                // Measure exact target coordinates of the navbar text
+                const targetRect = navText.getBoundingClientRect();
+                const targetX = targetRect.left;
+                const targetY = targetRect.top;
+                const scaleX  = targetRect.width / startWidth;
+                const scaleY  = targetRect.height / startHeight;
 
-                const brandDuration   = 1300; // 1.3s for brand text flight
-                const curtainDuration = 1800; // 1.8s for smooth cinematic curtain lift
-                const brandEase   = 'cubic-bezier(0.77, 0, 0.175, 1)';
-                const curtainEase = 'cubic-bezier(0.65, 0, 0.35, 1)';
+                const brandDuration   = 1400; // 1.4s silky smooth
+                const curtainDuration = 1800; // 1.8s smooth architectural lift
+                const ease = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
-                // Apply transition directly to position, transform, font-size and spacing
-                brand.style.transition = `top ${brandDuration}ms ${brandEase}, left ${brandDuration}ms ${brandEase}, transform ${brandDuration}ms ${brandEase}, font-size ${brandDuration}ms ${brandEase}, letter-spacing ${brandDuration}ms ${brandEase}`;
-                curtain.style.transition = `transform ${curtainDuration}ms ${curtainEase}`;
+                // Set GPU-only hardware-accelerated transitions
+                brand.style.transition = `transform ${brandDuration}ms ${ease}, opacity 250ms ease ${brandDuration - 100}ms`;
+                curtain.style.transition = `transform ${curtainDuration}ms ${ease}`;
 
-                // Fly directly to exact navbar coordinates and typography
-                brand.style.top = targetRect.top + 'px';
-                brand.style.left = targetRect.left + 'px';
-                brand.style.transform = 'translate(0, 0)';
-                brand.style.fontSize = targetStyle.fontSize;
-                brand.style.letterSpacing = targetStyle.letterSpacing;
-                brand.style.lineHeight = targetStyle.lineHeight;
+                // Trigger smooth GPU translation and scale
+                brand.style.transform = `translate3d(${targetX}px, ${targetY}px, 0px) scale(${scaleX}, ${scaleY})`;
+                curtain.style.transform = 'translate3d(0, -100%, 0)';
 
-                // Lift the curtain smoothly
-                curtain.style.transform = 'translateY(-100%)';
-
-                // Reveal logo icon and subtitle as text arrives
+                // Reveal logo icon and subtitle as text glides in
                 setTimeout(() => {
                     if (navImg) {
-                        navImg.style.transition = 'opacity 400ms ease';
+                        navImg.style.transition = 'opacity 500ms ease';
                         navImg.style.opacity = '1';
                     }
                     if (navSub) {
-                        navSub.style.transition = 'opacity 400ms ease';
+                        navSub.style.transition = 'opacity 500ms ease';
                         navSub.style.opacity = '1';
                     }
-                }, brandDuration * 0.6);
+                }, brandDuration * 0.55);
 
-                // Seamless handoff to permanent navbar text
+                // Seamless handoff to navbar text
                 setTimeout(() => {
+                    navText.style.transition = 'opacity 250ms ease';
                     navText.style.opacity = '1';
-                    brand.remove();
-                }, brandDuration + 40);
+                    brand.style.opacity = '0';
+                }, brandDuration - 100);
 
-                // Remove curtain after it finishes gliding off screen
+                // Clean up elements from DOM
+                setTimeout(() => {
+                    brand.remove();
+                }, brandDuration + 200);
+
                 setTimeout(() => {
                     curtain.remove();
-                }, curtainDuration + 50);
+                }, curtainDuration + 100);
 
             }, 750);
         }
