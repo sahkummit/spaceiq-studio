@@ -101,8 +101,42 @@
             Space IQ <span class="text-gradient">Design Studio</span>
         </h1>
         
-        <p class="text-lg md:text-2xl text-white font-medium tracking-widest uppercase mb-10 font-display">
-            Where Vision Meets Reality
+        <p class="text-lg md:text-2xl text-white font-medium tracking-widest uppercase mb-10 font-display min-h-[40px]"
+           x-data="{ 
+               words: ['Hyper-Realistic 4K Renders', 'Stunning 360 Virtual Tours', 'Cinematic Walkthrough Videos', 'Detailed Floor Plans & CAD'],
+               currentWord: '',
+               wordIdx: 0,
+               charIdx: 0,
+               isDeleting: false,
+               typeSpeed: 80,
+               init() {
+                   this.typeEffect();
+               },
+               typeEffect() {
+                   let fullWord = this.words[this.wordIdx];
+                   if (this.isDeleting) {
+                       this.currentWord = fullWord.substring(0, this.charIdx - 1);
+                       this.charIdx--;
+                       this.typeSpeed = 30;
+                   } else {
+                       this.currentWord = fullWord.substring(0, this.charIdx + 1);
+                       this.charIdx++;
+                       this.typeSpeed = 80;
+                   }
+                   
+                   if (!this.isDeleting && this.charIdx === fullWord.length) {
+                       this.typeSpeed = 2000;
+                       this.isDeleting = true;
+                   } else if (this.isDeleting && this.charIdx === 0) {
+                       this.isDeleting = false;
+                       this.wordIdx = (this.wordIdx + 1) % this.words.length;
+                       this.typeSpeed = 400;
+                   }
+                   
+                   setTimeout(() => this.typeEffect(), this.typeSpeed);
+               }
+           }">
+            <span x-text="currentWord"></span><span class="animate-pulse text-accent-400">|</span>
         </p>
         
         <p class="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
@@ -338,7 +372,7 @@
                              @endif
                         >
                             <!-- Tilting Card Container -->
-                            <div class="flex flex-col {{ $index % 2 == 0 ? 'md:flex-row' : 'md:flex-row-reverse' }} items-center group bg-brand-900/30 border border-white/5 hover:border-accent-400/20 rounded-xl overflow-hidden transition-colors duration-500 tilt-card">
+                            <div class="flex flex-col {{ $index % 2 == 0 ? 'md:flex-row' : 'md:flex-row-reverse' }} items-center group bg-brand-900/30 border border-white/5 hover:border-accent-400/20 rounded-xl overflow-hidden transition-colors duration-500 tilt-card {{ $index % 2 == 0 ? 'reveal-left' : 'reveal-right' }}">
                                 <div class="w-full md:w-1/2 p-8 md:p-10 xl:p-12 z-10 relative">
                                     <h4 class="text-3xl font-display font-bold text-white mb-4 uppercase">{{ $service->title }}</h4>
                                     <p class="text-gray-400 mb-8 font-light text-lg leading-relaxed">{{ $service->short_description ?? Str::limit(strip_tags($service->description), 100) }}</p>
