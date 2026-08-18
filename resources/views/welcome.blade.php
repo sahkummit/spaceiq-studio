@@ -79,40 +79,6 @@
             color: #ffffff !important;
         }
 
-        /* ── BIG.dk-style Intro Animation (60fps GPU Accelerated) ── */
-        #intro-curtain {
-            position: fixed;
-            inset: 0;
-            z-index: 99998;
-            background: #000000;
-            pointer-events: none;
-            will-change: transform;
-            transform: translateY(0%);
-            transition: transform 1.1s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-        #intro-curtain.lift {
-            transform: translateY(-100%);
-        }
-
-        #intro-brand {
-            position: fixed;
-            z-index: 99999;
-            pointer-events: none;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(1);
-            transform-origin: top left;
-            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-weight: 800;
-            font-size: clamp(3.2rem, 11vw, 8rem);
-            color: #ffffff;
-            letter-spacing: -0.01em;
-            white-space: nowrap;
-            line-height: 1;
-            will-change: transform;
-            transition: transform 1.1s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-
         /* ── Stats strip ── */
         .stats-strip-sep {
             width: 1px;
@@ -120,28 +86,6 @@
             height: 40px;
             align-self: center;
         }
-
-        /* ── Services editorial layout ── */
-        .service-number {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: clamp(6rem, 16vw, 13rem);
-            font-weight: 300;
-            line-height: 1;
-            color: rgba(255,255,255,0.04);
-            position: absolute;
-            bottom: -0.1em;
-            pointer-events: none;
-            user-select: none;
-            letter-spacing: -0.02em;
-        }
-    </style>
-@endsection
-
-@section('content')
-
-{{-- ── BIG.dk-style Intro: black curtain + big centered brand that flies to nav ── --}}
-<div id="intro-curtain"></div>
-<div id="intro-brand">Space IQ</div>
 
 <!-- Hero Section — full screen video, no text overlay except stats bar -->
 <section class="relative overflow-hidden bg-brand-950" style="height: 100svh; min-height: 600px;">
@@ -573,7 +517,7 @@
 
 @push('scripts')
 <script>
-// ── BIG.dk-style Intro Animation (GPU Accelerated FLIP) ──
+// ── BIG.dk-style Intro Animation ──
 (function() {
     const curtain = document.getElementById('intro-curtain');
     const brand   = document.getElementById('intro-brand');
@@ -583,45 +527,46 @@
 
     if (!curtain || !brand || !navText) return;
 
-    // Initially hide the header brand elements so the flying brand merges seamlessly
+    // Immediately hide the nav elements so only the big intro text is active
     navText.style.opacity = '0';
     if (navSub) navSub.style.opacity = '0';
     if (navImg) navImg.style.opacity = '0';
 
-    // Step 1: Wait 700ms on pure black screen with the huge centered white text
+    // Hold for 750ms on pure black screen
     setTimeout(() => {
-        // Step 2: Calculate FLIP coordinates
-        const brandRect  = brand.getBoundingClientRect();
-        const targetRect = navText.getBoundingClientRect();
+        const targetRect  = navText.getBoundingClientRect();
+        const targetStyle = window.getComputedStyle(navText);
 
-        // Calculate exact scale and translate deltas from origin (window.innerWidth / 2, window.innerHeight / 2)
-        const targetX = targetRect.left - (window.innerWidth / 2);
-        const targetY = targetRect.top  - (window.innerHeight / 2);
-        const scale   = targetRect.height / brandRect.height;
+        // Move directly to navbar text coordinates
+        brand.style.top = targetRect.top + 'px';
+        brand.style.left = targetRect.left + 'px';
+        brand.style.transform = 'translate(0, 0)';
+        brand.style.fontSize = targetStyle.fontSize;
+        brand.style.letterSpacing = targetStyle.letterSpacing;
+        brand.style.fontWeight = targetStyle.fontWeight;
 
-        // Apply smooth GPU transform transition to both brand and curtain
-        brand.style.transform = `translate(${targetX}px, ${targetY}px) scale(${scale})`;
-        curtain.classList.add('lift');
+        // Simultaneously lift the curtain
+        curtain.style.transform = 'translateY(-100%)';
 
-        // Fade in logo image and subtitle as it approaches
+        // Fade in the logo icon and tagline as it arrives
         setTimeout(() => {
             if (navImg) {
-                navImg.style.transition = 'opacity 0.4s ease';
+                navImg.style.transition = 'opacity 0.35s ease';
                 navImg.style.opacity = '1';
             }
             if (navSub) {
-                navSub.style.transition = 'opacity 0.4s ease';
+                navSub.style.transition = 'opacity 0.35s ease';
                 navSub.style.opacity = '1';
             }
-        }, 700);
+        }, 750);
 
-        // Step 3: When arrived, reveal real nav text and clean up intro elements
+        // Merge and cleanup
         setTimeout(() => {
             navText.style.opacity = '1';
             brand.remove();
             curtain.remove();
         }, 1150);
-    }, 700);
+    }, 750);
 })();
 
 (function() {

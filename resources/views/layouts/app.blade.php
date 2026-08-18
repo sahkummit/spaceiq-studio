@@ -276,6 +276,12 @@
     @yield('head')
 </head>
 <body class="antialiased overflow-x-hidden relative" x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => pageLoaded = true)">
+    @if(request()->routeIs('home'))
+    <!-- BIG.dk Opening Curtain & Centered Logo -->
+    <div id="intro-curtain" style="position: fixed; inset: 0; z-index: 999998; background: #000000; pointer-events: none; will-change: transform; transform: translateY(0); transition: transform 1.1s cubic-bezier(0.77, 0, 0.175, 1);"></div>
+    <div id="intro-brand" style="position: fixed; z-index: 999999; top: 50%; left: 50%; transform: translate(-50%, -50%); will-change: top, left, transform, font-size, letter-spacing; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: clamp(3.2rem, 11vw, 8rem); color: #ffffff; letter-spacing: 0.04em; white-space: nowrap; line-height: 1; pointer-events: none; transition: top 1.1s cubic-bezier(0.77, 0, 0.175, 1), left 1.1s cubic-bezier(0.77, 0, 0.175, 1), transform 1.1s cubic-bezier(0.77, 0, 0.175, 1), font-size 1.1s cubic-bezier(0.77, 0, 0.175, 1), letter-spacing 1.1s cubic-bezier(0.77, 0, 0.175, 1);">Space IQ</div>
+    @endif
+
     <!-- Page Loading Bar -->
     <div id="page-loader"></div>
     
