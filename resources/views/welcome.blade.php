@@ -105,7 +105,7 @@
     touchEndX: 0,
 
     openLightbox(images, index = 0) {
-        this.lightboxImages = images || [];
+        this.lightboxImages = Array.isArray(images) ? images : [];
         this.lightboxIndex = (typeof index === 'number') ? index : 0;
         const current = this.lightboxImages[this.lightboxIndex];
         this.lightboxUrl = current ? (current.img || current.url || '') : '';
@@ -192,7 +192,9 @@
             this.pannellumViewer = null;
         }
     }
-}">
+}"
+@open-lightbox-modal.window="openLightbox($event.detail.items || $event.detail.images, $event.detail.index)"
+@open-lightbox.window="openLightbox($event.detail.items || $event.detail.images, $event.detail.index)">
 
 <!-- Hero Section — full screen video, no text overlay except stats bar -->
 <section class="relative overflow-hidden bg-brand-950" style="height: 100svh; min-height: 600px;">
@@ -321,7 +323,7 @@
                 <!-- 1. The Palm Residence -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 0)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 0 })">
                     <div class="relative overflow-hidden aspect-[16/11] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136440349.jpg') }}" 
                              alt="The Palm Residence"
@@ -337,7 +339,7 @@
                 <!-- 2. Artisan Marketplace & Bar -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 1)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 1 })">
                     <div class="relative overflow-hidden aspect-[4/3] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136449032.jpg') }}" 
                              alt="Artisan Marketplace & Central Bar"
@@ -353,7 +355,7 @@
                 <!-- 3. Forest Turret Villa -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 2)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 2 })">
                     <div class="relative overflow-hidden aspect-[1/1] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136449231.jpg') }}" 
                              alt="Highland Forest Stone Villa"
@@ -369,7 +371,7 @@
                 <!-- 4. Olive & Marble Culinary Kitchen -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 3)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 3 })">
                     <div class="relative overflow-hidden aspect-[4/3] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136460065.jpg') }}" 
                              alt="Olive & Marble Culinary Kitchen"
@@ -385,7 +387,7 @@
                 <!-- 5. Curved Bouclé Lounge -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 4)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 4 })">
                     <div class="relative overflow-hidden aspect-[16/11] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136841724.jpg') }}" 
                              alt="Curved Bouclé Lounge"
@@ -406,7 +408,7 @@
                 <!-- 6. Classical Arched Hearth Lounge -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 5)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 5 })">
                     <div class="relative overflow-hidden aspect-[1/1] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136460079.jpg') }}" 
                              alt="Classical Arched Hearth Living"
@@ -422,7 +424,7 @@
                 <!-- 7. Grand Promenade Arcade -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 6)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 6 })">
                     <div class="relative overflow-hidden aspect-[16/10] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136440316.jpg') }}" 
                              alt="Grand Promenade Retail Arcade"
@@ -438,7 +440,7 @@
                 <!-- 8. Brko Grand Cafe & Dining -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 7)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 7 })">
                     <div class="relative overflow-hidden aspect-[16/10] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136449246.jpg') }}" 
                              alt="Brko Grand Cafe & Dining Hall"
@@ -454,7 +456,7 @@
                 <!-- 9. The Heritage Brick Estate -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 8)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 8 })">
                     <div class="relative overflow-hidden aspect-[16/11] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136440362.jpg') }}" 
                              alt="The Heritage Brick Estate"
@@ -470,7 +472,7 @@
                 <!-- 10. K-Line Wellness & Fitness -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 9)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 9 })">
                     <div class="relative overflow-hidden aspect-[16/10] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136449247.jpg') }}" 
                              alt="K-Line Wellness & Fitness Club"
@@ -491,7 +493,7 @@
                 <!-- 11. Coffee Tim Garden Pavilion -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 10)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 10 })">
                     <div class="relative overflow-hidden aspect-[16/11] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136440327.jpg') }}" 
                              alt="Coffee Tim Botanical Pavilion"
@@ -507,7 +509,7 @@
                 <!-- 12. Minimalist Master Suite -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 11)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 11 })">
                     <div class="relative overflow-hidden aspect-[1/1] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136449219.jpg') }}" 
                              alt="Minimalist Linen Master Suite"
@@ -523,7 +525,7 @@
                 <!-- 13. K-Line Commercial Center -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 12)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 12 })">
                     <div class="relative overflow-hidden aspect-[16/11] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136440348.jpg') }}" 
                              alt="K-Line Commercial Center"
@@ -539,7 +541,7 @@
                 <!-- 14. Contemporary Marble Dining Suite -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 13)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 13 })">
                     <div class="relative overflow-hidden aspect-[4/3] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136460085.jpg') }}" 
                              alt="Contemporary Marble Dining Suite"
@@ -555,7 +557,7 @@
                 <!-- 15. Marble & Bleached Oak Ensuite -->
                 <div class="reveal group relative bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(items, 14)">
+                     @click="$dispatch('open-lightbox-modal', { items: items, index: 14 })">
                     <div class="relative overflow-hidden aspect-[16/9] bg-slate-100">
                         <img src="{{ webp_asset('img/showcase/media_1787136841731.jpg') }}" 
                              alt="Marble & Bleached Oak Master Ensuite"
@@ -672,7 +674,7 @@
             <template x-for="(item, index) in visibleItems" :key="index">
                 <div class="group relative rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-md hover:shadow-2xl transition-all duration-500 flex flex-col justify-between cursor-pointer"
                      data-cursor-label="VIEW"
-                     @click="openLightbox(filteredItems, index)">
+                     @click="$dispatch('open-lightbox-modal', { items: filteredItems, index: index })">
                     
                     <!-- Image Container with Smooth Parallax Zoom -->
                     <div class="scroll-scale-wrap relative w-full aspect-[16/10] overflow-hidden bg-slate-900">

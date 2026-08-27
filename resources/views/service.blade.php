@@ -1024,7 +1024,6 @@
                     
                 </div>
             </template>
-            </template>
         </div>
     @else
         <!-- Empty Placeholder -->

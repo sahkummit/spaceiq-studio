@@ -646,10 +646,10 @@
                     
                     <!-- Exterior Renders Dropdown -->
                     <div class="relative" @mouseenter="activeMenu = 'exterior'" @mouseleave="activeMenu = null">
-                        <a href="{{ route('service.show', 'exterior-renders') }}" class="nav-link-underline hover:text-accent-500 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
-                            Exterior Renders
+                        <button type="button" @click="activeMenu = (activeMenu === 'exterior' ? null : 'exterior')" class="nav-link-underline hover:text-accent-500 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
+                            <span>Exterior Renders</span>
                             <svg class="w-3 h-3 transition-transform duration-200" :class="activeMenu === 'exterior' ? 'rotate-180 text-accent-500' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                        </a>
+                        </button>
                         <div x-show="activeMenu === 'exterior'" 
                              x-transition:enter="transition ease-out duration-200"
                              x-transition:enter-start="opacity-0 translate-y-1"
@@ -657,13 +657,14 @@
                              x-transition:leave="transition ease-in duration-150"
                              x-transition:leave-start="opacity-100 translate-y-0"
                              x-transition:leave-end="opacity-0 translate-y-1"
-                             class="absolute left-1/2 -translate-x-1/2 mt-3 w-48 bg-white/98 backdrop-blur-md border border-slate-200 shadow-2xl rounded-xl py-2 z-50 text-left"
-                             style="display: none;">
+                             @click.outside="activeMenu = null"
+                             class="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white border border-slate-200 shadow-2xl rounded-2xl py-2.5 z-50 text-left"
+                             style="display: none; background-color: #ffffff !important;">
 
-                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'residential']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">Residential</a>
-                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'commercial']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">Commercial</a>
-                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'aerial']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">Aerial</a>
-                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'landscape']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">Landscape</a>
+                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'residential']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">Residential</a>
+                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'commercial']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">Commercial</a>
+                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'aerial']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">Aerial</a>
+                            <a href="{{ route('service.show', ['slug' => 'exterior-renders', 'subcategory' => 'landscape']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">Landscape</a>
                         </div>
                     </div>
 
@@ -671,10 +672,10 @@
 
                     <!-- Interior Renders Dropdown -->
                     <div class="relative" @mouseenter="activeMenu = 'interior'" @mouseleave="activeMenu = null">
-                        <a href="{{ route('service.show', 'interior-renders') }}" class="nav-link-underline hover:text-accent-500 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
-                            Interior Renders
+                        <button type="button" @click="activeMenu = (activeMenu === 'interior' ? null : 'interior')" class="nav-link-underline hover:text-accent-500 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
+                            <span>Interior Renders</span>
                             <svg class="w-3 h-3 transition-transform duration-200" :class="activeMenu === 'interior' ? 'rotate-180 text-accent-500' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                        </a>
+                        </button>
                         <div x-show="activeMenu === 'interior'" 
                              x-transition:enter="transition ease-out duration-200"
                              x-transition:enter-start="opacity-0 translate-y-1"
@@ -682,11 +683,12 @@
                              x-transition:leave="transition ease-in duration-150"
                              x-transition:leave-start="opacity-100 translate-y-0"
                              x-transition:leave-end="opacity-0 translate-y-1"
-                             class="absolute left-1/2 -translate-x-1/2 mt-3 w-48 bg-white/98 backdrop-blur-md border border-slate-200 shadow-2xl rounded-xl py-2 z-50 text-left"
-                             style="display: none;">
+                             @click.outside="activeMenu = null"
+                             class="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white border border-slate-200 shadow-2xl rounded-2xl py-2.5 z-50 text-left"
+                             style="display: none; background-color: #ffffff !important;">
 
-                            <a href="{{ route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'residential']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">Residential</a>
-                            <a href="{{ route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'commercial']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">Commercial</a>
+                            <a href="{{ route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'residential']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">Residential</a>
+                            <a href="{{ route('service.show', ['slug' => 'interior-renders', 'subcategory' => 'commercial']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">Commercial</a>
                         </div>
                     </div>
 
@@ -704,10 +706,10 @@
 
                     <!-- Floor Plans Dropdown -->
                     <div class="relative" @mouseenter="activeMenu = 'floorplans'" @mouseleave="activeMenu = null">
-                        <a href="{{ route('service.show', 'floor-plans') }}" class="nav-link-underline hover:text-accent-500 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
-                            Floor Plans
+                        <button type="button" @click="activeMenu = (activeMenu === 'floorplans' ? null : 'floorplans')" class="nav-link-underline hover:text-accent-500 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer focus:outline-none uppercase font-semibold">
+                            <span>Floor Plans</span>
                             <svg class="w-3 h-3 transition-transform duration-200" :class="activeMenu === 'floorplans' ? 'rotate-180 text-accent-500' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                        </a>
+                        </button>
                         <div x-show="activeMenu === 'floorplans'" 
                              x-transition:enter="transition ease-out duration-200"
                              x-transition:enter-start="opacity-0 translate-y-1"
@@ -715,12 +717,13 @@
                              x-transition:leave="transition ease-in duration-150"
                              x-transition:leave-start="opacity-100 translate-y-0"
                              x-transition:leave-end="opacity-0 translate-y-1"
-                             class="absolute left-1/2 -translate-x-1/2 mt-3 w-48 bg-white/98 backdrop-blur-md border border-slate-200 shadow-2xl rounded-xl py-2 z-50 text-left"
-                             style="display: none;">
+                             @click.outside="activeMenu = null"
+                             class="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white border border-slate-200 shadow-2xl rounded-2xl py-2.5 z-50 text-left"
+                             style="display: none; background-color: #ffffff !important;">
 
-                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'b-w']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">B&W</a>
-                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'color']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">Color</a>
-                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'site-plan']) }}" class="block px-4 py-2.5 text-[10px] text-slate-700 hover:text-accent-500 hover:bg-slate-50 transition-colors tracking-widest font-semibold uppercase">Site Plans</a>
+                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'b-w']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">B&amp;W Plans</a>
+                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'color']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">Color Plans</a>
+                            <a href="{{ route('service.show', ['slug' => 'floor-plans', 'subcategory' => 'site-plan']) }}" class="block px-4 py-2.5 text-xs text-slate-800 hover:text-accent-600 hover:bg-slate-50 transition-colors tracking-wider font-semibold uppercase">Site Plans</a>
                         </div>
                     </div>
 
@@ -1242,6 +1245,34 @@
             
             window.addEventListener('load', initTilt);
             setInterval(initTilt, 2500);
+        })();
+
+        // ── Ultra-Smooth Momentum Scrolling Engine (Lenis) ──
+        (function() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/lenis@1.1.18/dist/lenis.min.js';
+            script.onload = function() {
+                const lenis = new Lenis({
+                    duration: 1.15,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    orientation: 'vertical',
+                    gestureOrientation: 'vertical',
+                    smoothWheel: true,
+                    wheelMultiplier: 0.95,
+                    touchMultiplier: 1.2,
+                    infinite: false,
+                });
+
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+                requestAnimationFrame(raf);
+                window.lenis = lenis;
+            };
+            document.head.appendChild(script);
         })();
     </script>
     @stack('scripts')
