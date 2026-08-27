@@ -48,24 +48,40 @@
     <link rel="preload" as="image" href="{{ asset('img/logo.png') }}" fetchpriority="high">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS Engine -->
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <style type="text/tailwindcss">
-        @theme {
-            --color-brand-950: #080e0e;
-            --color-brand-900: #0c1818;
-            --color-brand-800: #122828;
-            --color-brand-700: #1a3a3a;
-            --color-brand-600: #0E7C7B;
-            --color-brand-500: #1A9E96;
-            --color-brand-400: #3AADAA;
-            --color-brand-300: #7EC8C0;
-            --color-accent-500: #0E7C7B;
-            --color-accent-400: #1A9E96;
-            --color-accent-300: #3AADAA;
-            --font-display: 'Montserrat', sans-serif;
-            --font-sans: 'Montserrat', sans-serif;
+    <!-- Fast Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            950: '#080e0e',
+                            900: '#0c1818',
+                            800: '#122828',
+                            700: '#1a3a3a',
+                            600: '#0E7C7B',
+                            500: '#1A9E96',
+                            400: '#3AADAA',
+                            300: '#7EC8C0',
+                        },
+                        accent: {
+                            500: '#0E7C7B',
+                            400: '#1A9E96',
+                            300: '#3AADAA',
+                            600: '#0c6665',
+                            700: '#094e4d',
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
         }
+    </script>
+    <style>
         
         html, body { 
             font-family: var(--font-sans); 

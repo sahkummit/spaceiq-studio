@@ -10,7 +10,8 @@ if (!function_exists('webp_asset')) {
      */
     function webp_asset(string $path): string
     {
-        $webpPath = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $path);
+        $cleanPath = ltrim($path, '/');
+        $webpPath = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $cleanPath);
 
         // Check public path first
         if (file_exists(public_path($webpPath))) {
@@ -18,12 +19,14 @@ if (!function_exists('webp_asset')) {
         }
 
         // Check storage/app/public path (accessed via storage symlink)
-        $storagePath = str_replace('storage/', '', $webpPath);
-        if (file_exists(storage_path('app/public/' . $storagePath))) {
-            return asset($webpPath);
+        if (str_starts_with($cleanPath, 'storage/')) {
+            $subPath = substr($webpPath, 8); // strip 'storage/'
+            if (file_exists(storage_path('app/public/' . $subPath))) {
+                return asset($webpPath);
+            }
         }
 
-        return asset($path);
+        return asset($cleanPath);
     }
 }
 
