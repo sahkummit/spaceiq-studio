@@ -129,10 +129,22 @@
         : ($isInterior 
             ? ['residential' => 'Residential', 'commercial' => 'Commercial'] 
             : ($isFloorPlans 
-                ? ['b-w' => 'B&W', 'color' => 'Color', 'site-plan' => 'Site Plan'] 
+                ? ['b-w' => 'B&W', 'color' => 'Color', 'site-plan' => 'Site Plans'] 
                 : []));
     $serviceLabel = $isExterior ? 'Exterior Renders' : ($isInterior ? 'Interior Renders' : ($isFloorPlans ? 'Floor Plans' : ''));
     $currentLabel = $hasSubcategories ? ($subLabels[$currentSub] ?? ($isFloorPlans ? 'B&W' : 'Residential')) : $service->title;
+
+    $categoryCounts = [];
+    if ($hasSubcategories && $service->media->count() > 0) {
+        foreach($subLabels as $key => $label) {
+            $categoryCounts[$key] = $service->media->filter(function($m) use ($key) {
+                $cat = str_replace(' ', '-', strtolower($m->category ?? ''));
+                if ($cat === 'b&w' || $cat === 'bw') $cat = 'b-w';
+                $cat = str_replace('-views', '', $cat);
+                return $cat === $key;
+            })->count();
+        }
+    }
 
     // Early Grouping for Lightbox Index Navigation
     if ($service->media->count() > 0) {
@@ -175,8 +187,19 @@
     lightboxImages: {{ json_encode($lightboxImagesCollect->values()->toArray()) }},
     is360: {{ $service->slug === '360-views' ? 'true' : 'false' }},
     pannellumViewer: null,
-    touchStartX: 0,
-    touchEndX: 0,
+    openLightbox(index, url, title) {
+        if (Array.isArray(this.lightboxImages) && this.lightboxImages.length > index && this.lightboxImages[index]) {
+            this.lightboxIndex = index;
+            this.lightboxUrl = this.lightboxImages[index].url || url;
+            this.lightboxTitle = this.lightboxImages[index].title || title;
+        } else {
+            this.lightboxIndex = index;
+            this.lightboxUrl = url;
+            this.lightboxTitle = title;
+        }
+        this.lightboxOpen = true;
+        this.initPannellum(this.lightboxUrl);
+    },
     prevImage() {
         if (this.lightboxImages.length === 0) return;
         this.lightboxIndex = (this.lightboxIndex - 1 + this.lightboxImages.length) % this.lightboxImages.length;
@@ -288,129 +311,80 @@
         this.renderPdfPage(this.pdfPageNum);
     },
     closePdf() {
-        this.pdfOpen = false;
         this.pdfDoc = null;
     }
-}">">
+}">
 
-<!-- ── HERO ── -->
-<section class="relative flex flex-col justify-start overflow-hidden bg-brand-950 pb-0">
+<!-- ── Luminous Minimalist Architectural Header ── -->
+<section class="relative bg-gradient-to-b from-white via-slate-50/80 to-[#f8fafc] pt-28 pb-10 border-b border-slate-200/80 overflow-hidden">
+    
+    {{-- Subtle architectural background ambient glow --}}
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-teal-500/[0.04] rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -top-12 left-10 w-72 h-72 bg-slate-300/[0.15] rounded-full blur-2xl pointer-events-none"></div>
 
-    {{-- First portfolio image as blurred hero background --}}
-    @php $heroMedia = $service->media->sortBy('sort_order')->first(); @endphp
-    @if($heroMedia && $heroMedia->file_type !== 'video')
-    <div class="absolute inset-0 z-0" style="background-image:url('{{ webp_asset(parse_url(Storage::url($heroMedia->file_path), PHP_URL_PATH)) }}');background-size:cover;background-position:center;filter:blur(8px) brightness(0.18);transform:scale(1.05);"></div>
-    @else
-    {{-- Background gradient fallback --}}
-    <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-900 to-[#0b2020]"></div>
-    @endif
+    <div class="container mx-auto px-6 max-w-7xl relative z-10">
+        
+        {{-- Top Bar: Clean Breadcrumbs & Project Counter --}}
+        <div class="flex items-center justify-between gap-4 mb-6">
+            <a href="{{ route('home') }}#services"
+               class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 transition-all text-xs font-medium tracking-wide shadow-xs group">
+                <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                <span>Services</span>
+                <span class="text-slate-300">/</span>
+                <span class="text-slate-900 font-semibold">{{ $service->title }}</span>
+            </a>
 
-    {{-- Always-on dark overlay to ensure text readability --}}
-    <div class="absolute inset-0 bg-brand-950/70 z-0"></div>
-
-    {{-- Subtle grid --}}
-    <div class="absolute inset-0 opacity-[0.035]"
-         style="background-image:linear-gradient(rgba(58,173,170,1) 1px,transparent 1px),linear-gradient(90deg,rgba(58,173,170,1) 1px,transparent 1px);background-size:64px 64px;"></div>
-
-    {{-- Glow orbs --}}
-    <div class="absolute -top-40 -left-40 w-[700px] h-[700px] rounded-full pointer-events-none"
-         style="background:radial-gradient(circle,rgba(58,173,170,0.12) 0%,transparent 70%);"></div>
-    <div class="absolute -bottom-32 right-[-5%] w-[600px] h-[600px] rounded-full pointer-events-none"
-         style="background:radial-gradient(circle,rgba(26,158,150,0.09) 0%,transparent 70%);"></div>
-    <div class="absolute top-[30%] right-[20%] w-[300px] h-[300px] rounded-full pointer-events-none"
-         style="background:radial-gradient(circle,rgba(58,173,170,0.06) 0%,transparent 70%);"></div>
-
-    {{-- Diagonal accent lines --}}
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-0 left-[12%] w-px h-full"
-             style="background:linear-gradient(to bottom,transparent 0%,rgba(58,173,170,0.18) 40%,transparent 100%);transform:skewX(-18deg);"></div>
-        <div class="absolute top-0 left-[38%] w-px h-full"
-             style="background:linear-gradient(to bottom,transparent 0%,rgba(58,173,170,0.08) 55%,transparent 100%);transform:skewX(-18deg);"></div>
-        <div class="absolute top-0 right-[18%] w-px h-full"
-             style="background:linear-gradient(to bottom,transparent 0%,rgba(26,158,150,0.15) 45%,transparent 100%);transform:skewX(-18deg);"></div>
-        <div class="absolute top-0 right-[42%] w-px h-full"
-             style="background:linear-gradient(to bottom,transparent 0%,rgba(58,173,170,0.06) 35%,transparent 100%);transform:skewX(-18deg);"></div>
-    </div>
-
-    {{-- Floating particles --}}
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        @foreach([['3%','8%',3,0],['17%','62%',2,1.2],['33%','25%',4,0.6],['50%','80%',2,2],['65%','15%',3,0.3],['78%','50%',2,1.8],['88%','35%',4,0.9],['92%','75%',3,1.5],['45%','55%',2,2.4],['25%','90%',3,0.7],['70%','88%',2,1.1],['55%','40%',4,1.9]] as [$t,$l,$s,$delay])
-        <div class="absolute rounded-full bg-accent-400 animate-pulse"
-             style="top:{{$t}};left:{{$l}};width:{{$s}}px;height:{{$s}}px;opacity:0.18;animation-delay:{{$delay}}s;animation-duration:4s;"></div>
-        @endforeach
-    </div>
-
-    {{-- Back link --}}
-    <div class="relative z-10 container mx-auto px-6 pt-20 lg:pt-24">
-        <a href="{{ route('home') }}#services"
-           class="inline-flex items-center gap-2 text-white/40 hover:text-accent-300 transition-all duration-300 text-xs font-bold tracking-[0.2em] uppercase group">
-            <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            All Services
-        </a>
-    </div>
-
-    {{-- Hero copy --}}
-    <div class="relative z-10 container mx-auto px-6 mt-8 pb-0">
-
-        {{-- Eyebrow --}}
-        <div class="flex items-center gap-4 mb-4">
-            <div class="h-px w-12 bg-gradient-to-r from-accent-400 to-transparent"></div>
-            <span class="text-accent-400 text-[10px] font-black tracking-[0.35em] uppercase">Space IQ Design Studio</span>
-            <div class="h-px flex-1 bg-gradient-to-r from-accent-400/20 to-transparent max-w-[120px]"></div>
+            @if($hasSubcategories && isset($categoryCounts[$currentSub]))
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/60 text-teal-800 text-xs font-semibold tracking-wide">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                <span>{{ $categoryCounts[$currentSub] }} {{ Str::plural('Project', $categoryCounts[$currentSub]) }}</span>
+            </span>
+            @endif
         </div>
 
-        {{-- Title --}}
-        <h1 class="font-black text-white leading-[0.88] tracking-tight mb-5"
-            style="font-size:clamp(3.2rem,8.5vw,8rem);text-transform:uppercase;">
+        {{-- Title + Clean Filter Navigation --}}
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                    @if($hasSubcategories)
+                        @if($currentSub === 'site-plan')
+                            <span>Site Plans</span>
+                        @else
+                            <span>{{ $currentLabel }}</span>
+                            <span class="text-slate-400 font-normal ml-1.5">{{ $serviceLabel }}</span>
+                        @endif
+                    @else
+                        <span>{{ $service->title }}</span>
+                    @endif
+                </h1>
+                <p class="text-slate-500 text-sm sm:text-base mt-2 font-normal max-w-xl leading-relaxed">
+                    {{ $service->short_description }}
+                </p>
+            </div>
+
+            {{-- Compact, Sleek Filter Pills --}}
             @if($hasSubcategories)
-                <span class="block text-white/25 font-bold mb-2"
-                      style="font-size:clamp(0.75rem,1.8vw,1.2rem);letter-spacing:0.35em;">{{ $serviceLabel }}</span>
-                <span class="block"
-                      style="background:linear-gradient(130deg,#ffffff 0%,#7EC8C0 45%,#1A9E96 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
-                    {{ $currentLabel }}
-                </span>
-            @else
-                <span class="block"
-                      style="background:linear-gradient(130deg,#ffffff 0%,#7EC8C0 45%,#1A9E96 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
-                    {{ $service->title }}
-                </span>
-            @endif
-        </h1>
-
-        {{-- Description --}}
-        <p class="text-gray-500 text-base md:text-lg font-light leading-relaxed max-w-xl mb-10">
-            {{ $service->short_description }}
-        </p>
-    </div>
-
-    {{-- Category tab bar --}}
-    @if($hasSubcategories)
-    <div class="relative z-10 border-t border-white/[0.07]">
-        <div class="container mx-auto px-6">
-            <nav class="flex items-stretch overflow-x-auto" style="scrollbar-width:none;">
+            <nav class="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-x-auto max-w-full" style="scrollbar-width:none; -webkit-overflow-scrolling: touch;">
                 @foreach($subLabels as $key => $label)
                 @php $active = ($currentSub === $key); @endphp
                 <a href="{{ route('service.show', ['slug' => $service->slug, 'subcategory' => $key]) }}"
-                   class="relative flex-shrink-0 px-8 py-5 text-xs font-black tracking-[0.22em] uppercase transition-all duration-300 focus:outline-none whitespace-nowrap
-                          {{ $active ? 'text-accent-300' : 'text-white/35 hover:text-white/70' }}">
-                    {{ $label }}
-                    @if($active)
-                    <span class="absolute bottom-0 left-0 right-0 h-[2px] rounded-full"
-                          style="background:linear-gradient(90deg,transparent 0%,#3AADAA 30%,#3AADAA 70%,transparent 100%);"></span>
-                    <span class="absolute inset-0 pointer-events-none"
-                          style="background:linear-gradient(to top,rgba(58,173,170,0.06),transparent);"></span>
+                   class="px-4 py-2 rounded-xl text-xs tracking-wide transition-all whitespace-nowrap font-medium
+                          {{ $active 
+                             ? 'bg-slate-900 text-white font-semibold shadow-xs' 
+                             : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                    <span>{{ $label }}</span>
+                    @if(isset($categoryCounts[$key]))
+                    <span class="ml-1.5 text-[11px] {{ $active ? 'text-slate-300' : 'text-slate-400' }}">({{ $categoryCounts[$key] }})</span>
                     @endif
                 </a>
                 @endforeach
             </nav>
+            @endif
         </div>
-    </div>
-    @else
-    <div class="h-8 relative z-10"></div>
-    @endif
 
+    </div>
 </section>
 
 <!-- Content Section -->
@@ -421,28 +395,249 @@
                 <div>
                     @php
                         $is360 = $service->slug === '360-views';
+                        $isFloorPlans = $service->slug === 'floor-plans';
                         $isPdf = $service->media->where('file_type', 'pdf')->count() > 0;
-                        $numCols = 3;
-                        $gridColsClass = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+                        $gridColsClass = $isFloorPlans ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
                     @endphp
-                    <div class="grid {{ $gridColsClass }} items-start w-full mb-16 pt-8">
+
+                    @if($isFloorPlans && $currentSub === 'site-plan')
+                        @php
+                            $landscapePlans = [];
+                            $verticalPlans  = [];
+                            foreach($categoryMedia->sortBy('sort_order') as $media) {
+                                $filePath = public_path(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                $isVertical = false;
+                                if (file_exists($filePath)) {
+                                    $sz = @getimagesize($filePath);
+                                    if ($sz && $sz[0] > 0 && ($sz[1] / $sz[0]) > 1.1) {
+                                        $isVertical = true;
+                                    }
+                                }
+                                if ($isVertical) {
+                                    $verticalPlans[] = $media;
+                                } else {
+                                    $landscapePlans[] = $media;
+                                }
+                            }
+                        @endphp
+
+                        {{-- Tier 1: Master Landscape Plans (Bigger & Expansive in 2-Column Grid) --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-7xl mx-auto mb-12">
+                            @foreach($landscapePlans as $media)
+                                @php
+                                    $mediaUrl = webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                    $mediaIndex = $lightboxImagesCollect->values()->filter(fn($x) => $x['url'] === $mediaUrl)->keys()->first() ?? 0;
+                                    $imgOrigUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
+                                    $imgWebpUrl = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $imgOrigUrl);
+                                    $imgWebpPath = public_path($imgWebpUrl);
+                                    $hasWebp = file_exists($imgWebpPath);
+                                @endphp
+                                <div class="relative group overflow-hidden border border-white/5 bg-black cursor-pointer w-full"
+                                     @click="openLightbox({{ $mediaIndex }}, {{ json_encode($mediaUrl) }}, {{ json_encode($media->title ?? '') }})">
+                                    <div class="cursor-pointer overflow-hidden bg-brand-900/50 relative" x-data="{ imgLoaded: false }">
+                                        <div class="absolute inset-0 skeleton-shimmer z-0 min-h-[200px]" x-show="!imgLoaded"></div>
+                                        <picture>
+                                            @if($hasWebp)
+                                            <source srcset="{{ $imgWebpUrl }}" type="image/webp">
+                                            @endif
+                                            <img src="{{ $imgOrigUrl }}"
+                                                 alt="{{ $media->alt_text ?? $media->title ?? 'Site Plan' }}"
+                                                 loading="lazy"
+                                                 decoding="async"
+                                                 @load="imgLoaded = true"
+                                                 class="w-full h-auto block transition-transform duration-700 group-hover:scale-105 lazy-img relative z-10"
+                                                 :class="imgLoaded ? 'loaded' : ''">
+                                        </picture>
+                                        @if($media->title)
+                                        <div class="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out pointer-events-none"
+                                             style="background:linear-gradient(to top, rgba(8,14,14,0.92) 0%, transparent 100%); padding: 20px 16px 14px;">
+                                            <p class="text-white text-xs font-semibold uppercase tracking-widest">{{ $media->title }}</p>
+                                        </div>
+                                        @endif
+                                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-3 pointer-events-none z-20">
+                                            <div class="bg-brand-900/80 backdrop-blur-sm p-2.5 rounded-full">
+                                                <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Tier 2: Vertical Lot & Detailed Strip Plans (3-Column Grid, Scaled Down & Elegant) --}}
+                        @if(count($verticalPlans) > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full max-w-7xl mx-auto items-start mb-16">
+                            @foreach($verticalPlans as $vIndex => $media)
+                                @php
+                                    $mediaUrl = webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                    $mediaIndex = $lightboxImagesCollect->values()->filter(fn($x) => $x['url'] === $mediaUrl)->keys()->first() ?? 0;
+                                    $imgOrigUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
+                                    $imgWebpUrl = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $imgOrigUrl);
+                                    $imgWebpPath = public_path($imgWebpUrl);
+                                    $hasWebp = file_exists($imgWebpPath);
+
+                                    // Right card is wider (w-full) while narrow vertical strips are scaled proportionally
+                                    $cardWidthClass = match($vIndex) {
+                                        0 => 'max-w-[60%] md:max-w-[55%]',
+                                        1 => 'max-w-[65%] md:max-w-[60%]',
+                                        default => 'w-full'
+                                    };
+                                @endphp
+                                <div class="flex justify-center items-start w-full">
+                                    <div class="relative group overflow-hidden border border-white/5 bg-black cursor-pointer {{ $cardWidthClass }}"
+                                         @click="openLightbox({{ $mediaIndex }}, {{ json_encode($mediaUrl) }}, {{ json_encode($media->title ?? '') }})">
+                                        <div class="cursor-pointer overflow-hidden bg-brand-900/50 relative" x-data="{ imgLoaded: false }">
+                                            <div class="absolute inset-0 skeleton-shimmer z-0 min-h-[200px]" x-show="!imgLoaded"></div>
+                                            <picture>
+                                                @if($hasWebp)
+                                                <source srcset="{{ $imgWebpUrl }}" type="image/webp">
+                                                @endif
+                                                <img src="{{ $imgOrigUrl }}"
+                                                     alt="{{ $media->alt_text ?? $media->title ?? 'Site Plan' }}"
+                                                     loading="lazy"
+                                                     decoding="async"
+                                                     @load="imgLoaded = true"
+                                                     class="w-full h-auto block transition-transform duration-700 group-hover:scale-105 lazy-img relative z-10"
+                                                     :class="imgLoaded ? 'loaded' : ''">
+                                            </picture>
+                                            @if($media->title)
+                                            <div class="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out pointer-events-none"
+                                                 style="background:linear-gradient(to top, rgba(8,14,14,0.92) 0%, transparent 100%); padding: 20px 16px 14px;">
+                                                <p class="text-white text-xs font-semibold uppercase tracking-widest">{{ $media->title }}</p>
+                                            </div>
+                                            @endif
+                                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-3 pointer-events-none z-20">
+                                                <div class="bg-brand-900/80 backdrop-blur-sm p-2.5 rounded-full">
+                                                    <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    @else
+                    <div class="grid {{ $gridColsClass }} items-start w-full mb-16 {{ $isFloorPlans ? 'pt-2' : 'pt-8' }}">
                     @php
                         $columns = [[], [], []];
-                        $index = 0;
-                        foreach($categoryMedia->sortBy('sort_order') as $media) {
-                            $columns[$index % 3][] = $media;
-                            $index++;
+                        if ($isFloorPlans && $currentSub !== 'site-plan') {
+                            $items = [];
+                            $threePlanItem = null;
+                            foreach($categoryMedia as $media) {
+                                $hWeight = 1.0;
+                                $filePath = public_path(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                if (file_exists($filePath)) {
+                                    $sz = @getimagesize($filePath);
+                                    if ($sz && $sz[0] > 0) {
+                                        $hWeight = $sz[1] / $sz[0];
+                                    }
+                                }
+                                $isMultiPlan = str_contains($media->title, 'Multi-Style') || str_contains($media->file_path, '3plan');
+                                if ($isMultiPlan) {
+                                    $threePlanItem = ['media' => $media, 'h' => $hWeight];
+                                } else {
+                                    $items[] = [
+                                        'media' => $media,
+                                        'h' => $hWeight,
+                                    ];
+                                }
+                            }
+
+                            $colHeights = [0.0, 0.0, 0.0];
+
+                            // Place 3-plan image at top center (Column 1, Index 0)
+                            // On the color tab it's rendered full-width above the grid instead
+                            if ($threePlanItem && $currentSub !== 'color') {
+                                $columns[1][] = $threePlanItem['media'];
+                                $colHeights[1] += $threePlanItem['h'];
+                            }
+
+                            // Sort remaining items descending by height for optimal bin-packing
+                            usort($items, fn($a, $b) => $b['h'] <=> $a['h']);
+
+                            foreach ($items as $it) {
+                                $minCol = 0;
+                                if ($colHeights[1] < $colHeights[$minCol]) $minCol = 1;
+                                if ($colHeights[2] < $colHeights[$minCol]) $minCol = 2;
+                                
+                                $columns[$minCol][] = $it['media'];
+                                $colHeights[$minCol] += $it['h'];
+                            }
+                        } else {
+                            $colHeights = ($isFloorPlans || $isPdf) ? [0.0, 0.0, 0.0] : [0.0, 0.12, 0.24];
+                            foreach($categoryMedia->sortBy('sort_order') as $media) {
+                                $hWeight = 1.0;
+                                $filePath = public_path(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
+                                if (file_exists($filePath)) {
+                                    $sz = @getimagesize($filePath);
+                                    if ($sz && $sz[0] > 0) {
+                                        $hWeight = $sz[1] / $sz[0];
+                                    }
+                                }
+                                $minCol = 0;
+                                if ($colHeights[1] < $colHeights[$minCol]) $minCol = 1;
+                                if ($colHeights[2] < $colHeights[$minCol]) $minCol = 2;
+
+                                $columns[$minCol][] = $media;
+                                $colHeights[$minCol] += $hWeight;
+                            }
                         }
                     @endphp
-                    
+
+                    {{-- Full-width 3-plan hero image — Color tab only --}}
+                    @if($isFloorPlans && $currentSub === 'color' && $threePlanItem)
+                        @php
+                            $tpm        = $threePlanItem['media'];
+                            $tpmUrl     = webp_asset(parse_url(Storage::url($tpm->file_path), PHP_URL_PATH));
+                            $tpmIndex   = $lightboxImagesCollect->values()->filter(fn($x) => $x['url'] === $tpmUrl)->keys()->first() ?? 0;
+                            $tpmOrigUrl = parse_url(Storage::url($tpm->file_path), PHP_URL_PATH);
+                            $tpmWebpUrl = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $tpmOrigUrl);
+                            $tpmHasWebp = file_exists(public_path($tpmWebpUrl));
+                        @endphp
+                        <div class="col-span-3 mb-2">
+                            <div class="relative group overflow-hidden border border-white/5 bg-black cursor-pointer mx-auto"
+                                 style="max-width:88%;"
+                                 @click="openLightbox({{ $tpmIndex }}, {{ json_encode($tpmUrl) }}, {{ json_encode($tpm->title ?? '') }})">
+                                <div class="overflow-hidden bg-brand-900/50 relative" x-data="{ imgLoaded: false }">
+                                    <div class="absolute inset-0 skeleton-shimmer z-0 min-h-[200px]" x-show="!imgLoaded"></div>
+                                    <picture>
+                                        @if($tpmHasWebp)
+                                        <source srcset="{{ $tpmWebpUrl }}" type="image/webp">
+                                        @endif
+                                        <img src="{{ $tpmOrigUrl }}"
+                                             alt="{{ $tpm->alt_text ?? $tpm->title ?? $service->title }}"
+                                             loading="lazy"
+                                             decoding="async"
+                                             @load="imgLoaded = true"
+                                             class="w-full h-auto block transition-transform duration-700 group-hover:scale-105 lazy-img relative z-10"
+                                             :class="imgLoaded ? 'loaded' : ''">
+                                    </picture>
+                                    @if($tpm->title)
+                                    <div class="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out pointer-events-none"
+                                         style="background:linear-gradient(to top,rgba(8,14,14,0.92) 0%,transparent 100%);padding:20px 16px 14px;">
+                                        <p class="text-white text-xs font-semibold uppercase tracking-widest">{{ $tpm->title }}</p>
+                                    </div>
+                                    @endif
+                                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-3 pointer-events-none z-20">
+                                        <div class="bg-brand-900/80 backdrop-blur-sm p-2.5 rounded-full">
+                                            <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     @foreach($columns as $colIndex => $columnMedia)
+
                         @php
                             $staggerClass = match($colIndex) {
-                                1 => $isPdf ? '' : 'md:mt-12',
-                                2 => $isPdf ? '' : 'lg:mt-24',
+                                1 => ($isPdf || $isFloorPlans) ? '' : 'md:mt-12',
+                                2 => ($isPdf || $isFloorPlans) ? '' : 'lg:mt-24',
                                 default => ''
                             };
-                            $spaceClass = ($is360 || $isPdf) ? 'space-y-6' : 'space-y-4';
+                            $spaceClass = ($is360 || $isPdf) ? 'space-y-6' : ($isFloorPlans ? 'space-y-3 md:space-y-4' : 'space-y-4');
                         @endphp
                         <div class="{{ $spaceClass }} w-full {{ $staggerClass }}">
                             @foreach($columnMedia as $media)
@@ -568,43 +763,43 @@
                                          $mediaUrl = webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
                                          $mediaIndex = $lightboxImagesCollect->values()->filter(fn($x) => $x['url'] === $mediaUrl)->keys()->first() ?? 0;
                                      @endphp
-                                     <div class="relative group overflow-hidden border border-white/5 bg-black {{ $isTallImage ? 'max-w-[60%] md:max-w-[50%] mx-auto' : 'w-full' }}" 
+                                     <div class="relative group overflow-hidden border border-white/5 bg-black cursor-pointer {{ ($isTallImage && !$isFloorPlans) ? 'max-w-[60%] md:max-w-[50%] mx-auto' : 'w-full' }}" 
                                           @if($media->file_type !== 'video') 
-                                             @click="lightboxOpen = true; lightboxIndex = {{ $mediaIndex }}; lightboxUrl = '{{ $mediaUrl }}'; lightboxTitle = '{{ $media->title }}'; initPannellum('{{ $mediaUrl }}')" 
+                                             @click="openLightbox({{ $mediaIndex }}, {{ json_encode($mediaUrl) }}, {{ json_encode($media->title ?? '') }})" 
                                           @endif>
-                                        @if($media->file_type === 'video')
-                                            @php
-                                                $isYoutube = false;
-                                                $youtubeId = '';
-                                                if (str_contains($media->file_path, 'youtube.com') || str_contains($media->file_path, 'youtu.be')) {
-                                                    $isYoutube = true;
-                                                    if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $media->file_path, $match)) {
-                                                        $youtubeId = $match[1];
-                                                    }
-                                                }
-                                            @endphp
-                                            @if($isYoutube)
-                                                <div class="relative w-full aspect-video overflow-hidden border border-white/5 bg-brand-900/50">
-                                                    <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=0&controls=1&rel=0" 
-                                                            class="absolute inset-0 w-full h-full" 
-                                                            frameborder="0" 
-                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                                            allowfullscreen>
-                                                    </iframe>
-                                                </div>
-                                            @else
-                                                <video src="{{ Storage::url($media->file_path) }}" controls class="w-full h-auto block border border-white/5"></video>
-                                            @endif
-                                        @else
-                                            <div class="cursor-pointer overflow-hidden bg-brand-900/50 relative"
-                                                 x-data="{ imgLoaded: false }">
-                                                <!-- Skeleton shimmer placeholder -->
-                                                <div class="absolute inset-0 skeleton-shimmer z-0 min-h-[200px]" x-show="!imgLoaded"></div>
-                                                @php
-                                                     $imgOrigUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
-                                                     $imgWebpUrl = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $imgOrigUrl);
-                                                     $imgWebpPath = public_path($imgWebpUrl);
-                                                     $hasWebp = file_exists($imgWebpPath);
+                                         @if($media->file_type === 'video')
+                                             @php
+                                                 $isYoutube = false;
+                                                 $youtubeId = '';
+                                                 if (str_contains($media->file_path, 'youtube.com') || str_contains($media->file_path, 'youtu.be')) {
+                                                     $isYoutube = true;
+                                                     if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|watch\?v=|v=)|youtu\.be/)([^"&?/ ]{11})%i', $media->file_path, $match)) {
+                                                         $youtubeId = $match[1];
+                                                     }
+                                                 }
+                                             @endphp
+                                             @if($isYoutube)
+                                                 <div class="relative w-full aspect-video overflow-hidden border border-white/5 bg-brand-900/50">
+                                                     <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=0&controls=1&rel=0" 
+                                                             class="absolute inset-0 w-full h-full" 
+                                                             frameborder="0" 
+                                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                                             allowfullscreen>
+                                                     </iframe>
+                                                 </div>
+                                             @else
+                                                 <video src="{{ Storage::url($media->file_path) }}" controls class="w-full h-auto block border border-white/5"></video>
+                                             @endif
+                                         @else
+                                             <div class="cursor-pointer overflow-hidden bg-brand-900/50 relative"
+                                                  x-data="{ imgLoaded: false }">
+                                                 <!-- Skeleton shimmer placeholder -->
+                                                 <div class="absolute inset-0 skeleton-shimmer z-0 min-h-[200px]" x-show="!imgLoaded"></div>
+                                                 @php
+                                                      $imgOrigUrl = parse_url(Storage::url($media->file_path), PHP_URL_PATH);
+                                                      $imgWebpUrl = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $imgOrigUrl);
+                                                      $imgWebpPath = public_path($imgWebpUrl);
+                                                      $hasWebp = file_exists($imgWebpPath);
                                                  @endphp
                                                  <picture>
                                                      @if($hasWebp)
@@ -615,79 +810,105 @@
                                                           loading="lazy"
                                                           decoding="async"
                                                           @load="imgLoaded = true"
-                                                          class="w-full h-auto block transition-transform duration-700 group-hover:scale-110 grayscale-[10%] group-hover:grayscale-0 lazy-img relative z-10"
+                                                          class="w-full h-auto block transition-transform duration-700 group-hover:scale-105 lazy-img relative z-10"
                                                           :class="imgLoaded ? 'loaded' : ''">
                                                  </picture>
-                                                <!-- Hover caption overlay -->
-                                                @if($media->title)
-                                                <div class="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out pointer-events-none"
-                                                     style="background:linear-gradient(to top, rgba(8,14,14,0.92) 0%, transparent 100%); padding: 20px 16px 14px;">
-                                                    <p class="text-white text-xs font-semibold uppercase tracking-widest">{{ $media->title }}</p>
-                                                </div>
-                                                @endif
-                                                <!-- Zoom icon -->
-                                                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-3 pointer-events-none z-20">
-                                                    <div class="bg-brand-900/80 backdrop-blur-sm p-2.5 rounded-full">
-                                                        <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
+                                                 <!-- Hover caption overlay -->
+                                                 @if($media->title)
+                                                 <div class="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out pointer-events-none"
+                                                      style="background:linear-gradient(to top, rgba(8,14,14,0.92) 0%, transparent 100%); padding: 20px 16px 14px;">
+                                                     <p class="text-white text-xs font-semibold uppercase tracking-widest">{{ $media->title }}</p>
+                                                 </div>
+                                                 @endif
+                                                 <!-- Zoom icon -->
+                                                 <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-3 pointer-events-none z-20">
+                                                     <div class="bg-brand-900/80 backdrop-blur-sm p-2.5 rounded-full">
+                                                         <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         @endif
+                                     </div>
                                 @endif
                             @endforeach
                         </div>
                     @endforeach
                     </div>
+                    @endif
                 </div>
             @endforeach
 
-            <!-- Lightbox Modal -->
+            <!-- Lightbox Modal (Full-Screen Image Display) -->
             <template x-teleport="body">
                 <div x-show="lightboxOpen" 
-                     class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-brand-950/98 p-4 md:p-8 backdrop-blur-md" 
+                     class="fixed inset-0 z-[999999] flex flex-col justify-between bg-black/95 p-3 sm:p-6 backdrop-blur-md" 
                      x-transition.opacity 
                      style="display: none;"
                      @keydown.escape.window="closeLightbox()"
                      @keydown.left.window="if(!is360) prevImage()"
                      @keydown.right.window="if(!is360) nextImage()">
                     
-                    <!-- Close Button -->
-                    <button @click="closeLightbox()" class="absolute top-4 right-4 md:top-8 md:right-8 text-white/70 hover:text-white transition-colors z-[110] bg-black/50 rounded-full p-3 border border-white/10 hover:bg-black/80 hover:scale-110 transform duration-300">
-                        <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
+                    <!-- Top Bar: Counter & Close Button -->
+                    <div class="w-full flex items-center justify-between z-[110] px-2 sm:px-4 flex-shrink-0">
+                        <div>
+                            <span class="text-xs sm:text-sm text-white/70 font-mono tracking-wider" x-text="(lightboxIndex + 1) + ' / ' + lightboxImages.length"></span>
+                        </div>
+
+                        <!-- Close Button -->
+                        <button type="button" 
+                                @click="closeLightbox()" 
+                                class="text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-2.5 sm:p-3 border border-white/20 hover:scale-105 transform duration-200 cursor-pointer" 
+                                title="Close (Esc)">
+                            <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
                     
                     <!-- 360 Viewer Container -->
                     <template x-if="is360">
-                        <div class="w-full h-full max-w-6xl max-h-[80vh] md:max-h-[85vh] rounded-md overflow-hidden border border-white/10 shadow-2xl relative z-[105] bg-brand-950" @click.away="closeLightbox()">
-                            <div id="panorama-viewer" class="w-full h-full"></div>
+                        <div class="w-full h-full max-w-7xl max-h-[85vh] mx-auto rounded-2xl overflow-hidden border border-white/10 shadow-2xl relative z-[105] bg-brand-950 flex flex-col my-auto" @click.away="closeLightbox()">
+                            <div id="panorama-viewer" class="w-full h-full min-h-[450px]"></div>
                         </div>
                     </template>
                     
-                    <!-- Standard Image Container with Nav Buttons -->
+                    <!-- Standard Image Container: Fills Whole Screen -->
                     <template x-if="!is360">
-                        <div class="relative max-w-full max-h-[85vh] flex items-center justify-center z-[105]" 
-                             @click.away="closeLightbox()"
+                        <div class="relative w-full h-full flex-1 flex items-center justify-center z-[105] overflow-hidden my-auto select-none"
                              @touchstart="touchStartX = $event.touches[0].clientX"
-                             @touchend="touchEndX = $event.changedTouches[0].clientX; if (touchStartX - touchEndX > 40) nextImage(); if (touchEndX - touchStartX > 40) prevImage();"
-                             style="touch-action: pan-y;">
+                             @touchend="touchEndX = $event.changedTouches[0].clientX; if (touchStartX - touchEndX > 40) nextImage(); if (touchEndX - touchStartX > 40) prevImage();">
+                            
                             <!-- Left Arrow -->
-                            <button type="button" x-show="lightboxImages.length > 1" @click.stop="prevImage()" class="absolute left-4 md:-left-20 text-white/70 hover:text-white transition-all bg-black/50 hover:bg-black/80 rounded-full p-3 border border-white/10 hover:scale-110 transform z-[115] cursor-pointer">
-                                <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                            <button type="button" 
+                                    x-show="lightboxImages.length > 1" 
+                                    @click.stop="prevImage()" 
+                                    class="absolute left-2 sm:left-6 text-white/80 hover:text-white transition-all bg-black/60 hover:bg-black/90 rounded-full p-3 sm:p-4 border border-white/20 hover:scale-110 transform z-[115] cursor-pointer" 
+                                    title="Previous (Left Arrow)">
+                                <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
                             </button>
                             
-                            <img :src="lightboxUrl" :alt="lightboxTitle || 'Space IQ Portfolio Project'" class="max-w-full max-h-[80vh] rounded-sm shadow-2xl object-contain">
+                            <!-- Full-Screen Image Viewport -->
+                            <div class="w-full h-full flex items-center justify-center p-1 sm:p-4">
+                                <img :src="lightboxUrl" 
+                                     :alt="lightboxTitle || 'Space IQ Portfolio Project'" 
+                                     class="w-auto h-auto max-w-[96vw] max-h-[86vh] object-contain rounded-lg shadow-2xl select-none mx-auto block"
+                                     style="image-rendering: -webkit-optimize-contrast; image-rendering: high-quality;">
+                            </div>
                             
                             <!-- Right Arrow -->
-                            <button type="button" x-show="lightboxImages.length > 1" @click.stop="nextImage()" class="absolute right-4 md:-right-20 text-white/70 hover:text-white transition-all bg-black/50 hover:bg-black/80 rounded-full p-3 border border-white/10 hover:scale-110 transform z-[115] cursor-pointer">
-                                <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                            <button type="button" 
+                                    x-show="lightboxImages.length > 1" 
+                                    @click.stop="nextImage()" 
+                                    class="absolute right-2 sm:right-6 text-white/80 hover:text-white transition-all bg-black/60 hover:bg-black/90 rounded-full p-3 sm:p-4 border border-white/20 hover:scale-110 transform z-[115] cursor-pointer" 
+                                    title="Next (Right Arrow)">
+                                <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                             </button>
                         </div>
                     </template>
 
-                    <!-- Title Caption -->
-                    <div class="mt-4 text-center z-[110]" x-show="lightboxTitle">
-                        <h3 class="text-white text-xs font-semibold tracking-widest uppercase bg-brand-900/60 border border-white/5 px-4 py-2 rounded shadow-sm inline-block" x-text="lightboxTitle"></h3>
+                    <!-- Bottom Bar: Title Caption -->
+                    <div class="w-full text-center z-[110] flex-shrink-0 pt-1">
+                        <h3 class="text-white text-xs sm:text-sm md:text-base font-display font-medium tracking-wide bg-black/80 backdrop-blur-md border border-white/20 px-6 py-2 rounded-full shadow-2xl inline-block" 
+                            x-show="lightboxTitle" 
+                            x-text="lightboxTitle"></h3>
                     </div>
                 </div>
             </template>
@@ -834,16 +1055,25 @@
 </div>
 
 <!-- Service Page Bottom CTA -->
-<section class="py-20 relative overflow-hidden" style="background: linear-gradient(135deg, #080e0e 0%, #0c1818 50%, #080e0e 100%);">
-    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 30% 50%, #1A9E96 0%, transparent 50%);"></div>
-    <div class="container mx-auto px-6 text-center relative z-10">
-        <p class="text-xs uppercase tracking-widest text-accent-400 font-bold mb-4">Ready to get started?</p>
-        <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Love what you see?<br><span class="text-gradient">Let's work together.</span></h2>
-        <p class="text-gray-400 font-light mb-10 max-w-xl mx-auto">Share your project details and our team will get back to you within 24 hours.</p>
-        <a href="{{ route('contact') }}" class="inline-flex items-center gap-3 px-10 py-4 bg-accent-500 hover:bg-accent-400 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 shadow-xl hover:-translate-y-1">
-            Start Your Project
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </a>
+<section class="py-20 relative overflow-hidden bg-slate-50/80">
+    <div class="container mx-auto px-6 max-w-4xl text-center relative z-10">
+        <div class="p-10 sm:p-14 rounded-3xl bg-gradient-to-br from-white via-slate-50 to-teal-50/40 border border-slate-200/90 shadow-xl relative overflow-hidden">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200/70 text-teal-800 text-xs font-semibold uppercase tracking-wider mb-4">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                <span>Ready to get started?</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-display font-light text-slate-900 mb-4">
+                Love what you see? <br>
+                <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-700 via-teal-800 to-slate-900">Let's work together.</span>
+            </h2>
+            <p class="text-slate-600 font-normal mb-8 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+                Share your project drawings or 3D models and our architectural rendering team will prepare a custom proposal within 24 hours.
+            </p>
+            <a href="{{ route('contact') }}" class="inline-flex items-center gap-3 px-9 py-4 bg-teal-700 hover:bg-teal-800 text-white font-semibold uppercase tracking-widest text-xs rounded-full transition-all duration-300 shadow-lg shadow-teal-700/20 hover:scale-105">
+                <span>Start Your Project</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
     </div>
 </section>
 

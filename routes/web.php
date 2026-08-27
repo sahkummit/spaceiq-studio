@@ -14,7 +14,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/services/{slug}/{subcategory?}', function ($slug, $subcategory = null) {
-    $service = \App\Models\Service::where('slug', $slug)->where('is_active', true)->firstOrFail();
+    $service = \App\Models\Service::with(['media' => function($q) {
+        $q->orderBy('sort_order');
+    }])->where('slug', $slug)->where('is_active', true)->firstOrFail();
     return view('service', compact('service', 'subcategory'));
 })->name('service.show');
 
