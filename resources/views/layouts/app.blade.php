@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Space IQ')</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <meta name="description" content="@yield('meta_description', \App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'Hyper-realistic 4K renders that captivate clients.')">
+    <meta name="description" content="@yield('meta_description', rescue(fn() => \App\Models\Setting::where('key', 'seo_description')->value('value'), 'Hyper-realistic 4K architectural renders and 3D visualization.', false))">
     <meta name="keywords" content="architectural rendering, 3D visualization, exterior render, interior render, floor plans, 360 views, walkthrough animation, CGI, architectural visualization studio">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ request()->url() }}">
@@ -835,7 +834,8 @@
     </main>
 
     @php
-        $settings = \App\Models\Setting::pluck('value', 'key');
+        $settings = rescue(fn() => \App\Models\Setting::pluck('value', 'key'), collect([]), false);
+        $footerServices = rescue(fn() => \App\Models\Service::where('is_active', true)->orderBy('sort_order')->get(), collect([]), false);
     @endphp
 
     <!-- Footer -->
@@ -856,7 +856,7 @@
                         </div>
                     </a>
                     <p class="text-slate-600 text-sm leading-relaxed mb-6 font-normal max-w-sm">
-                        {{ \App\Models\Setting::where('key', 'seo_description')->value('value') ?? 'High-Fidelity Renders. Professional Delivery. Zero Compromise.' }}
+                        {{ $settings['seo_description'] ?? 'High-Fidelity Renders. Professional Delivery. Zero Compromise.' }}
                     </p>
                 </div>
                 
@@ -864,7 +864,7 @@
                 <div class="col-span-1 md:col-span-3">
                     <h3 class="font-bold uppercase tracking-widest text-xs mb-4 text-teal-800">Services</h3>
                     <ul class="space-y-2.5">
-                        @foreach(\App\Models\Service::where('is_active', true)->orderBy('sort_order')->get() as $service)
+                        @foreach($footerServices as $service)
                         <li>
                             <a href="{{ route('service.show', $service->slug) }}" class="inline-block text-slate-600 hover:text-teal-800 text-sm transition-all duration-200 font-medium hover:translate-x-1 transform">
                                 {{ $service->title }}
@@ -1245,34 +1245,6 @@
             
             window.addEventListener('load', initTilt);
             setInterval(initTilt, 2500);
-        })();
-
-        // ── Ultra-Smooth Momentum Scrolling Engine (Lenis) ──
-        (function() {
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/lenis@1.1.18/dist/lenis.min.js';
-            script.onload = function() {
-                const lenis = new Lenis({
-                    duration: 1.15,
-                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                    orientation: 'vertical',
-                    gestureOrientation: 'vertical',
-                    smoothWheel: true,
-                    wheelMultiplier: 0.95,
-                    touchMultiplier: 1.2,
-                    infinite: false,
-                });
-
-                function raf(time) {
-                    lenis.raf(time);
-                    requestAnimationFrame(raf);
-                }
-                requestAnimationFrame(raf);
-                window.lenis = lenis;
-            };
-            document.head.appendChild(script);
         })();
     </script>
     @stack('scripts')
