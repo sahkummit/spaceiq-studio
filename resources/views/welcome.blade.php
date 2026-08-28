@@ -200,8 +200,8 @@
 <section class="relative w-full overflow-hidden bg-brand-950 flex flex-col justify-between md:block md:h-[100svh] md:min-h-[600px]">
     <!-- Background Video Wrapper -->
     <div class="relative w-full aspect-[16/9] min-w-full md:aspect-auto md:absolute md:inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
-        <!-- Direct YouTube Autoplay Video with zero side gaps -->
-        <iframe class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90 select-none scale-[1.08] md:scale-[1.35] md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[100vw] md:h-[56.25vw] md:min-h-[100vh] md:min-w-[177.77vh]"
+        <!-- Direct YouTube Autoplay Video with all YouTube UI cropped out -->
+        <iframe class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] min-w-full min-h-full object-cover pointer-events-none opacity-90 select-none scale-[1.05] md:scale-[1.35] md:w-[100vw] md:h-[56.25vw] md:min-h-[100vh] md:min-w-[177.77vh]"
                 src="https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&showinfo=0&rel=0&modestbranding=1&start=26&iv_load_policy=3&disablekb=1&fs=0"
                 frameborder="0"
                 allow="autoplay; encrypted-media; fullscreen"
