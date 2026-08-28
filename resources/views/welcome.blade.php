@@ -196,12 +196,12 @@
 @open-lightbox-modal.window="openLightbox($event.detail.items || $event.detail.images, $event.detail.index)"
 @open-lightbox.window="openLightbox($event.detail.items || $event.detail.images, $event.detail.index)">
 
-<!-- Hero Section — actual landscape ratio on mobile, full screen video on desktop -->
-<section class="relative overflow-hidden bg-brand-950 flex flex-col justify-between md:block md:h-[100svh] md:min-h-[600px]">
+<!-- Hero Section — actual landscape ratio filling full screen width on mobile, full screen video on desktop -->
+<section class="relative w-full overflow-hidden bg-brand-950 flex flex-col justify-between md:block md:h-[100svh] md:min-h-[600px]">
     <!-- Background Video Wrapper -->
-    <div class="relative w-full aspect-[16/9] pt-14 sm:pt-16 md:pt-0 md:aspect-auto md:absolute md:inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
-        <!-- Direct YouTube Autoplay Video -->
-        <iframe class="w-full h-full aspect-[16/9] pointer-events-none opacity-90 select-none md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[100vw] md:h-[56.25vw] md:min-h-[100vh] md:min-w-[177.77vh] md:scale-[1.35]"
+    <div class="relative w-full aspect-[16/9] min-w-full md:aspect-auto md:absolute md:inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
+        <!-- Direct YouTube Autoplay Video with zero side gaps -->
+        <iframe class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90 select-none scale-[1.08] md:scale-[1.35] md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[100vw] md:h-[56.25vw] md:min-h-[100vh] md:min-w-[177.77vh]"
                 src="https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&showinfo=0&rel=0&modestbranding=1&start=26&iv_load_policy=3&disablekb=1&fs=0"
                 frameborder="0"
                 allow="autoplay; encrypted-media; fullscreen"
