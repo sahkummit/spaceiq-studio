@@ -196,12 +196,12 @@
 @open-lightbox-modal.window="openLightbox($event.detail.items || $event.detail.images, $event.detail.index)"
 @open-lightbox.window="openLightbox($event.detail.items || $event.detail.images, $event.detail.index)">
 
-<!-- Hero Section — full screen video, no text overlay except stats bar -->
-<section class="relative overflow-hidden bg-brand-950" style="height: 100svh; min-height: 600px;">
+<!-- Hero Section — actual landscape ratio on mobile, full screen video on desktop -->
+<section class="relative overflow-hidden bg-brand-950 flex flex-col justify-between md:block md:h-[100svh] md:min-h-[600px]">
     <!-- Background Video Wrapper -->
-    <div class="absolute inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
+    <div class="relative w-full aspect-[16/9] pt-14 sm:pt-16 md:pt-0 md:aspect-auto md:absolute md:inset-0 z-0 bg-brand-950 overflow-hidden" id="hero-video-container">
         <!-- Direct YouTube Autoplay Video -->
-        <iframe class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] pointer-events-none opacity-85 select-none scale-[1.35]"
+        <iframe class="w-full h-full aspect-[16/9] pointer-events-none opacity-90 select-none md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[100vw] md:h-[56.25vw] md:min-h-[100vh] md:min-w-[177.77vh] md:scale-[1.35]"
                 src="https://www.youtube.com/embed/aTCQdR368LA?autoplay=1&mute=1&controls=0&loop=1&playlist=aTCQdR368LA&playsinline=1&showinfo=0&rel=0&modestbranding=1&start=26&iv_load_policy=3&disablekb=1&fs=0"
                 frameborder="0"
                 allow="autoplay; encrypted-media; fullscreen"
@@ -210,8 +210,8 @@
         <div class="absolute inset-0 bg-transparent z-10 pointer-events-auto"></div>
     </div>
 
-    <!-- Stats Banner — Completely transparent, floating directly over video -->
-    <div class="absolute bottom-0 left-0 w-full z-20 py-6 sm:py-8 bg-transparent">
+    <!-- Stats Banner — Cleanly under video on mobile, floating directly over video on desktop -->
+    <div class="relative w-full py-6 sm:py-7 md:py-8 bg-brand-950 md:bg-transparent md:absolute md:bottom-0 md:left-0 z-20">
         <div class="container mx-auto px-4 sm:px-6 max-w-5xl">
             <div class="grid grid-cols-2 md:flex md:items-center md:justify-center gap-5 sm:gap-8 md:gap-16 text-center" id="stats-section">
                 <div>
@@ -238,14 +238,16 @@
     </div>
 </section>
 
-<!-- Value Proposition Section — Clean Architectural Narrative -->
+<!-- Value Proposition Section — Clean Architectural Narrative (Slider on mobile, 3-col Grid on Desktop) -->
 <section class="py-16 sm:py-20 border-y border-slate-200/80 bg-slate-50/80 relative overflow-hidden">
     <!-- Slow Atmospheric Ambient Drift -->
     <div class="ambient-drift-1 absolute -top-24 -left-24 w-80 h-80 bg-accent-500/5 rounded-full blur-[100px] pointer-events-none"></div>
     <div class="ambient-drift-2 absolute -bottom-24 -right-24 w-80 h-80 bg-[#1A9E96]/5 rounded-full blur-[100px] pointer-events-none"></div>
 
     <div class="container mx-auto px-6 xl:px-12 relative z-10" style="max-width:1536px">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10 md:gap-12 text-center">
+        
+        <!-- Desktop Grid View (Visible only on md and up) -->
+        <div class="hidden md:grid md:grid-cols-3 gap-6 sm:gap-10 md:gap-12 text-center">
             <div class="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300">
                 <div class="w-12 h-12 rounded-xl bg-accent-500/15 border border-accent-400/25 flex items-center justify-center mb-5 mx-auto">
                     <svg class="w-6 h-6 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -270,6 +272,101 @@
                 <p class="text-slate-600 text-sm leading-relaxed font-light">Master high-resolution imagery and cinematics engineered to plug directly into your marketing decks, campaigns, and investor pitches.</p>
             </div>
         </div>
+
+        <!-- Mobile One-Line Slider View (Visible only on mobile) -->
+        <div class="md:hidden" 
+             x-data="{ 
+                 activeSlide: 0, 
+                 totalSlides: 3,
+                 touchStartX: 0,
+                 touchEndX: 0,
+                 handleTouchStart(e) { this.touchStartX = e.touches[0].clientX; },
+                 handleTouchEnd(e) { 
+                     this.touchEndX = e.changedTouches[0].clientX; 
+                     const diff = this.touchStartX - this.touchEndX;
+                     if (Math.abs(diff) > 40) {
+                         if (diff > 0) { this.activeSlide = (this.activeSlide + 1) % this.totalSlides; }
+                         else { this.activeSlide = (this.activeSlide - 1 + this.totalSlides) % this.totalSlides; }
+                     }
+                 }
+             }">
+             
+            <div class="relative min-h-[260px] overflow-hidden" 
+                 @touchstart="handleTouchStart($event)" 
+                 @touchend="handleTouchEnd($event)"
+                 style="touch-action: pan-y;">
+                
+                <!-- Slide 1: Hyper-Realistic Precision -->
+                <div x-show="activeSlide === 0" 
+                     x-transition:enter="transition ease-out duration-300 transform"
+                     x-transition:enter-start="opacity-0 translate-x-8"
+                     x-transition:enter-end="opacity-100 translate-x-0"
+                     x-transition:leave="transition ease-in duration-200 absolute inset-0 transform"
+                     x-transition:leave-start="opacity-100 translate-x-0"
+                     x-transition:leave-end="opacity-0 -translate-x-8"
+                     class="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-md text-center flex flex-col justify-center h-full">
+                    <div class="w-12 h-12 rounded-xl bg-accent-500/15 border border-accent-400/25 flex items-center justify-center mb-4 mx-auto">
+                        <svg class="w-6 h-6 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                    <h3 class="text-base font-display font-bold text-accent-600 mb-2 uppercase tracking-wider">Hyper-Realistic Precision</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">We don't just create images; we simulate reality. From light reflections to tactile brick textures, every detail is engineered for authenticity.</p>
+                </div>
+
+                <!-- Slide 2: Client-Centric Narrative -->
+                <div x-show="activeSlide === 1" 
+                     x-transition:enter="transition ease-out duration-300 transform"
+                     x-transition:enter-start="opacity-0 translate-x-8"
+                     x-transition:enter-end="opacity-100 translate-x-0"
+                     x-transition:leave="transition ease-in duration-200 absolute inset-0 transform"
+                     x-transition:leave-start="opacity-100 translate-x-0"
+                     x-transition:leave-end="opacity-0 -translate-x-8"
+                     class="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-md text-center flex flex-col justify-center h-full"
+                     style="display: none;">
+                    <div class="w-12 h-12 rounded-xl bg-accent-500/15 border border-accent-400/25 flex items-center justify-center mb-4 mx-auto">
+                        <svg class="w-6 h-6 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <h3 class="text-base font-display font-bold text-accent-600 mb-2 uppercase tracking-wider">Client-Centric Narrative</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">We populate your designs with life—modern landscaping, realistic lighting, and curated environments that help buyers envision themselves in the space.</p>
+                </div>
+
+                <!-- Slide 3: High Quality Delivery -->
+                <div x-show="activeSlide === 2" 
+                     x-transition:enter="transition ease-out duration-300 transform"
+                     x-transition:enter-start="opacity-0 translate-x-8"
+                     x-transition:enter-end="opacity-100 translate-x-0"
+                     x-transition:leave="transition ease-in duration-200 absolute inset-0 transform"
+                     x-transition:leave-start="opacity-100 translate-x-0"
+                     x-transition:leave-end="opacity-0 -translate-x-8"
+                     class="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-md text-center flex flex-col justify-center h-full"
+                     style="display: none;">
+                    <div class="w-12 h-12 rounded-xl bg-accent-500/15 border border-accent-400/25 flex items-center justify-center mb-4 mx-auto">
+                        <svg class="w-6 h-6 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg>
+                    </div>
+                    <h3 class="text-base font-display font-bold text-accent-600 mb-2 uppercase tracking-wider">High Quality Delivery</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">Master high-resolution 4K imagery and cinematics engineered to plug directly into your marketing decks, campaigns, and investor pitches.</p>
+                </div>
+            </div>
+
+            <!-- Mobile Pagination Dots & Controls -->
+            <div class="flex items-center justify-center gap-3 mt-6">
+                <button type="button" @click="activeSlide = (activeSlide - 1 + totalSlides) % totalSlides" class="p-2 text-slate-400 hover:text-slate-700 transition-colors" aria-label="Previous slide">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="flex items-center gap-2">
+                    <template x-for="i in totalSlides" :key="i">
+                        <button type="button" 
+                                @click="activeSlide = i - 1" 
+                                class="h-2 rounded-full transition-all duration-300"
+                                :class="activeSlide === (i - 1) ? 'w-6 bg-accent-500' : 'w-2 bg-slate-300'"
+                                :aria-label="'Go to slide ' + i"></button>
+                    </template>
+                </div>
+                <button type="button" @click="activeSlide = (activeSlide + 1) % totalSlides" class="p-2 text-slate-400 hover:text-slate-700 transition-colors" aria-label="Next slide">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
+
     </div>
 </section>
 

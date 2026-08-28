@@ -279,8 +279,11 @@
             border-radius: 1px;
         }
  
-        /* ── Architectural Custom Magnetic Cursor Pill ── */
-        @media (pointer: fine) {
+        /* ── Architectural Custom Magnetic Cursor Pill (Desktop Only) ── */
+        #cursor-ring, #cursor-dot {
+            display: none !important;
+        }
+        @media (min-width: 1025px) and (pointer: fine) {
             #cursor-ring {
                 position: fixed;
                 top: 0;
@@ -293,7 +296,7 @@
                 z-index: 999990;
                 transform: translate(-50%, -50%);
                 transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), height 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease, padding 0.3s ease;
-                display: flex;
+                display: flex !important;
                 align-items: center;
                 justify-content: center;
                 backdrop-filter: blur(8px);
@@ -345,6 +348,7 @@
                 transform: translate(-50%, -50%);
                 transition: opacity 0.2s ease, transform 0.2s ease;
                 opacity: 0;
+                display: block !important;
             }
             #cursor-ring.active-hover ~ #cursor-dot {
                 opacity: 0;
@@ -769,8 +773,8 @@
              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
              x-transition:leave-end="opacity-0 -translate-y-4 scale-[0.98]"
              @click.outside="mobileMenuOpen = false"
-             class="lg:hidden absolute top-full left-0 right-0 mx-3 sm:mx-4 mt-2 bg-white/98 backdrop-blur-xl border border-slate-200/90 rounded-3xl p-5 sm:p-6 flex flex-col gap-3.5 shadow-2xl text-left overflow-y-auto max-h-[82vh] pointer-events-auto z-50"
-             style="display: none;"
+             class="lg:hidden absolute top-full left-0 right-0 mx-3 sm:mx-4 mt-2 bg-white border border-slate-200 shadow-2xl rounded-3xl p-5 sm:p-6 flex flex-col gap-3.5 text-left overflow-y-auto max-h-[82vh] pointer-events-auto z-50"
+             style="display: none; background-color: #ffffff !important;"
              x-data="{ activeMobileSub: null }">
             
             <!-- Exterior Rendering Accordion -->

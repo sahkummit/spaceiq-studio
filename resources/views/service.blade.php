@@ -397,7 +397,7 @@
                         $is360 = $service->slug === '360-views';
                         $isFloorPlans = $service->slug === 'floor-plans';
                         $isPdf = $service->media->where('file_type', 'pdf')->count() > 0;
-                        $gridColsClass = $isFloorPlans ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+                        $gridColsClass = $isFloorPlans ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-6';
                     @endphp
 
                     @if($isFloorPlans && $currentSub === 'site-plan')
@@ -421,8 +421,8 @@
                             }
                         @endphp
 
-                        {{-- Tier 1: Master Landscape Plans (Bigger & Expansive in 2-Column Grid) --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-7xl mx-auto mb-12">
+                        {{-- Tier 1: Master Landscape Plans (Bigger & Expansive in 2-Column Grid on Desktop, Single Column on Mobile) --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-8 w-full max-w-7xl mx-auto mb-8 md:mb-12">
                             @foreach($landscapePlans as $media)
                                 @php
                                     $mediaUrl = webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
@@ -464,9 +464,9 @@
                             @endforeach
                         </div>
 
-                        {{-- Tier 2: Vertical Lot & Detailed Strip Plans (3-Column Grid, Scaled Down & Elegant) --}}
+                        {{-- Tier 2: Vertical Lot & Detailed Strip Plans (3-Column Grid on Desktop, Big 1-by-1 on Mobile) --}}
                         @if(count($verticalPlans) > 0)
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full max-w-7xl mx-auto items-start mb-16">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-8 w-full max-w-7xl mx-auto items-start mb-16">
                             @foreach($verticalPlans as $vIndex => $media)
                                 @php
                                     $mediaUrl = webp_asset(parse_url(Storage::url($media->file_path), PHP_URL_PATH));
@@ -476,10 +476,10 @@
                                     $imgWebpPath = public_path($imgWebpUrl);
                                     $hasWebp = file_exists($imgWebpPath);
 
-                                    // Right card is wider (w-full) while narrow vertical strips are scaled proportionally
+                                    // Full width on mobile, proportionally scaled on desktop
                                     $cardWidthClass = match($vIndex) {
-                                        0 => 'max-w-[60%] md:max-w-[55%]',
-                                        1 => 'max-w-[65%] md:max-w-[60%]',
+                                        0 => 'w-full md:max-w-[55%]',
+                                        1 => 'w-full md:max-w-[60%]',
                                         default => 'w-full'
                                     };
                                 @endphp
@@ -595,9 +595,8 @@
                             $tpmWebpUrl = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $tpmOrigUrl);
                             $tpmHasWebp = file_exists(public_path($tpmWebpUrl));
                         @endphp
-                        <div class="col-span-3 mb-2">
-                            <div class="relative group overflow-hidden border border-white/5 bg-black cursor-pointer mx-auto"
-                                 style="max-width:88%;"
+                        <div class="col-span-1 md:col-span-3 mb-8 md:mb-2">
+                            <div class="relative group overflow-hidden border border-white/5 bg-black cursor-pointer mx-auto w-full md:max-w-[88%]"
                                  @click="openLightbox({{ $tpmIndex }}, {{ json_encode($tpmUrl) }}, {{ json_encode($tpm->title ?? '') }})">
                                 <div class="overflow-hidden bg-brand-900/50 relative" x-data="{ imgLoaded: false }">
                                     <div class="absolute inset-0 skeleton-shimmer z-0 min-h-[200px]" x-show="!imgLoaded"></div>
@@ -637,7 +636,7 @@
                                 2 => ($isPdf || $isFloorPlans) ? '' : 'lg:mt-24',
                                 default => ''
                             };
-                            $spaceClass = ($is360 || $isPdf) ? 'space-y-6' : ($isFloorPlans ? 'space-y-3 md:space-y-4' : 'space-y-4');
+                            $spaceClass = ($is360 || $isPdf) ? 'space-y-8 md:space-y-6' : ($isFloorPlans ? 'space-y-8 md:space-y-4' : 'space-y-8 md:space-y-4');
                         @endphp
                         <div class="{{ $spaceClass }} w-full {{ $staggerClass }}">
                             @foreach($columnMedia as $media)
